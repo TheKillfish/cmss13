@@ -406,6 +406,9 @@
 #define PRAETORIAN_WARDEN "Warden"
 #define PRAETORIAN_OPPRESSOR "Oppressor"
 
+// Warrior strain flags
+#define WARRIOR_MERCENARY "Mercenary"
+
 /////////////////////////////////////////////////////////////////////////////////////
 //
 // Modifiers
