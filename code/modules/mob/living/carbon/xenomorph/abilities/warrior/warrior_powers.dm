@@ -171,3 +171,167 @@
 	xeno.flick_attack_overlay(carbon, "punch")
 	shake_camera(carbon, 2, 1)
 	step_away(carbon, xeno, 2)
+
+// Mercenary Abilities
+/datum/action/xeno_action/onclick/sharpen/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/xeno = owner
+
+	if(!istype(xeno))
+		return
+
+	if(!action_cooldown_check())
+		return
+
+	if(!xeno.check_state())
+		return
+
+	var/datum/behavior_delegate/warrior_mercenary/behavior_del = xeno.behavior_delegate
+	if(!istype(behavior_del))
+		return
+
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] swings it's tail and bites it!"), SPAN_XENONOTICE("We grab our tail in preparation to sharpen it's edge."))
+	if(!do_after(xeno, 2 SECONDS, INTERRUPT_ALL | BEHAVIOR_IMMOBILE, BUSY_ICON_HOSTILE))
+		return
+
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] pulls it's tail through it's clenched jaws, sharpening it!"), SPAN_XENOHIGHDANGER("We pull our tail through our mouth and grind resin off the edge of our tail, sharpening it!"))
+	behavior_del.sharp_hits += 3
+	apply_cooldown()
+	return ..()
+
+/datum/action/xeno_action/activable/quickslash/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/xeno = owner
+	var/damage = (xeno.melee_damage_lower)
+
+	if(!action_cooldown_check())
+		return
+
+	if(!isxeno_human(target) || xeno.can_not_harm(target))
+		return
+
+	var/distance = get_dist(xeno, target)
+	if(distance > 2)
+		return
+
+	var/mob/living/carbon/carbon = target
+	if(!xeno.Adjacent(carbon))
+		return
+
+	if(carbon.stat == DEAD)
+		return
+	if(HAS_TRAIT(carbon, TRAIT_NESTED))
+		return
+
+	var/datum/behavior_delegate/warrior_mercenary/behavior_del = xeno.behavior_delegate
+	if(!istype(behavior_del))
+		return
+
+	var/obj/limb/target_limb = carbon.get_limb(check_zone(xeno.zone_selected))
+	if(ishuman(carbon) && (!target_limb || (target_limb.status & LIMB_DESTROYED)))
+		target_limb = carbon.get_limb("chest")
+
+	if(behavior_del.sharp_hits == 0)
+		xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail infront of it, bashing [carbon] in the [target_limb ? target_limb.display_name : "chest"]!"), \
+		SPAN_XENOWARNING("We quickly swipe [carbon] in the [target_limb ? target_limb.display_name : "chest"] with our tail, bashing them!"))
+		playsound(carbon, 'sound/weapons/baton.ogg', 50, 1)
+		carbon.apply_effect(3, DAZE)
+		carbon.KnockDown(1)
+		carbon.apply_armoured_damage(get_xeno_damage_slash(carbon, damage), ARMOR_MELEE, BRUTE, target_limb ? target_limb.name : "chest")
+		shake_camera(carbon, 2, 1)
+		apply_cooldown(2)
+		return..()
+	else
+		xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail infront of it, slashing [carbon] in the [target_limb ? target_limb.display_name : "chest"]!"), \
+		SPAN_XENOWARNING("We quickly swipe [carbon] in the [target_limb ? target_limb.display_name : "chest"] with our tail, cutting them!"))
+		playsound(carbon, 'sound/weapons/slice.ogg', 50, 1)
+		carbon.apply_armoured_damage(get_xeno_damage_slash(carbon, damage), ARMOR_MELEE, BRUTE, target_limb ? target_limb.name : "chest", 10)
+		apply_cooldown()
+		behavior_del.modify_sharpness(-1)
+		return..()
+
+/datum/action/xeno_action/activable/forwardslash/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/xeno = owner
+	var/damage = (xeno.melee_damage_lower)
+
+	if(!action_cooldown_check())
+		return
+
+	var/datum/behavior_delegate/warrior_mercenary/behavior_del = xeno.behavior_delegate
+	if(!istype(behavior_del))
+		return
+
+	var/list/turf/target_turfs = list()
+	var/facing = Get_Compass_Dir(xeno, target)
+	var/turf/turf = xeno.loc
+	var/turf/temp = xeno.loc
+	var/list/telegraph_atom_list = list()
+
+	if(!do_after(xeno, 0.5, INTERRUPT_ALL | BEHAVIOR_IMMOBILE, BUSY_ICON_HOSTILE))
+		return
+
+	for (var/step in 0 to 1)
+		temp = get_step(turf, facing)
+		if(facing in GLOB.diagonals)
+			var/reverse_face = GLOB.reverse_dir[facing]
+
+			var/turf/back_left = get_step(temp, turn(reverse_face, 45))
+			var/turf/back_right = get_step(temp, turn(reverse_face, -45))
+			if((!back_left || back_left.density) && (!back_right || back_right.density))
+				break
+		if(!temp || temp.density || temp.opacity)
+			break
+
+		var/blocked = FALSE
+		for(var/obj/structure/structure_blocker in temp)
+			if(istype(structure_blocker, /obj/structure/window/framed))
+				var/obj/structure/window/framed/framed_window = structure_blocker
+				if(!framed_window.unslashable)
+					framed_window.deconstruct(disassembled = FALSE)
+
+			if(structure_blocker.opacity)
+				blocked = TRUE
+				break
+		if(blocked)
+			break
+
+		turf = temp
+		target_turfs += turf
+		telegraph_atom_list += new /obj/effect/xenomorph/xeno_telegraph/red(turf, 0.25 SECONDS)
+
+	for (var/turf/target_turf in target_turfs)
+		for (var/mob/living/carbon/c_target in target_turf)
+			if(!isxeno_human(c_target) || xeno.can_not_harm(c_target))
+				continue
+			if(c_target.stat == DEAD)
+				continue
+			if(HAS_TRAIT(c_target, TRAIT_NESTED))
+				continue
+
+
+
+			if(behavior_del.sharp_hits == 0)
+				xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail in a wide arc, slamming it into the ground infront of it!"), \
+				SPAN_XENOWARNING("We quickly swing our tail and slam the ground infront of us!"))
+				playsound(c_target, 'sound/weapons/baton.ogg', 50, 1)
+				c_target.apply_effect(3, DAZE)
+				c_target.KnockDown(0.5)
+				step_away(c_target, xeno)
+				c_target.apply_armoured_damage(get_xeno_damage_slash(c_target, damage), ARMOR_MELEE, BRUTE)
+				shake_camera(c_target, 2, 1)
+				apply_cooldown(2)
+				return..()
+			else
+				xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail in a wide arc, slashing the ground infront of it!"), \
+				SPAN_XENOWARNING("We quickly swing our tail and slash the ground infront of us!"))
+				playsound(c_target, 'sound/weapons/slice.ogg', 50, 1)
+				c_target.apply_armoured_damage(get_xeno_damage_slash(c_target, damage), ARMOR_MELEE, BRUTE, 10)
+				apply_cooldown()
+				behavior_del.modify_sharpness(-1)
+				return..()
+
+/datum/action/xeno_action/activable/spinslash/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/xeno = owner
+	var/damage = (xeno.melee_damage_lower + xeno.frenzy_aura * FRENZY_DAMAGE_MULTIPLIER)
+
+/datum/action/xeno_action/activable/helmsplitter/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/xeno = owner
+	var/damage = (xeno.melee_damage_upper + xeno.frenzy_aura * FRENZY_DAMAGE_MULTIPLIER)

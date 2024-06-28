@@ -1,7 +1,7 @@
 /datum/xeno_strain/mercenary
 	name = WARRIOR_MERCENARY
-	description = "Lose your punch, lunge, fling, tail stab, passive healing and some health in exchange for a new set of strong tail-based abilities: Quick Slash which deals lower damage and can only hit adjacent targets but has no windup; Forward Slash, which deals moderate damage after a short windup and hits up to two tiles away from you; Spin Swipe, which deals moderate damage after a windup and hits everyone adjacent to you; and Helmsplitter, which deals enormous damage to targets up to three tiles away after a long windup. Your new abilities are influenced by the state your tail is in; Sharp or Blunt, starting with Sharp and degrading to Blunt as you use tail abilities. Sharp gives you the fastest cooldowns and armor penetration, while Blunt increases cooldowns and loses armor penetration but instead gains knockback and dazing effects on hit. You can Sharpen your tail to refresh your tail's blunting progress."
-	flavor_description = "Whether by cleaving and crushing, our foes shall fall to your tail so mighty."
+	description = "Lose your punch, lunge, fling, tail stab, passive healing and some health in exchange for a new set of strong tail-based abilities: Quick Slash which deals lower damage and can only hit adjacent targets but has no windup; Forward Slash, which deals moderate damage after a short windup and hits up to two tiles away from you; Spin Swipe, which deals moderate damage after a windup and hits everyone adjacent to you; and Helmsplitter, which deals enormous damage to targets up to three tiles away after a long windup. Your new abilities are influenced by the state your tail is in; Sharp or Blunt, starting with Sharp and degrading to Blunt as you use tail abilities. Sharp gives you the fastest cooldowns and armor penetration, while Blunt increases cooldowns and loses armor penetration but instead gains knockback/knockdown and dazing effects on hit. You can Sharpen your tail to refresh your tail's blunting progress."
+	flavor_description = "Whether by cleaving or crushing, our foes shall fall to your tail so mighty."
 	icon_state_prefix = "Mercenary"
 
 	actions_to_remove = list(
@@ -32,8 +32,13 @@
 
 	var/sharp_hits = 5
 	var/sharp_max = 10
-	var/is_sharp = TRUE
-	var/is_blunt = FALSE
+
+/datum/behavior_delegate/warrior_mercenary/proc/modify_sharpness(amount)
+	sharp_hits += amount
+	if(sharp_hits > sharp_max)
+		sharp_hits = sharp_max
+	if(sharp_hits < 0)
+		sharp_hits = 0
 
 /datum/behavior_delegate/warrior_mercenary/append_to_stat()
 	. = list()

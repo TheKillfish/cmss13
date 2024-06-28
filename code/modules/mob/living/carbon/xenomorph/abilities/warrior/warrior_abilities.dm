@@ -52,9 +52,7 @@
 	macro_path = /datum/action/xeno_action/verb/verb_sharpen
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_1
-	cooldown = 4
-
-	var/sharpen_amount = 5
+	xeno_cooldown = 4 SECONDS
 
 /datum/action/xeno_action/activable/quickslash
 	name = "Quick Slash"
@@ -63,9 +61,7 @@
 	macro_path = /datum/action/xeno_action/verb/verb_quickslash
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
-
-	var/qs_sharp_cooldown = 60		// Cooldown when the Merc has a sharp tail
-	var/qs_blunt_cooldown = 120	// Cooldown when the Merc has a blunt tail
+	xeno_cooldown = 6 SECONDS
 
 /datum/action/xeno_action/activable/forwardslash
 	name = "Forward Slash"
@@ -74,9 +70,7 @@
 	macro_path = /datum/action/xeno_action/verb/verb_forwardslash
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_3
-
-	var/fs_sharp_cooldown = 6
-	var/fs_blunt_cooldown = 12
+	xeno_cooldown = 8 SECONDS
 
 /datum/action/xeno_action/activable/spinswipe
 	name = "Spin Swipe"
@@ -85,9 +79,7 @@
 	macro_path = /datum/action/xeno_action/verb/verb_spinswipe
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_4
-
-	var/spsw_sharp_cooldown = 10
-	var/spsw_blunt_cooldown = 20
+	xeno_cooldown = 10 SECONDS
 
 /datum/action/xeno_action/activable/helmsplitter
 	name = "Helmsplitter"
@@ -96,6 +88,4 @@
 	macro_path = /datum/action/xeno_action/verb/verb_helmsplitter
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_5
-
-	var/hs_sharp_cooldown = 20
-	var/hs_blunt_cooldown = 30
+	xeno_cooldown = 20 SECONDS
