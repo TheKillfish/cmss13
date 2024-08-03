@@ -35,14 +35,20 @@
 
 	if(istype(W, /obj/item/weapon/twohanded/breacher))
 		var/obj/item/weapon/twohanded/breacher/current_hammer = W
+		if(!current_hammer.can_destroy)
+			return
 		if(user.action_busy)
 			return
 		if(!(HAS_TRAIT(user, TRAIT_SUPER_STRONG) || !current_hammer.really_heavy))
 			to_chat(user, SPAN_WARNING("You can't use \the [current_hammer] properly!"))
 			return
+		if(istype(current_hammer, /obj/item/weapon/twohanded/breacher/spec))
+			if((!skillcheck(user, SKILL_SPEC_WEAPONS, SKILL_SPEC_ALL) && user.skills.get_skill_level(SKILL_SPEC_WEAPONS) != SKILL_SPEC_BREACHER))
+				to_chat(user, SPAN_WARNING("You can't use \the [current_hammer] properly!"))
+				return
 
 		to_chat(user, SPAN_NOTICE("You start taking down \the [src]."))
-		if(!do_after(user, 10 SECONDS, INTERRUPT_ALL_OUT_OF_RANGE, BUSY_ICON_BUILD))
+		if(!do_after(user, current_hammer.rwall_break_time, INTERRUPT_ALL_OUT_OF_RANGE, BUSY_ICON_BUILD))
 			to_chat(user, SPAN_NOTICE("You stop taking down \the [src]."))
 			return
 		to_chat(user, SPAN_NOTICE("You tear down \the [src]."))

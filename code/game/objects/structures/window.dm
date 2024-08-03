@@ -250,6 +250,30 @@
 			healthcheck(1, 1, 1, M) //The person thrown into the window literally shattered it
 		return
 
+	if(istype(W, /obj/item/weapon/twohanded/breacher))
+		var/obj/item/weapon/twohanded/breacher/current_hammer = W
+		if(!current_hammer.can_destroy)
+			return
+		if(user.action_busy)
+			return
+		if(!(HAS_TRAIT(user, TRAIT_SUPER_STRONG) || !current_hammer.really_heavy))
+			to_chat(user, SPAN_WARNING("You can't use \the [current_hammer] properly!"))
+			return
+		if(istype(current_hammer, /obj/item/weapon/twohanded/breacher/spec))
+			if((!skillcheck(user, SKILL_SPEC_WEAPONS, SKILL_SPEC_ALL) && user.skills.get_skill_level(SKILL_SPEC_WEAPONS) != SKILL_SPEC_BREACHER))
+				to_chat(user, SPAN_WARNING("You can't use \the [current_hammer] properly!"))
+				return
+
+		user.animation_attack_on(src)
+		if(not_damageable)
+			to_chat(user, SPAN_WARNING("Despite bashing \the [src] as hard as you can, you barely leave a mark. There's no breaking this."))
+			playsound(loc, 'sound/effects/glassbash.ogg', 25, 1)
+			return
+
+		playsound(src, "windowshatter", 50, 1)
+		shatter_window(TRUE)
+		return
+
 	if(W.flags_item & NOBLUDGEON) return
 
 	if(HAS_TRAIT(W, TRAIT_TOOL_SCREWDRIVER) && !not_deconstructable)

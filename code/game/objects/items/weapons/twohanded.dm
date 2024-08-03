@@ -315,6 +315,22 @@
 	flags_equip_slot = SLOT_BACK
 	attack_verb = list("pulverized", "smashed", "thwacked", "crushed", "hammered", "wrecked")
 	var/really_heavy = FALSE
+	var/can_destroy = FALSE
+	var/wall_break_time = 5 SECONDS
+	var/rwall_break_time = 10 SECONDS
+	var/girder_break_time = 3 SECONDS
+
+/obj/item/weapon/twohanded/breacher/wield(mob/user)
+	. = ..()
+	if(!.)
+		return
+	can_destroy = TRUE
+
+/obj/item/weapon/twohanded/breacher/unwield(mob/user)
+	. = ..()
+	if(!.)
+		return
+	can_destroy = FALSE
 
 /obj/item/weapon/twohanded/breacher/synth
 	name = "\improper B5 Breaching Hammer"
@@ -324,6 +340,9 @@
 	force_wielded = MELEE_FORCE_VERY_STRONG
 	really_heavy = TRUE
 	var/move_delay_addition = 1.5
+	wall_break_time = 3 SECONDS
+	rwall_break_time = 5 SECONDS
+	girder_break_time = 1.5 SECONDS
 
 /obj/item/weapon/twohanded/breacher/synth/pickup(mob/user)
 	if(!(HAS_TRAIT(user, TRAIT_SUPER_STRONG)))
@@ -346,4 +365,37 @@
 	if(!HAS_TRAIT(user, TRAIT_SUPER_STRONG))
 		to_chat(user, SPAN_WARNING("\The [src] is too heavy for you to use as a weapon!"))
 		return
+	..()
+
+/obj/item/weapon/twohanded/breacher/spec
+	name = "\improper D5 Breaching Hammer"
+	desc = "A combat tool derived from the D2 and B5 Breaching Hammers that packs enough force in its swing to take down walls with decent ease and has a simple prybar at the other end. It has odd weight balancing which requires specialist training to use properly."
+	icon_state = "syn_breacher"
+	item_state = "syn_breacher"
+	force_wielded = MELEE_FORCE_STRONG
+
+/obj/item/weapon/twohanded/breacher/spec/wield(mob/user)
+	. = ..()
+	if(!.)
+		return
+	pry_capable = IS_PRY_CAPABLE_SIMPLE
+
+/obj/item/weapon/twohanded/breacher/spec/unwield(mob/user)
+	. = ..()
+	if(!.)
+		return
+	pry_capable = 0
+
+/obj/item/weapon/twohanded/breacher/spec/pickup(mob/user)
+	if(. && istype(user))
+		if((!skillcheck(user, SKILL_SPEC_WEAPONS, SKILL_SPEC_ALL) && user.skills.get_skill_level(SKILL_SPEC_WEAPONS) != SKILL_SPEC_BREACHER))
+			to_chat(user, SPAN_WARNING("As you hold \The [src] you notice the balance feels very off. You probably won't be able to use it."))
+			return
+	..()
+
+/obj/item/weapon/twohanded/breacher/spec/attack(target as mob, mob/living/user as mob)
+	if(. && istype(user))
+		if((!skillcheck(user, SKILL_SPEC_WEAPONS, SKILL_SPEC_ALL) && user.skills.get_skill_level(SKILL_SPEC_WEAPONS) != SKILL_SPEC_BREACHER))
+			to_chat(user, SPAN_WARNING("\The [src] is too awkwardly balanced to swing properly!"))
+			return
 	..()

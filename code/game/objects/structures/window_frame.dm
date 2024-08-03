@@ -109,6 +109,24 @@
 				SEND_SIGNAL(user, COMSIG_MOB_DISASSEMBLE_W_FRAME, src)
 				deconstruct()
 
+	else if(istype(W, /obj/item/weapon/twohanded/breacher))
+		var/obj/item/weapon/twohanded/breacher/current_hammer = W
+		if(!current_hammer.can_destroy)
+			return
+		if(user.action_busy)
+			return
+		if(!(HAS_TRAIT(user, TRAIT_SUPER_STRONG) || !current_hammer.really_heavy))
+			to_chat(user, SPAN_WARNING("You can't use \the [current_hammer] properly!"))
+			return
+		if(istype(current_hammer, /obj/item/weapon/twohanded/breacher/spec))
+			if((!skillcheck(user, SKILL_SPEC_WEAPONS, SKILL_SPEC_ALL) && user.skills.get_skill_level(SKILL_SPEC_WEAPONS) != SKILL_SPEC_BREACHER))
+				to_chat(user, SPAN_WARNING("You can't use \the [current_hammer] properly!"))
+				return
+
+		user.animation_attack_on(src)
+		playsound(loc, 'sound/effects/metalhit.ogg', 30, 1)
+		deconstruct()
+
 	else if(istype(W, /obj/item/grab))
 		var/obj/item/grab/G = W
 		if(isxeno(user)) return

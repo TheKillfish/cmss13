@@ -905,6 +905,21 @@ GLOBAL_LIST_INIT(allowed_helmet_items, list(
 	clothing_traits = list(TRAIT_EAR_PROTECTION)
 	unacidable = TRUE
 
+/obj/item/clothing/head/helmet/marine/breacher
+	name = "M4-D breaching helmet"
+	desc = "A custom-built helmet for USCM Breachers."
+	icon_state = "breacher_helmet"
+	item_state = "breacher_helmet"
+	armor_melee = CLOTHING_ARMOR_HIGH
+	armor_bomb = CLOTHING_ARMOR_MEDIUMLOW
+	armor_bio = CLOTHING_ARMOR_HIGH
+	armor_rad = CLOTHING_ARMOR_MEDIUM
+	armor_internaldamage = CLOTHING_ARMOR_MEDIUMLOW
+	unacidable = TRUE
+	anti_hug = 4
+	specialty = "M4-D breaching"
+	flags_item = MOB_LOCK_ON_EQUIP|NO_CRYO_STORE
+
 /obj/item/clothing/head/helmet/marine/pilot
 	name = "\improper M30 tactical helmet"
 	desc = "The M30 tactical helmet has a left eyepiece filter used to filter tactical data. It is required to fly the dropships manually and in safety."

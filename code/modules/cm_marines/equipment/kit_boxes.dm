@@ -160,6 +160,21 @@
 	new /obj/item/device/binoculars(src)
 
 
+/obj/item/storage/box/spec/breacher
+	name = "\improper Breacher equipment case"
+	desc = "A large case containing a D5 Breaching Hammer, M4-D breaching armor and helmet, an XM51E2 and additional pieces of equipment.\nDrag this sprite onto yourself to open it up! NOTE: You cannot put items back inside this case."
+	kit_overlay = "b18"
+
+/obj/item/storage/box/spec/breacher/fill_preset_inventory()
+	new /obj/item/clothing/suit/storage/marine/M4D(src)
+	new /obj/item/clothing/head/helmet/marine/breacher(src)
+	new /obj/item/weapon/twohanded/breacher/spec(src)
+	new /obj/item/weapon/gun/pistol/vp78(src)
+	new /obj/item/ammo_magazine/pistol/vp78(src)
+	new /obj/item/ammo_magazine/pistol/vp78(src)
+	new /obj/item/device/binoculars(src)
+
+
 //maybe put in req for later use?
 /obj/item/storage/box/spec/B18
 	name = "\improper B18 heavy armor case"
@@ -295,6 +310,10 @@
 			//this is to be able to use C4s that are coming with the kit
 			if(!skillcheck(user, SKILL_ENGINEER, SKILL_ENGINEER_TRAINED))
 				user.skills.set_skill(SKILL_ENGINEER, SKILL_ENGINEER_TRAINED)
+		if("Breacher")
+			spec_box = new /obj/item/storage/box/spec/breacher(T)
+			specialist_assignment = "Breacher"
+			user.skills.set_skill(SKILL_SPEC_WEAPONS, SKILL_SPEC_BREACHER)
 	if(specialist_assignment)
 		user.put_in_hands(spec_box)
 		card.set_assignment((user.assigned_squad && squad_assignment_update ? (user.assigned_squad.name + " ") : "") + card.assignment + " ([specialist_assignment])")

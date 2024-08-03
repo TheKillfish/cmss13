@@ -90,6 +90,8 @@
 							set_name = "Scout Set"
 						if(SKILL_SPEC_SNIPER)
 							set_name = "Sniper Set"
+						if(SKILL_SPEC_BREACHER)
+							set_name = "Breacher Set"
 
 					if(set_name && !GLOB.available_specialist_sets.Find(set_name))
 						GLOB.available_specialist_sets += set_name

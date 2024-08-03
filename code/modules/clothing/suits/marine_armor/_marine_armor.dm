@@ -650,6 +650,40 @@
 	flags_item = MOB_LOCK_ON_EQUIP|NO_CRYO_STORE
 	unacidable = TRUE
 
+/obj/item/clothing/suit/storage/marine/M4D
+	name ="\improper M4-D breaching armor"
+	desc = "A custom set of M4 armor designed for USCM Breachers."
+	icon_state = "breacher"
+	armor_melee = CLOTHING_ARMOR_HIGH
+	armor_bio = CLOTHING_ARMOR_HIGH
+	armor_rad = CLOTHING_ARMOR_MEDIUM
+	armor_internaldamage = CLOTHING_ARMOR_MEDIUMLOW
+	specialty = "M4-D breaching"
+	flags_item = MOB_LOCK_ON_EQUIP|NO_CRYO_STORE
+	unacidable = TRUE
+	allowed = list(
+		/obj/item/weapon/gun,
+		/obj/item/prop/prop_gun,
+		/obj/item/tank/emergency_oxygen,
+		/obj/item/device/flashlight,
+		/obj/item/storage/fancy/cigarettes,
+		/obj/item/tool/lighter,
+		/obj/item/storage/bible,
+		/obj/item/attachable/bayonet,
+		/obj/item/storage/backpack/general_belt,
+		/obj/item/storage/large_holster/machete,
+		/obj/item/storage/belt/gun/type47,
+		/obj/item/storage/belt/gun/m4a3,
+		/obj/item/storage/belt/gun/m44,
+		/obj/item/storage/belt/gun/smartpistol,
+		/obj/item/storage/belt/gun/flaregun,
+		/obj/item/device/motiondetector,
+		/obj/item/device/walkman,
+		/obj/item/storage/belt/gun/m39,
+		/obj/item/storage/belt/gun/xm51,
+		/obj/item/weapon/twohanded/breacher/spec,
+	)
+
 /obj/item/clothing/suit/storage/RO
 	name = "quartermaster jacket"
 	desc = "A green jacket worn by USCM personnel. The back has the flag of the United Americas on it."
