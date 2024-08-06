@@ -72,15 +72,11 @@
 		if(is_fighting == FALSE)
 			if(escort && escorting == TRUE && get_dist(src, escort) >= 4)
 				walk_to(src, escort, rand(1, 2), 4)
-				if(get_dist(src, escort) <= rand(1, 2))
-					walk(src, 0)
 			if(got_orders == FALSE && get_dist(src, xeno_master) >= 4)
 				walk_to(src, xeno_master, rand(1, 2), 4)
-				if(get_dist(src, xeno_master) <= rand(1, 2))
-					walk(src, 0)
 
 	if(mastertarget && mastertarget.stat == DEAD)
-		mastertarget = FALSE
+		mastertarget = null
 
 	if(escort && escort.stat == DEAD)
 		escorting = FALSE

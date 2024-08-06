@@ -1,14 +1,3 @@
-/datum/action/xeno_action/activable/secrete_resin/reaper
-	name = "Compel Resin"
-	ability_name = "compel resin"
-	action_icon_state = "secrete_resin"
-	macro_path = /datum/action/xeno_action/verb/verb_compel_resin
-	action_type = XENO_ACTION_CLICK
-	ability_primacy = XENO_NOT_PRIMARY_ACTION
-	thick = TRUE
-	build_speed_mod = 0.5
-	var/resin_cost = 30
-
 /datum/action/xeno_action/activable/flesh_harvest
 	name = "Flesh Harvest"
 	ability_name = "flesh harvest"

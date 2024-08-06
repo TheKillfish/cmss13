@@ -21,7 +21,6 @@
 	weed_level = WEED_LEVEL_STANDARD
 
 	behavior_delegate_type = /datum/behavior_delegate/base_reaper
-	max_build_dist = 1
 
 	tackle_min = 2
 	tackle_max = 5
@@ -32,11 +31,6 @@
 	aura_strength = 3
 
 	minimum_evolve_time = 15 MINUTES
-
-/datum/caste_datum/reaper/New()
-	. = ..()
-
-	resin_build_order = GLOB.resin_build_order_reaper
 
 /mob/living/carbon/xenomorph/reaper
 	caste_type = XENO_CASTE_REAPER
@@ -63,8 +57,6 @@
 		/datum/action/xeno_action/onclick/emit_pheromones,
 		/datum/action/xeno_action/activable/place_construction/not_primary,
 		/datum/action/xeno_action/onclick/plant_weeds/not_primary,
-		/datum/action/xeno_action/onclick/choose_resin/not_primary,
-		/datum/action/xeno_action/activable/secrete_resin/reaper,
 		/datum/action/xeno_action/activable/flesh_harvest, //first macro
 		/datum/action/xeno_action/activable/claw_strike, //second macro
 		/datum/action/xeno_action/activable/raise_servant, //third macro

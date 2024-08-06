@@ -287,7 +287,7 @@
 /datum/reagent/toxin/flesh_resin_toxin
 	name = "Flesh Venom"
 	id = "fleshresintoxin"
-	description = "A thick, horrid-smelling venom of unknown composition, produced by certain specialized Xenomorphs. Contains several toxic byproducts with neurotoxic effects, causing large amounts of pain."
+	description = "A viscous, horrid-smelling venom of unknown composition, produced by certain specialized Xenomorphs. Contains several toxic byproducts with neurotoxic effects, causing large amounts of pain."
 	color = "#6A4666"
 	reagent_state = LIQUID
 	chemclass = CHEM_CLASS_NONE

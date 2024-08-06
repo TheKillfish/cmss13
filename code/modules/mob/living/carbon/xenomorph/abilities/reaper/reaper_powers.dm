@@ -1,38 +1,3 @@
-/datum/action/xeno_action/activable/secrete_resin/reaper/use_ability(atom/target)
-	var/mob/living/carbon/xenomorph/xeno = owner
-	var/datum/behavior_delegate/base_reaper/reaper = xeno.behavior_delegate
-	if(!xeno.check_state())
-		return
-
-	if(!..())
-		return
-
-	if(!xeno.selected_resin)
-		return
-
-	var/turf/target_turf = get_turf(target)
-	if(!target_turf)
-		return
-
-	// Opening doors from afar is cool
-	var/obj/structure/mineral_door/resin/resin_door = target
-	if(istype(target, /obj/structure/mineral_door/resin) && !xeno.Adjacent(resin_door))
-		resin_door.TryToSwitchState(xeno)
-		if(resin_door.state)
-			to_chat(xeno, SPAN_XENONOTICE("We compel the resin door to close."))
-		else
-			to_chat(xeno, SPAN_XENONOTICE("We compel the resin door to open."))
-		return
-
-	if(reaper.flesh_resin < resin_cost)
-		build_speed_mod = 1
-	else
-		build_speed_mod = initial(build_speed_mod)
-		reaper.flesh_resin -= resin_cost
-		to_chat(xeno, SPAN_XENONOTICE("We absorb some stored flesh resin to hasten our building."))
-
-	return TRUE
-
 /datum/action/xeno_action/activable/flesh_harvest/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/xeno = owner
 	var/mob/living/carbon/carbon = target
@@ -179,7 +144,7 @@
 			cooldown_mult += 1
 			playsound(xeno, limb_remove_end, 25, TRUE)
 
-	if(fake_count == 4) // Let's be real, this isn't going to happen naturally, but it would be fucking funny.
+	if(fake_count == 4) // Let's be real, this isn't going to happen normally, but it would be fucking funny
 		xeno.emote("hiss")
 		reaper.harvesting = FALSE
 		xeno.visible_message(SPAN_XENONOTICE("After inspecting [carbon]'s corpse, [xeno] rises angrily."), SPAN_XENOWARNING("It was all fake! Infuriating!"))
