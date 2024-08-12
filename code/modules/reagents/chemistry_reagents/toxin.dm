@@ -284,11 +284,11 @@
 	chemclass = CHEM_CLASS_NONE
 	properties = list(PROPERTY_CORROSIVE = 2, PROPERTY_TOXIC = 1, PROPERTY_CROSSMETABOLIZING = 3)
 
-/datum/reagent/toxin/flesh_resin_toxin
+/datum/reagent/toxin/flesh_plasma_toxin
 	name = "Flesh Venom"
-	id = "fleshresintoxin"
+	id = "fleshplasmatoxin"
 	description = "A viscous, horrid-smelling venom of unknown composition, produced by certain specialized Xenomorphs. Contains several toxic byproducts with neurotoxic effects, causing large amounts of pain."
-	color = "#6A4666"
+	color = "#c5bc81"
 	reagent_state = LIQUID
 	chemclass = CHEM_CLASS_NONE
 	properties = list(PROPERTY_TOXIC = 2, PROPERTY_PAINING = 4, PROPERTY_CROSSMETABOLIZING = 3)

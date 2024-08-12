@@ -5,11 +5,8 @@
 	macro_path = /datum/action/xeno_action/verb/verb_flesh_harvest
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_1
-	xeno_cooldown = 5 SECONDS
-	plasma_cost = 50
-	var/pause_duration = 30 SECONDS
 
-/datum/action/xeno_action/activable/claw_strike
+/datum/action/xeno_action/activable/rapture
 	name = "Rapture"
 	ability_name = "rapture"
 	action_icon_state = "claw_strike"
@@ -17,19 +14,18 @@
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
 	xeno_cooldown = 15 SECONDS
-	var/strike_range = 3
-	var/envenomed = TRUE
-	var/pause_duration = 10 SECONDS
+	var/normal_range = 2
+	var/max_range = 4
+	var/toxin_amount = 3
 
-/datum/action/xeno_action/activable/raise_servant
-	name = "Raise Servant"
-	ability_name = "raise servant"
-	action_icon_state = "unburrow"
-	macro_path = /datum/action/xeno_action/verb/verb_raise_servant
+/datum/action/xeno_action/onclick/extra_pheros
+	name = "Emit Extra Pheremones"
+	ability_name = "Emit Extra Pheremones"
+	action_icon_state = "screech"
+	macro_path = /datum/action/xeno_action/verb/verb_extra_pheros
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_3
 	xeno_cooldown = 20 SECONDS
 	plasma_cost = 100
-	var/resin_cost = 200
-	var/creattime = 10 SECONDS
-	var/pause_duration = 20 SECONDS
+	var/flesh_plasma_cost = 200
+
