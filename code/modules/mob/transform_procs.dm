@@ -102,6 +102,8 @@
 				new_xeno = new /mob/living/carbon/xenomorph/queen(loc)
 			if(XENO_CASTE_HELLHOUND)
 				new_xeno = new /mob/living/carbon/xenomorph/hellhound(loc)
+			if(XENO_CASTE_HUNTER)
+				new_xeno = new /mob/living/carbon/xenomorph/hunter(loc)
 			else
 				new_xeno = new /mob/living/carbon/xenomorph/drone(loc)
 

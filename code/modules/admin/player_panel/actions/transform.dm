@@ -43,6 +43,11 @@ GLOBAL_LIST_INIT(pp_transformables, list(
 	name = "Lesser Drone",
 	key = /mob/living/carbon/xenomorph/lesser_drone,
 	color = "purple"
+	),
+	list(
+	name = "Sibling",
+	key = /mob/living/carbon/xenomorph/sibling,
+	color = "purple"
 	)
 	),
 
@@ -98,6 +103,11 @@ GLOBAL_LIST_INIT(pp_transformables, list(
 	list(
 	name = XENO_CASTE_CARRIER,
 	key = /mob/living/carbon/xenomorph/carrier,
+	color = "purple"
+	),
+	list(
+	name = XENO_CASTE_HUNTER,
+	key = /mob/living/carbon/xenomorph/hunter,
 	color = "purple"
 	)
 	),
