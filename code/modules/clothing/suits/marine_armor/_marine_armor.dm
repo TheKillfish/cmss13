@@ -578,6 +578,36 @@
 	icon_state = "H6"
 	armor_variation = 0
 
+/obj/item/clothing/suit/storage/marine/medical
+	name = "\improper M3-M pattern medic armor"
+	desc = "A modified set of M3 armor for field medics, trading some protection for better mobility. Features seven large leather loops in place of a pouch for securely holding suitable medical equipment, such as vials, bottles, hyposprays and syringes. With a bit of effort, one can even carry pistol magazines in the loops."
+	desc_lore = "A recent development, it's inception came around due to requests from corpsmen who sought a less encumbering alternative to the standard M3 pattern armor but that did not suffer from reduced storage capacity. Though the protective plating has been thinned, an improved inner liner compensates for reduced bullet protectiveness and additionally provides robust CBRN protection."
+	storage_slots = 7
+	armor_variation = 0
+	specialty = "\improper M3-M pattern medic"
+	slowdown = SLOWDOWN_ARMOR_LIGHT
+	armor_melee = CLOTHING_ARMOR_MEDIUMLOW
+	armor_bullet = CLOTHING_ARMOR_MEDIUM
+	armor_bomb = CLOTHING_ARMOR_MEDIUMLOW
+	armor_bio = CLOTHING_ARMOR_MEDIUM
+	armor_rad = CLOTHING_ARMOR_MEDIUMHIGH
+	armor_internaldamage = CLOTHING_ARMOR_MEDIUM
+	flags_atom = NO_SNOW_TYPE
+	flags_marine_armor = ARMOR_LAMP_OVERLAY
+	icon_state = "med_armor"
+	item_state = "med_armor"
+
+/obj/item/clothing/suit/storage/marine/medical/Initialize(mapload)
+	. = ..()
+	pockets.can_hold = list(
+		/obj/item/reagent_container/dropper,
+		/obj/item/reagent_container/glass/bottle,
+		/obj/item/reagent_container/syringe,
+		/obj/item/reagent_container/hypospray,
+		/obj/item/ammo_magazine/pistol,
+	)
+	pockets.max_storage_space = 14
+
 //===========================//SPECIALIST\\================================\\
 //=======================================================================\\
 
