@@ -111,3 +111,9 @@
 	qdel(src)
 
 #undef XENO_STRUCTURE_PLASMA_MULTIPLIER
+
+/datum/construction_template/xenomorph/hatchery
+	name = XENO_STRUCTURE_HATCHERY
+	description = "How specialized sisters are created."
+	build_type = /obj/effect/alien/resin/special/hatchery
+	build_icon_state = "core"

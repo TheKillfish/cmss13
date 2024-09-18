@@ -140,6 +140,26 @@ GLOBAL_LIST_INIT(pp_transformables, list(
 	name = XENO_CASTE_PREDALIEN,
 	key = /mob/living/carbon/xenomorph/predalien,
 	color = "purple"
+	),
+	list(
+	name = XENO_CASTE_BULLDOZER,
+	key = /mob/living/carbon/xenomorph/bulldozer,
+	color = "purple"
+	),
+	list(
+	name = XENO_CASTE_FUMIGATOR,
+	key = /mob/living/carbon/xenomorph/fumigator,
+	color = "purple"
+	),
+	list(
+	name = XENO_CASTE_INFILTRATOR,
+	key = /mob/living/carbon/xenomorph/infiltrator,
+	color = "purple"
+	),
+	list(
+	name = XENO_CASTE_THUNDERER,
+	key = /mob/living/carbon/xenomorph/thunderer,
+	color = "purple"
 	)
 	),
 

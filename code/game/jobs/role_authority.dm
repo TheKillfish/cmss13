@@ -759,6 +759,14 @@ I hope it's easier to tell what the heck this proc is even doing, unlike previou
 			M = /mob/living/carbon/xenomorph/predalien
 		if(XENO_CASTE_HELLHOUND)
 			M = /mob/living/carbon/xenomorph/hellhound
+		if(XENO_CASTE_BULLDOZER)
+			M = /mob/living/carbon/xenomorph/bulldozer
+		if(XENO_CASTE_FUMIGATOR)
+			M = /mob/living/carbon/xenomorph/fumigator
+		if(XENO_CASTE_INFILTRATOR)
+			M = /mob/living/carbon/xenomorph/infiltrator
+		if(XENO_CASTE_THUNDERER)
+			M = /mob/living/carbon/xenomorph/thunderer
 	return M
 
 

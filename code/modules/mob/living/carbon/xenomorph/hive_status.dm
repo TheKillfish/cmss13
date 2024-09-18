@@ -83,6 +83,7 @@
 		XENO_STRUCTURE_EGGMORPH = 6,
 		XENO_STRUCTURE_RECOVERY = 6,
 		XENO_STRUCTURE_PYLON = 2,
+		XENO_STRUCTURE_HATCHERY = 1,
 	)
 
 	var/global/list/hive_structure_types = list(
@@ -139,6 +140,9 @@
 	The name of the icon should be the same as the XENO_CASTE_ define for that caste eg. #define XENO_CASTE_DRONE "Drone"
 	*/
 	var/static/list/evolution_menu_images
+
+	/// When a hatchery xeno is bought, this var is switched to true
+	var/has_special_hatchery = FALSE
 
 /datum/hive_status/New()
 	hive_ui = new(src)
@@ -1372,6 +1376,11 @@
 	if(!length(personal_allies))
 		return
 	clear_personal_allies(TRUE)
+
+/datum/hive_status/proc/give_hatchery()
+	if(has_special_hatchery)
+		return
+	hive_structure_types.Add(XENO_STRUCTURE_HATCHERY)
 
 //Xeno Resin Mark Shit, the very best place for it too :0)
 //Defines at the bottom of this list here will show up at the top in the mark menu
