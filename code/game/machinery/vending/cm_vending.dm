@@ -414,6 +414,8 @@ GLOBAL_LIST_EMPTY(vending_products)
 		shove_time = 30
 	if(istype(user,/mob/living/carbon/xenomorph/crusher))
 		shove_time = 15
+	if(istype(user, /mob/living/carbon/xenomorph/bulldozer))
+		shove_time = 5
 
 	xeno_attack_delay(user) //Adds delay here and returns nothing because otherwise it'd cause lag *after* finishing the shove.
 

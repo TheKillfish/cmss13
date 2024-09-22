@@ -143,7 +143,10 @@
 						acided_hole_dir = dir_to & (NORTH|SOUTH)
 			new /obj/effect/acid_hole(src)
 		else
-			take_damage(damage_cap / XENO_HITS_TO_DESTROY_WALL)
+			if(user.claw_type != CLAW_TYPE_BULLDOZER)
+				take_damage(damage_cap / XENO_HITS_TO_DESTROY_WALL)
+			else
+				take_damage(damage_cap / (XENO_HITS_TO_DESTROY_WALL / 3))
 		return XENO_ATTACK_ACTION
 
 	. = ..()

@@ -334,7 +334,7 @@
 		else
 			playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 		health -= rand(M.melee_damage_lower, M.melee_damage_upper)
-		if(health <= 0)
+		if(health <= 0 || M.claw_type == CLAW_TYPE_BULLDOZER)
 			M.visible_message(SPAN_DANGER("[M] slices [src] apart!"), \
 			SPAN_DANGER("We slice [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 			deconstruct(FALSE)
@@ -346,7 +346,10 @@
 //Breaking barricades
 /obj/structure/barricade/attack_alien(mob/living/carbon/xenomorph/M)
 	M.animation_attack_on(src)
-	take_damage( rand(M.melee_damage_lower, M.melee_damage_upper) * brute_multiplier)
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		take_damage(rand(M.melee_damage_lower, M.melee_damage_upper) * brute_multiplier * 3)
+	else
+		take_damage(rand(M.melee_damage_lower, M.melee_damage_upper) * brute_multiplier)
 	if(barricade_hitsound)
 		playsound(src, barricade_hitsound, 25, 1)
 	if(health <= 0)
@@ -441,6 +444,13 @@
 		M.visible_message(SPAN_WARNING("[M] creepily taps on [src] with its huge claw."), \
 		SPAN_WARNING("We creepily tap on [src]."), \
 		SPAN_WARNING("You hear a glass tapping sound."), 5, CHAT_TYPE_XENO_COMBAT)
+	else if(M.claw_type == CLAW_TYPE_BULLDOZER && !not_damageable)
+		M.animation_attack_on(src)
+		playsound(src, "windowshatter", 50, 1)
+		shatter_window(TRUE)
+		M.visible_message(SPAN_DANGER("[M] swings it's enormous arm into \the [src], shattering it instantly!"), \
+		SPAN_DANGER("We smash the [src]!"), \
+		SPAN_DANGER("You hear a particularly violent glass shatter!"), 5, CHAT_TYPE_XENO_COMBAT)
 	else
 		attack_generic(M, M.melee_damage_lower)
 	return XENO_ATTACK_ACTION
@@ -449,7 +459,7 @@
 /obj/structure/machinery/bot/attack_alien(mob/living/carbon/xenomorph/M)
 	M.animation_attack_on(src)
 	health -= rand(15, 30)
-	if(health <= 0)
+	if(health <= 0 || M.claw_type == CLAW_TYPE_BULLDOZER)
 		M.visible_message(SPAN_DANGER("[M] slices [src] apart!"), \
 		SPAN_DANGER("We slice [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 	else
@@ -481,6 +491,8 @@
 	var/damage = 25
 	if(M.mob_size >= MOB_SIZE_BIG)
 		damage = 40
+	else if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		damage = 300
 	take_damage(damage)
 	return XENO_ATTACK_ACTION
 
@@ -488,7 +500,13 @@
 /obj/structure/grille/attack_alien(mob/living/carbon/xenomorph/M)
 	M.animation_attack_on(src)
 	playsound(loc, 'sound/effects/grillehit.ogg', 25, 1)
-	var/damage_dealt = 5
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		qdel()
+		handle_debris()
+	else
+		var/damage_dealt = 5
+		health -= damage_dealt
+		healthcheck()
 	M.visible_message(SPAN_DANGER("[M] mangles [src]!"), \
 	SPAN_DANGER("We mangle [src]!"), \
 	SPAN_DANGER("We hear twisting metal!"), 5, CHAT_TYPE_XENO_COMBAT)
@@ -499,20 +517,22 @@
 		SPAN_DANGER("You hear a sharp ZAP and a smell of ozone."))
 		return XENO_NO_DELAY_ACTION //Intended apparently ?
 
-	health -= damage_dealt
-	healthcheck()
 	return XENO_ATTACK_ACTION
 
 //Slashing fences
 /obj/structure/fence/attack_alien(mob/living/carbon/xenomorph/M)
 	M.animation_attack_on(src)
-	var/damage_dealt = 25
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		playsound(loc, 'sound/effects/grillehit.ogg', 25, 1)
+		cut_grille()
+	else
+		var/damage_dealt = 25
+		health -= damage_dealt
+		healthcheck()
 	M.visible_message(SPAN_DANGER("[M] mangles [src]!"), \
 	SPAN_DANGER("We mangle [src]!"), \
 	SPAN_DANGER("We hear twisting metal!"), 5, CHAT_TYPE_XENO_COMBAT)
 
-	health -= damage_dealt
-	healthcheck()
 	return XENO_ATTACK_ACTION
 
 //Slashin mirrors
@@ -548,22 +568,22 @@
 		return XENO_NO_DELAY_ACTION
 
 	if(welded)
-		if(M.claw_type >= CLAW_TYPE_SHARP)
+		if(M.claw_type >= CLAW_TYPE_SHARP && M.claw_type != CLAW_TYPE_BULLDOZER)
 			M.animation_attack_on(src)
 			playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 			take_damage(damage_cap / XENO_HITS_TO_DESTROY_WELDED_DOOR)
 			return XENO_ATTACK_ACTION
-		else
+		else if(M.claw_type != CLAW_TYPE_BULLDOZER)
 			to_chat(M, SPAN_WARNING("[src] is welded shut."))
 			return XENO_NO_DELAY_ACTION
 
 	if(locked)
-		if(M.claw_type >= CLAW_TYPE_SHARP)
+		if(M.claw_type >= CLAW_TYPE_SHARP && M.claw_type != CLAW_TYPE_BULLDOZER)
 			M.animation_attack_on(src)
 			playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 			take_damage(HEALTH_DOOR / XENO_HITS_TO_DESTROY_BOLTED_DOOR)
 			return XENO_ATTACK_ACTION
-		else
+		else if(M.claw_type != CLAW_TYPE_BULLDOZER)
 			to_chat(M, SPAN_WARNING("[src] is bolted down tight."))
 			return XENO_NO_DELAY_ACTION
 
@@ -578,12 +598,23 @@
 
 	var/delay
 
-	if(!arePowerSystemsOn())
-		delay = 1 SECONDS
-		playsound(loc, "alien_doorpry", 25, TRUE)
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		if(arePowerSystemsOn())
+			delay = 1 SECONDS
+			playsound(loc, "alien_doorpry", 25, TRUE)
+		else if(welded)
+			delay = 2 SECONDS
+			playsound(loc, "alien_doorpry", 25, TRUE)
+		else if(locked)
+			delay = 8 SECONDS
+			playsound(loc, "alien_doorpry", 25, TRUE)
 	else
-		delay = 4 SECONDS
-		playsound(loc, "alien_doorpry", 25, TRUE)
+		if(!arePowerSystemsOn())
+			delay = 1 SECONDS
+			playsound(loc, "alien_doorpry", 25, TRUE)
+		else
+			delay = 4 SECONDS
+			playsound(loc, "alien_doorpry", 25, TRUE)
 
 	M.visible_message(SPAN_WARNING("[M] digs into [src] and begins to pry it open."), \
 	SPAN_WARNING("We dig into [src] and begin to pry it open."), null, 5, CHAT_TYPE_XENO_COMBAT)
@@ -594,17 +625,26 @@
 			return XENO_NO_DELAY_ACTION //Make sure we're still there
 		if(M.is_mob_incapacitated() || M.body_position != STANDING_UP)
 			return XENO_NO_DELAY_ACTION
-		if(locked)
-			to_chat(M, SPAN_WARNING("[src] is bolted down tight."))
-			return XENO_NO_DELAY_ACTION
-		if(welded)
-			to_chat(M, SPAN_WARNING("[src] is welded shut."))
-			return XENO_NO_DELAY_ACTION
+		if(!M.claw_type == CLAW_TYPE_BULLDOZER)
+			if(locked)
+				to_chat(M, SPAN_WARNING("[src] is bolted down tight."))
+				return XENO_NO_DELAY_ACTION
+			if(welded)
+				to_chat(M, SPAN_WARNING("[src] is welded shut."))
+				return XENO_NO_DELAY_ACTION
 		if(density) //Make sure it's still closed
 			spawn(0)
-				open(1)
-				M.visible_message(SPAN_DANGER("[M] pries [src] open."), \
-				SPAN_DANGER("We pry [src] open."), null, 5, CHAT_TYPE_XENO_COMBAT)
+				if(!M.claw_type == CLAW_TYPE_BULLDOZER)
+					open(1)
+					M.visible_message(SPAN_DANGER("[M] pries [src] open."), \
+					SPAN_DANGER("We pry [src] open."), null, 5, CHAT_TYPE_XENO_COMBAT)
+				else
+					locked = 0
+					welded = 0
+					update_icon()
+					open(1)
+					M.visible_message(SPAN_DANGER("[M] tears [src] open!"), \
+					SPAN_DANGER("We tear [src] open!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 	return XENO_NO_DELAY_ACTION
 
 /obj/structure/machinery/door/airlock/attack_larva(mob/living/carbon/xenomorph/larva/M)
@@ -613,7 +653,7 @@
 //Prying open FIREdoors
 /obj/structure/machinery/door/firedoor/attack_alien(mob/living/carbon/xenomorph/M)
 	var/turf/cur_loc = M.loc
-	if(blocked)
+	if(blocked && M.claw_type != CLAW_TYPE_BULLDOZER)
 		to_chat(M, SPAN_WARNING("[src] is welded shut."))
 		return XENO_NO_DELAY_ACTION
 	if(!istype(cur_loc))
@@ -630,14 +670,20 @@
 	if(do_after(M, 30, INTERRUPT_ALL, BUSY_ICON_HOSTILE))
 		if(M.loc != cur_loc)
 			return XENO_NO_DELAY_ACTION //Make sure we're still there
-		if(blocked)
+		if(blocked && M.claw_type != CLAW_TYPE_BULLDOZER)
 			to_chat(M, SPAN_WARNING("[src] is welded shut."))
 			return XENO_NO_DELAY_ACTION
 		if(density) //Make sure it's still closed
 			spawn(0)
-				open(1)
-				M.visible_message(SPAN_DANGER("[M] pries [src] open."), \
-				SPAN_DANGER("We pry [src] open."), null, 5, CHAT_TYPE_XENO_COMBAT)
+				if(M.claw_type != CLAW_TYPE_BULLDOZER)
+					open(1)
+					M.visible_message(SPAN_DANGER("[M] pries [src] open."), \
+					SPAN_DANGER("We pry [src] open."), null, 5, CHAT_TYPE_XENO_COMBAT)
+				else
+					blocked = 0
+					open(1)
+					M.visible_message(SPAN_DANGER("[M] breaks tge welds on [src] and forces it open!"), \
+					SPAN_DANGER("We force [src] open."), null, 5, CHAT_TYPE_XENO_COMBAT)
 	return XENO_NO_DELAY_ACTION
 
 /obj/structure/mineral_door/resin/attack_larva(mob/living/carbon/xenomorph/larva/M)
@@ -664,7 +710,9 @@
 			playsound(loc, "alien_resin_break", 25)
 
 		M.animation_attack_on(src)
-		if (hivenumber == M.hivenumber)
+		if(M.claw_type == CLAW_TYPE_BULLDOZER)
+			qdel(src)
+		else if(hivenumber == M.hivenumber)
 			qdel(src)
 		else
 			health -= M.melee_damage_lower * RESIN_XENO_DAMAGE_MULTIPLIER
@@ -682,7 +730,12 @@
 	M.animation_attack_on(src)
 	playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 	update_health(rand(M.melee_damage_lower, M.melee_damage_upper))
-	if(health <= 0)
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		M.visible_message(SPAN_DANGER("[M] crushes \the [src]!"), \
+		SPAN_DANGER("We crush \the [src]!"), null, 5, CHAT_TYPE_XENO_COMBAT)
+		if(!unacidable)
+			qdel(src)
+	else if(health <= 0)
 		M.visible_message(SPAN_DANGER("[M] slices \the [src] apart!"), \
 		SPAN_DANGER("We slice \the [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 		if(!unacidable)
@@ -701,7 +754,12 @@
 	M.animation_attack_on(src)
 	playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 	update_health(rand(M.melee_damage_lower, M.melee_damage_upper))
-	if(health <= 0)
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		M.visible_message(SPAN_DANGER("[M] crushes \the [src]!"), \
+		SPAN_DANGER("We crush \the [src]!"), null, 5, CHAT_TYPE_XENO_COMBAT)
+		if(!unacidable)
+			qdel(src)
+	else if(health <= 0)
 		M.visible_message(SPAN_DANGER("[M] slices \the [src] apart!"), \
 		SPAN_DANGER("We slice \the [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 		if(!unacidable)
@@ -720,7 +778,12 @@
 	M.animation_attack_on(src)
 	playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 	update_health(rand(M.melee_damage_lower, M.melee_damage_upper))
-	if(health <= 0)
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		M.visible_message(SPAN_DANGER("[M] crushes \the [src]!"), \
+		SPAN_DANGER("We crush \the [src]!"), null, 5, CHAT_TYPE_XENO_COMBAT)
+		if(!unacidable)
+			qdel(src)
+	else if(health <= 0)
 		M.visible_message(SPAN_DANGER("[M] slices \the [src] apart!"), \
 		SPAN_DANGER("We slice \the [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 		if(!unacidable)
@@ -740,7 +803,11 @@
 	alien.animation_attack_on(src)
 	playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 	update_health(rand(alien.melee_damage_lower, alien.melee_damage_upper))
-	if(health <= 0)
+	if(alien.claw_type == CLAW_TYPE_BULLDOZER)
+		alien.visible_message(SPAN_DANGER("[alien] crushes \the [src]!"), \
+		SPAN_DANGER("We crush \the [src]!"), null, 5, CHAT_TYPE_XENO_COMBAT)
+		new /obj/item/stack/sheet/metal(destroyloc, 2)
+	else if(health <= 0)
 		alien.visible_message(SPAN_DANGER("[alien] slices \the [src] apart!"), \
 		SPAN_DANGER("We slice \the [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 		new /obj/item/stack/sheet/metal(destroyloc, 2)
@@ -758,7 +825,12 @@
 	alien.animation_attack_on(src)
 	playsound(src, 'sound/effects/metalhit.ogg', 25, 1)
 	update_health(rand(alien.melee_damage_lower, alien.melee_damage_upper))
-	if(health <= 0)
+	if(alien.claw_type == CLAW_TYPE_BULLDOZER)
+		alien.visible_message(SPAN_DANGER("[alien] crushes \the [src]!"), \
+		SPAN_DANGER("We crush \the [src]!"), null, 5, CHAT_TYPE_XENO_COMBAT)
+		if(!unacidable)
+			qdel(src)
+	else if(health <= 0)
 		alien.visible_message(SPAN_DANGER("[alien] slices \the [src] apart!"), \
 		SPAN_DANGER("We slice \the [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 		if(!unacidable)
@@ -825,16 +897,24 @@
 	if(stat & BROKEN)
 		to_chat(M, SPAN_XENONOTICE("[src] is already broken!"))
 		return XENO_NO_DELAY_ACTION
-	else if(beenhit >= XENO_HITS_TO_CUT_WIRES && M.mob_size < MOB_SIZE_BIG)
+	else if(beenhit >= XENO_HITS_TO_CUT_WIRES && (M.mob_size < MOB_SIZE_BIG && !M.claw_type != CLAW_TYPE_BULLDOZER))
 		to_chat(M, SPAN_XENONOTICE("We aren't big enough to further damage [src]."))
 		return XENO_NO_DELAY_ACTION
 	M.animation_attack_on(src)
 	M.visible_message(SPAN_DANGER("[M] [M.slashes_verb] [src]!"), \
 	SPAN_DANGER("We [M.slash_verb] [src]!"), null, 5)
 	playsound(loc, "alien_claw_metal", 25, 1)
-	if (beenhit >= XENO_HITS_TO_CUT_WIRES)
+	if(beenhit >= XENO_HITS_TO_CUT_WIRES)
 		set_broken()
 		visible_message(SPAN_DANGER("[src]'s electronics are destroyed!"), null, null, 5)
+	else if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		wiresexposed = TRUE
+		for(var/wire = 1; wire <= length(get_wire_descriptions()); wire++)
+			if(!isWireCut(wire))
+				cut(wire, M, FALSE)
+		update_icon()
+		beenhit = XENO_HITS_TO_CUT_WIRES
+		visible_message(SPAN_DANGER("[src]'s cover flies open, wires tearing apart in a rain of sparks!"), null, null, 5)
 	else if(wiresexposed)
 		for(var/wire = 1; wire <= length(get_wire_descriptions()); wire++) // Cut all the wires because xenos don't know any better
 			if(!isWireCut(wire)) // Xenos don't need to mend the wires either
@@ -866,7 +946,11 @@
 		return XENO_NO_DELAY_ACTION
 	M.animation_attack_on(src)
 	M.visible_message("[M] slashes away at [src]!","We slash and claw at the bright light!", max_distance = 5, message_flags = CHAT_TYPE_XENO_COMBAT)
-	health  = max(health - rand(M.melee_damage_lower, M.melee_damage_upper), 0)
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		set_damaged()
+		return XENO_ATTACK_ACTION
+	else
+		health  = max(health - rand(M.melee_damage_lower, M.melee_damage_upper), 0)
 	if(!health)
 		set_damaged()
 	else
@@ -915,6 +999,10 @@
 			var/difficulty = 70 //if its just closed we can smash open quite easily
 			if(welded)
 				difficulty = 30 // if its welded shut it should be harder to smash open
+			if(M.claw_type == CLAW_TYPE_BULLDOZER)
+				break_open()
+				M.visible_message(SPAN_DANGER("[M] smashes \the [src] open!"), \
+				SPAN_DANGER("We smash \the [src] open!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 			if(prob(difficulty))
 				break_open()
 				M.visible_message(SPAN_DANGER("[M] smashes \the [src] open!"), \
@@ -930,7 +1018,12 @@
 		return XENO_NO_DELAY_ACTION
 	M.animation_attack_on(src)
 	health -= floor(rand(M.melee_damage_lower, M.melee_damage_upper) * 0.5)
-	if(health <= 0)
+	if(M.claw_type == CLAW_TYPE_BULLDOZER)
+		M.visible_message(SPAN_DANGER("[M] destroys [src]!"), \
+		SPAN_DANGER("We destroy [src]!"), null, 5, CHAT_TYPE_XENO_COMBAT)
+		playsound(loc, 'sound/effects/metalhit.ogg', 25, TRUE)
+		dismantle()
+	else if(health <= 0)
 		M.visible_message(SPAN_DANGER("[M] smashes [src] apart!"), \
 		SPAN_DANGER("We slice [src] apart!"), null, 5, CHAT_TYPE_XENO_COMBAT)
 		playsound(loc, 'sound/effects/metalhit.ogg', 25, TRUE)
@@ -968,6 +1061,8 @@
 		shove_time = 50
 	if(istype(M,/mob/living/carbon/xenomorph/crusher))
 		shove_time = 15
+	if(istype(M, /mob/living/carbon/xenomorph/bulldozer))
+		shove_time = 5
 
 	xeno_attack_delay(M)
 

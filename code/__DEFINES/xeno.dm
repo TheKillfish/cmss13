@@ -31,6 +31,7 @@
 #define CLAW_TYPE_NORMAL 1
 #define CLAW_TYPE_SHARP 2
 #define CLAW_TYPE_VERY_SHARP 3
+#define CLAW_TYPE_BULLDOZER 4
 
 #define XENO_HITS_TO_DESTROY_WALL 20
 #define XENO_HITS_TO_DESTROY_WINDOW_FRAME 3
@@ -89,9 +90,10 @@
 
 #define NORMAL_XENO  0
 #define XENO_QUEEN   1
-#define XENO_LEADER  2
+#define XENO_SPECIAL 2
+#define XENO_LEADER  3
 /// Nobody can create constructions. (Feral)
-#define XENO_NOBODY  3
+#define XENO_NOBODY  4
 
 #define XENO_HIVE_AREA_SIZE 21 //The turf size from the centrepiece of a hive in which special things can be done (like building structures)
 

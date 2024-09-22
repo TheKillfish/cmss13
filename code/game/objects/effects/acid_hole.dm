@@ -56,10 +56,19 @@
 	if(user.action_busy || user.is_mob_incapacitated())
 		return
 
+	var/time_needed = 60
+	if(istype(user, /mob/living/carbon/xenomorph/bulldozer))
+		time_needed = 30
+	else
+		time_needed = 60
+
 	playsound(src, "pry", 25, 1)
 	xeno_attack_delay(user)
-	if(do_after(user, 60, INTERRUPT_ALL, BUSY_ICON_GENERIC) && !QDELETED(src) && holed_wall && istype(holed_wall))
-		holed_wall.take_damage(rand(2000,3500))
+	if(do_after(user, time_needed, INTERRUPT_ALL, BUSY_ICON_GENERIC) && !QDELETED(src) && holed_wall && istype(holed_wall))
+		if(istype(user, /mob/living/carbon/xenomorph/bulldozer))
+			holed_wall.dismantle_wall(1)
+		else
+			holed_wall.take_damage(rand(2000,3500))
 		user.emote("roar")
 
 /obj/effect/acid_hole/proc/use_wall_hole(mob/living/user)
