@@ -37,9 +37,9 @@
 	caste_type = XENO_CASTE_BULLDOZER
 	name = XENO_CASTE_WARRIOR
 	desc = "A tower of chitin and raw strength. A living siege weapon."
-	icon = 'icons/mob/xenos/warrior.dmi'
+	icon = 'icons/mob/xenos/bulldozer.dmi'
 	icon_size = 64
-	icon_state = "Warrior Walking"
+	icon_state = "Bulldozer Walking"
 	plasma_types = list(PLASMA_CHITIN)
 	pixel_x = -16
 	old_x = -16
@@ -60,8 +60,8 @@
 
 	claw_type = CLAW_TYPE_BULLDOZER
 
-	icon_xeno = 'icons/mob/xenos/warrior.dmi'
-	icon_xenonid = 'icons/mob/xenonids/warrior.dmi'
+	icon_xeno = 'icons/mob/xenos/bulldozer.dmi'
+	icon_xenonid = 'icons/mob/xenonids/queen.dmi'
 
 	weed_food_icon = 'icons/mob/xenos/weeds_64x64.dmi'
 	weed_food_states = list("Warrior_1","Warrior_2","Warrior_3")
@@ -95,5 +95,3 @@
 
 /datum/behavior_delegate/bulldozer_base
 	name = "Base Bulldozer Behavior Delegate"
-
-

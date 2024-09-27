@@ -708,6 +708,55 @@
 		if(smoke.amount > 0)
 			smoke.spread_smoke()
 
+/obj/effect/particle_effect/smoke/xeno_smokescreen
+	time_to_live = 12
+	color = "#e3f7b9"
+	spread_speed = 6
+	smokeranking = SMOKE_RANK_MAX
+
+	var/hivenumber = XENO_HIVE_NORMAL
+
+/obj/effect/particle_effect/smoke/xeno_smokescreen/Initialize(mapload, amount, datum/cause_data/cause_data)
+	if(istype(cause_data))
+		var/datum/ui_state/hive_state/cause_data_hive_state = GLOB.hive_state[cause_data.faction]
+		var/new_hive_number = cause_data_hive_state?.hivenumber
+		if(new_hive_number)
+			hivenumber = new_hive_number
+			set_hive_data(src, new_hive_number)
+
+	return ..()
+
+/obj/effect/particle_effect/smoke/xeno_smokescreen/Crossed(mob/living/carbon/affected_mob as mob)
+	return
+
+/obj/effect/particle_effect/smoke/xeno_smokescreen/affect(mob/living/carbon/victim)
+	. = ..()
+	if(!.)
+		return FALSE
+	if(victim.stat == DEAD)
+		return FALSE
+	if(victim.ally_of_hivenumber(hivenumber))
+		return FALSE
+	if(isyautja(victim) && prob(50))
+		return FALSE
+	if(HAS_TRAIT(victim, TRAIT_NESTED) && victim.status_flags & XENO_HOST)
+		return FALSE
+
+	var/effect_amt = floor(6 + amount*6)
+
+	var/mob/living/carbon/human/human_victim
+	if(!issynth(victim) && !isxeno(victim))
+		victim.eye_blurry = max(victim.eye_blurry, effect_amt)
+		victim.EyeBlur(max(victim.eye_blurry, effect_amt))
+		if(human_victim && victim.coughedtime < world.time && !victim.stat) //Coughing/gasping
+			victim.coughedtime = world.time + 1.5 SECONDS
+			if(prob(50))
+				victim.Slow(1)
+				victim.emote("cough")
+			else
+				victim.emote("gasp")
+	victim.Slow(1)
+	return TRUE
 
 /////////////////////////////////////////////
 // Smoke spread
@@ -794,3 +843,6 @@
 		smoke.time_to_live = lifetime
 	if(smoke.amount > 0)
 		smoke.spread_smoke(direction)
+
+/datum/effect_system/smoke_spread/xeno_smokescreen
+	smoke_type = /obj/effect/particle_effect/smoke/xeno_smokescreen
