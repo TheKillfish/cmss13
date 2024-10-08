@@ -28,13 +28,6 @@
 	var/action_name = "Sharpen"
 	handle_xeno_macro(src, action_name)
 
-/datum/action/xeno_action/verb/verb_quickslash()
-	set category = "Alien"
-	set name = "Quick Slash"
-	set hidden = TRUE
-	var/action_name = "Quick Slash"
-	handle_xeno_macro(src, action_name)
-
 /datum/action/xeno_action/verb/verb_forwardslash()
 	set category = "Alien"
 	set name = "Forward Slash"

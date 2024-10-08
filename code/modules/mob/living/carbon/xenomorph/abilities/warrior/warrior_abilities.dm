@@ -47,45 +47,37 @@
 // Mercenary Abilities
 /datum/action/xeno_action/onclick/sharpen
 	name = "Sharpen"
-	action_icon_state = "punch"
+	action_icon_state = "prae_cleave_action"
 	ability_name = "sharpen"
 	macro_path = /datum/action/xeno_action/verb/verb_sharpen
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_1
-	xeno_cooldown = 4 SECONDS
-
-/datum/action/xeno_action/activable/quickslash
-	name = "Quick Slash"
-	action_icon_state = "punch"
-	ability_name = "quick slash"
-	macro_path = /datum/action/xeno_action/verb/verb_quickslash
-	action_type = XENO_ACTION_CLICK
-	ability_primacy = XENO_PRIMARY_ACTION_2
-	xeno_cooldown = 6 SECONDS
+	xeno_cooldown = 2 SECONDS
 
 /datum/action/xeno_action/activable/forwardslash
 	name = "Forward Slash"
-	action_icon_state = "punch"
+	action_icon_state = "prae_impale"
 	ability_name = "forward slash"
 	macro_path = /datum/action/xeno_action/verb/verb_forwardslash
 	action_type = XENO_ACTION_CLICK
-	ability_primacy = XENO_PRIMARY_ACTION_3
+	ability_primacy = XENO_PRIMARY_ACTION_2
 	xeno_cooldown = 8 SECONDS
 
-/datum/action/xeno_action/activable/spinswipe
+/datum/action/xeno_action/onclick/spinswipe
 	name = "Spin Swipe"
-	action_icon_state = "punch"
+	action_icon_state = "spin_slash"
 	ability_name = "spin swipe"
 	macro_path = /datum/action/xeno_action/verb/verb_spinswipe
 	action_type = XENO_ACTION_CLICK
-	ability_primacy = XENO_PRIMARY_ACTION_4
+	ability_primacy = XENO_PRIMARY_ACTION_3
 	xeno_cooldown = 10 SECONDS
 
 /datum/action/xeno_action/activable/helmsplitter
 	name = "Helmsplitter"
-	action_icon_state = "punch"
+	action_icon_state = "stomp"
 	ability_name = "helmsplitter"
 	macro_path = /datum/action/xeno_action/verb/verb_helmsplitter
 	action_type = XENO_ACTION_CLICK
-	ability_primacy = XENO_PRIMARY_ACTION_5
+	ability_primacy = XENO_PRIMARY_ACTION_4
 	xeno_cooldown = 20 SECONDS
+	var/damage_mult = 1.5

@@ -189,68 +189,18 @@
 	if(!istype(behavior_del))
 		return
 
-	xeno.visible_message(SPAN_XENOWARNING("[xeno] swings it's tail and bites it!"), SPAN_XENONOTICE("We grab our tail in preparation to sharpen it's edge."))
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] swings it's tail into it's mouth!"), SPAN_XENONOTICE("We grab our tail in preparation to sharpen it's edge."))
 	if(!do_after(xeno, 2 SECONDS, INTERRUPT_ALL | BEHAVIOR_IMMOBILE, BUSY_ICON_HOSTILE))
 		return
 
-	xeno.visible_message(SPAN_XENOWARNING("[xeno] pulls it's tail through it's clenched jaws, sharpening it!"), SPAN_XENOHIGHDANGER("We pull our tail through our mouth and grind resin off the edge of our tail, sharpening it!"))
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] pulls it's tail through it's clenched jaws, honing it's edge!"), SPAN_XENOHIGHDANGER("We grind resin off the edge of our tail, sharpening it!"))
 	behavior_del.sharp_hits += 3
 	apply_cooldown()
 	return ..()
 
-/datum/action/xeno_action/activable/quickslash/use_ability(atom/target)
-	var/mob/living/carbon/xenomorph/xeno = owner
-	var/damage = (xeno.melee_damage_lower)
-
-	if(!action_cooldown_check())
-		return
-
-	if(!isxeno_human(target) || xeno.can_not_harm(target))
-		return
-
-	var/distance = get_dist(xeno, target)
-	if(distance > 2)
-		return
-
-	var/mob/living/carbon/carbon = target
-	if(!xeno.Adjacent(carbon))
-		return
-
-	if(carbon.stat == DEAD)
-		return
-	if(HAS_TRAIT(carbon, TRAIT_NESTED))
-		return
-
-	var/datum/behavior_delegate/warrior_mercenary/behavior_del = xeno.behavior_delegate
-	if(!istype(behavior_del))
-		return
-
-	var/obj/limb/target_limb = carbon.get_limb(check_zone(xeno.zone_selected))
-	if(ishuman(carbon) && (!target_limb || (target_limb.status & LIMB_DESTROYED)))
-		target_limb = carbon.get_limb("chest")
-
-	if(behavior_del.sharp_hits == 0)
-		xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail infront of it, bashing [carbon] in the [target_limb ? target_limb.display_name : "chest"]!"), \
-		SPAN_XENOWARNING("We quickly swipe [carbon] in the [target_limb ? target_limb.display_name : "chest"] with our tail, bashing them!"))
-		playsound(carbon, 'sound/weapons/baton.ogg', 50, 1)
-		carbon.apply_effect(3, DAZE)
-		carbon.KnockDown(1)
-		carbon.apply_armoured_damage(get_xeno_damage_slash(carbon, damage), ARMOR_MELEE, BRUTE, target_limb ? target_limb.name : "chest")
-		shake_camera(carbon, 2, 1)
-		apply_cooldown(2)
-		return..()
-	else
-		xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail infront of it, slashing [carbon] in the [target_limb ? target_limb.display_name : "chest"]!"), \
-		SPAN_XENOWARNING("We quickly swipe [carbon] in the [target_limb ? target_limb.display_name : "chest"] with our tail, cutting them!"))
-		playsound(carbon, 'sound/weapons/slice.ogg', 50, 1)
-		carbon.apply_armoured_damage(get_xeno_damage_slash(carbon, damage), ARMOR_MELEE, BRUTE, target_limb ? target_limb.name : "chest", 10)
-		apply_cooldown()
-		behavior_del.modify_sharpness(-1)
-		return..()
-
 /datum/action/xeno_action/activable/forwardslash/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/xeno = owner
-	var/damage = (xeno.melee_damage_lower)
+	var/damage = (xeno.melee_damage_lower + xeno.frenzy_aura * FRENZY_DAMAGE_MULTIPLIER)
 
 	if(!action_cooldown_check())
 		return
@@ -310,28 +260,73 @@
 
 			if(behavior_del.sharp_hits == 0)
 				xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail in a wide arc, slamming it into the ground infront of it!"), \
-				SPAN_XENOWARNING("We quickly swing our tail and slam the ground infront of us!"))
-				playsound(c_target, 'sound/weapons/baton.ogg', 50, 1)
+				SPAN_XENOWARNING("We quickly slam the ground infront of us with our tail!"))
+				playsound(c_target, 'sound/weapons/alien_claw_block.ogg', 50, 1)
 				c_target.apply_effect(3, DAZE)
 				c_target.KnockDown(0.5)
 				step_away(c_target, xeno)
-				c_target.apply_armoured_damage(get_xeno_damage_slash(c_target, damage), ARMOR_MELEE, BRUTE)
+				c_target.apply_armoured_damage(damage, ARMOR_MELEE, BRUTE)
 				shake_camera(c_target, 2, 1)
 				apply_cooldown(2)
 				return..()
 			else
 				xeno.visible_message(SPAN_XENOWARNING("[xeno] quickly swings it's tail in a wide arc, slashing the ground infront of it!"), \
-				SPAN_XENOWARNING("We quickly swing our tail and slash the ground infront of us!"))
-				playsound(c_target, 'sound/weapons/slice.ogg', 50, 1)
-				c_target.apply_armoured_damage(get_xeno_damage_slash(c_target, damage), ARMOR_MELEE, BRUTE, 10)
+				SPAN_XENOWARNING("We quickly slash the ground infront of us with our tail!"))
+				playsound(c_target, 'sound/weapons/alien_tail_attack.ogg', 50, 1)
+				c_target.apply_armoured_damage(damage, ARMOR_MELEE, BRUTE, 10)
 				apply_cooldown()
 				behavior_del.modify_sharpness(-1)
 				return..()
 
-/datum/action/xeno_action/activable/spinslash/use_ability(atom/target)
+/datum/action/xeno_action/onclick/spinswipe/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/xeno = owner
 	var/damage = (xeno.melee_damage_lower + xeno.frenzy_aura * FRENZY_DAMAGE_MULTIPLIER)
 
+	if(!action_cooldown_check())
+		return
+
+	var/datum/behavior_delegate/warrior_mercenary/behavior_del = xeno.behavior_delegate
+	if(!istype(behavior_del))
+		return
+
+	behavior_del.winding = TRUE
+	if(!do_after(xeno, 1, INTERRUPT_ALL | BEHAVIOR_IMMOBILE, BUSY_ICON_HOSTILE))
+		behavior_del.winding = FALSE
+		return
+
+	xeno.spin_circle()
+	xeno.emote("roar")
+	for(var/mob/living/carbon/carbon in orange(2, xeno) - xeno)
+		if(carbon.stat == DEAD)
+			continue
+		if(HAS_TRAIT(carbon, TRAIT_NESTED))
+			continue
+		if(xeno.can_not_harm(carbon))
+			continue
+
+		if(behavior_del.sharp_hits == 0)
+			carbon.apply_armoured_damage(damage, ARMOR_MELEE, BRUTE)
+			step_away(carbon, xeno)
+			carbon.last_damage_data = create_cause_data(initial(xeno.name), xeno)
+			xeno.flick_attack_overlay(carbon, "punch")
+			to_chat(carbon, SPAN_DANGER("[xeno] blunt tail bashy."))
+			log_attack("[key_name(xeno)] hit [key_name(carbon)] with [name]")
+			playsound(carbon, 'sound/weapons/alien_claw_block.ogg', 50, TRUE)
+		else
+			carbon.apply_armoured_damage(damage, ARMOR_MELEE, BRUTE, 10)
+			carbon.last_damage_data = create_cause_data(initial(xeno.name), xeno)
+			xeno.flick_attack_overlay(carbon, "slash")
+			to_chat(carbon, SPAN_DANGER("[xeno] sharp tail slashy."))
+			log_attack("[key_name(xeno)] hit [key_name(carbon)] with [name]")
+			playsound(carbon, 'sound/weapons/alien_tail_attack.ogg', 50, TRUE)
+			behavior_del.modify_sharpness(-1)
+
+	xeno.visible_message(SPAN_DANGER("[xeno] swings it's tail in a circle!"), SPAN_NOTICE("We swing our tail around ourself!"))
+	behavior_del.winding = FALSE
+	apply_cooldown()
+	behavior_del.winding = FALSE
+	..()
+
 /datum/action/xeno_action/activable/helmsplitter/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/xeno = owner
-	var/damage = (xeno.melee_damage_upper + xeno.frenzy_aura * FRENZY_DAMAGE_MULTIPLIER)
+	var/damage = (xeno.melee_damage_upper * damage_mult + xeno.frenzy_aura * FRENZY_DAMAGE_MULTIPLIER)
