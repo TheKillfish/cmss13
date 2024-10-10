@@ -4,7 +4,7 @@
 	desc = "A console built to interface with ARES, allowing for 1:1 communication."
 	icon = 'icons/obj/structures/machinery/ares.dmi'
 	icon_state = "console"
-	exproof = TRUE
+	explo_proof = TRUE
 
 	var/current_menu = "login"
 	var/last_menu = ""
@@ -251,8 +251,8 @@
 				authentication = get_ares_access(idcard)
 				last_login = idcard.registered_name
 			else if(operator.wear_id)
-				idcard = operator.wear_id
-				if(istype(idcard))
+				idcard = operator.get_idcard()
+				if(idcard)
 					authentication = get_ares_access(idcard)
 					last_login = idcard.registered_name
 			else

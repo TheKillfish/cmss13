@@ -4,7 +4,7 @@
 	desc = "A portable interface used by Working-Joes, capable of connecting to the local command AI to relay tasking information. Built to withstand a nuclear bomb."
 	icon_state = "karnak_off"
 	unacidable = TRUE
-	indestructible = TRUE
+	explo_proof = TRUE
 	req_one_access = list(ACCESS_MARINE_AI_TEMP, ACCESS_MARINE_AI, ACCESS_ARES_DEBUG)
 
 	/// The ID used to link all devices.
@@ -198,8 +198,8 @@
 				authentication = get_ares_access(idcard)
 				last_login = idcard.registered_name
 			else if(user.wear_id)
-				idcard = user.wear_id
-				if(istype(idcard))
+				idcard = user.get_idcard()
+				if(idcard)
 					authentication = get_ares_access(idcard)
 					last_login = idcard.registered_name
 			else
@@ -343,8 +343,8 @@
 			if(istype(idcard))
 				has_id = TRUE
 			else if(user.wear_id)
-				idcard = user.wear_id
-				if(istype(idcard))
+				idcard = user.get_idcard()
+				if(idcard)
 					has_id = TRUE
 			if(!has_id)
 				to_chat(user, SPAN_WARNING("You require an ID card to request an access ticket!"))

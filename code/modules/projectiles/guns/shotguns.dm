@@ -838,6 +838,7 @@ can cause issues with ammo types getting mixed up during the burst.
 		return TRUE
 
 /datum/action/item_action/specialist/twobore_brace/action_activate()
+	. = ..()
 	var/obj/item/weapon/gun/shotgun/double/twobore/G = holder_item
 	if(G.braced)
 		return
@@ -857,7 +858,7 @@ can cause issues with ammo types getting mixed up during the burst.
 	icon_state = "twobore"
 	item_state = "twobore"
 	unacidable = TRUE
-	indestructible = TRUE
+	explo_proof = TRUE
 	force = 20 //Big heavy elephant gun.
 	current_mag = /obj/item/ammo_magazine/internal/shotgun/double/twobore
 	gauge = "2 bore"
@@ -1020,7 +1021,7 @@ can cause issues with ammo types getting mixed up during the burst.
 			throw_turfs.Remove(T)
 			continue
 		var/list/turf/path = get_line(get_step_towards(src, T), T) //Same path throw code will calculate from.
-		if(!path.len)
+		if(!length(path))
 			throw_turfs.Remove(T)
 			continue
 		var/prev_turf = start_turf

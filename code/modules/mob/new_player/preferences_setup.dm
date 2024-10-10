@@ -188,6 +188,10 @@
 	var/J = job_pref_to_gear_preset()
 	if(isnull(preview_dummy))
 		preview_dummy = new()
+
+	preview_dummy.blocks_emissive = FALSE
+	preview_dummy.update_emissive_block()
+
 	clear_equipment()
 	if(refresh_limb_status)
 		for(var/obj/limb/L in preview_dummy.limbs)
@@ -196,7 +200,8 @@
 	copy_appearance_to(preview_dummy)
 	preview_dummy.update_body()
 	preview_dummy.update_hair()
-
+	for (var/datum/character_trait/character_trait as anything in preview_dummy.traits)
+		character_trait.unapply_trait(preview_dummy)
 	arm_equipment(preview_dummy, J, FALSE, FALSE, owner, show_job_gear)
 
 	// If the dummy was equipped with marine armor.
@@ -211,20 +216,20 @@
 
 	if(isnull(preview_front))
 		preview_front = new()
-		owner.add_to_screen(preview_front)
 		preview_front.vis_contents += preview_dummy
 		preview_front.screen_loc = "preview:0,0"
 	preview_front.icon_state = bg_state
+	owner.add_to_screen(preview_front)
 
 	if(isnull(rotate_left))
 		rotate_left = new(null, preview_dummy)
-		owner.add_to_screen(rotate_left)
 		rotate_left.screen_loc = "preview:-1:16,0"
+	owner.add_to_screen(rotate_left)
 
 	if(isnull(rotate_right))
 		rotate_right = new(null, preview_dummy)
-		owner.add_to_screen(rotate_right)
 		rotate_right.screen_loc = "preview:1:-16,0"
+	owner.add_to_screen(rotate_right)
 
 /datum/preferences/proc/job_pref_to_gear_preset()
 	var/high_priority
@@ -260,6 +265,8 @@
 			return /datum/equipment_preset/uscm/intel/full
 		if(JOB_CAS_PILOT)
 			return /datum/equipment_preset/uscm_ship/gp/full
+		if(JOB_TANK_CREW)
+			return /datum/equipment_preset/uscm/tank/full
 		if(JOB_DROPSHIP_PILOT)
 			return /datum/equipment_preset/uscm_ship/dp/full
 		if(JOB_DROPSHIP_CREW_CHIEF)
