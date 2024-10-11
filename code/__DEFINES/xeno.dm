@@ -406,6 +406,9 @@
 #define PRAETORIAN_WARDEN "Warden"
 #define PRAETORIAN_OPPRESSOR "Oppressor"
 
+// Queen strain flags
+#define QUEEN_CRONE "Crone"
+
 /////////////////////////////////////////////////////////////////////////////////////
 //
 // Modifiers

@@ -120,11 +120,16 @@
 		to_chat(src, SPAN_WARNING("The restraints are too restricting to allow us to take a strain."))
 		return FALSE
 
+	var/mob/living/carbon/xenomorph/queen/queen = src
+	if(!queen.queen_aged)
+		to_chat(src, SPAN_WARNING("We aren't mature enough to take a strain."))
+		return FALSE
+
 	if(health < maxHealth)
 		to_chat(src, SPAN_WARNING("We must be at full health to take a strain."))
 		return FALSE
 
-	if(agility || fortify || crest_defense || stealth)
+	if(agility || fortify || crest_defense || stealth || queen.ovipositor)
 		to_chat(src, SPAN_WARNING("We cannot take a strain while in this stance."))
 		return FALSE
 

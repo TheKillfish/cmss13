@@ -30,6 +30,7 @@
 	weed_level = WEED_LEVEL_STANDARD
 	can_be_revived = FALSE
 
+	available_strains = list(/datum/xeno_strain/crone)
 	behavior_delegate_type = /datum/behavior_delegate/queen
 
 	spit_delay = 25
