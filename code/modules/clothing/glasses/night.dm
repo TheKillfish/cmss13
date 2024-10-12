@@ -53,6 +53,10 @@
 	fullscreen_vision = null
 	actions_types = list(/datum/action/item_action/toggle)
 
+/obj/item/clothing/glasses/night/M4RA/scout
+	name = "\improper Mark 3 Scout sight"
+	desc = "A headset and night vision goggles system for certain USCM Scout specialists. Allows highlighted imaging of surroundings, as well as the ability to view the health statuses of others. Click it to toggle."
+
 /obj/item/clothing/glasses/night/m42_night_goggles
 	name = "\improper M42 scout sight"
 	gender = NEUTER

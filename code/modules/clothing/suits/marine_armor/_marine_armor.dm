@@ -666,6 +666,19 @@
 	flags_item = MOB_LOCK_ON_EQUIP|NO_CRYO_STORE
 	unacidable = TRUE
 
+/obj/item/clothing/suit/storage/marine/M4A
+	name = "\improper M4-A light armor"
+	desc = "A custom set of M4 armor designed for USCM Assault Scouts."
+	icon_state = "scout_armor" // Actual will be called "assault_scout_armor"
+	armor_melee = CLOTHING_ARMOR_MEDIUMHIGH
+	armor_bullet = CLOTHING_ARMOR_MEDIUMHIGH
+	armor_rad = CLOTHING_ARMOR_MEDIUM
+	slowdown = SLOWDOWN_ARMOR_LIGHT
+	storage_slots = 4
+	specialty = "M4-A assault"
+	flags_item = MOB_LOCK_ON_EQUIP|NO_CRYO_STORE
+	unacidable = TRUE
+
 //==================Combat Correspondent==================\\
 
 /obj/item/clothing/suit/storage/marine/light/reporter

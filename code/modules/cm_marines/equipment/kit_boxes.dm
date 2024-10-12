@@ -92,25 +92,16 @@
 
 /obj/item/storage/box/spec/scout
 	name = "\improper Scout equipment case"
-	desc = "A large case containing an M4RA battle rifle, M3-S light armor and helmet, M4RA battle sight, M68 thermal cloak, V3 reactive thermal tarp, improved scout laser designator, ammunition and additional pieces of equipment.\nDrag this sprite onto yourself to open it up! NOTE: You cannot put items back inside this case."
+	desc = "A large case containing an M4RA battle rifle, M3-S light armor and helmet, M4RA battle sight, M68 thermal cloak, V3 reactive thermal tarp, improved scout laser designator, and additional pieces of equipment.\nDrag this sprite onto yourself to open it up! NOTE: You cannot put items back inside this case."
 	kit_overlay = "scout"
 
 /obj/item/storage/box/spec/scout/fill_preset_inventory()
 	new /obj/item/clothing/suit/storage/marine/M3S(src)
 	new /obj/item/clothing/head/helmet/marine/scout(src)
-	new /obj/item/clothing/glasses/night/M4RA(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom/incendiary(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom/incendiary(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom/impact(src)
-	new /obj/item/ammo_magazine/rifle/m4ra/custom/impact(src)
+	new /obj/item/clothing/glasses/night/M4RA/scout(src)
 	new /obj/item/weapon/gun/pistol/vp78(src)
 	new /obj/item/ammo_magazine/pistol/vp78(src)
 	new /obj/item/ammo_magazine/pistol/vp78(src)
-	new /obj/item/weapon/gun/rifle/m4ra_custom(src)
 	new /obj/item/storage/backpack/marine/satchel/scout_cloak(src)
 	new /obj/item/bodybag/tarp/reactive/scout(src)
 	new /obj/item/explosive/plastic(src)
@@ -121,6 +112,23 @@
 	else
 		new /obj/item/device/binoculars/range/designator/scout(src)
 
+/obj/item/storage/box/spec/scout/custom
+	name = "\improper Assault Scout equipment case"
+	desc = "A large case containing a custom M4RA battle rifle, M4-A assault armor and helmet, M4RA battle sight, "
+
+/obj/item/storage/box/spec/scout/custom/fill_preset_inventory()
+	new /obj/item/clothing/suit/storage/marine/M4A(src)
+	new /obj/item/clothing/head/helmet/marine/scout(src)
+	new /obj/item/clothing/glasses/night/M4RA(src)
+	new /obj/item/weapon/gun/rifle/m4ra_custom(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom/incendiary(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom/incendiary(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom/impact(src)
+	new /obj/item/ammo_magazine/rifle/m4ra/custom/impact(src)
 
 /obj/item/storage/box/spec/pyro
 	name = "\improper Pyrotechnician equipment case"

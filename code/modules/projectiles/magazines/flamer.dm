@@ -232,6 +232,21 @@
 
 	max_range = 7
 
+/obj/item/ammo_magazine/flamer_tank/light
+	name = "light incinerator tank"
+	desc = "A lighter-weight fuel tank used to store fuel for use in the M240-F precision incinerator unit. Handle with care."
+	icon_state = "flametank_large_custom"
+	item_state = "flametank_large"
+	max_rounds = 250
+	gun_type = /obj/item/weapon/gun/flamer/M240F
+
+	max_intensity = 80
+	max_range = 5
+	max_duration = 50
+
+/obj/item/ammo_magazine/flamer_tank/large/empty
+	flamer_chem = null
+
 //Custom pyro tanks
 /obj/item/ammo_magazine/flamer_tank/custom/large
 	name = "large custom incinerator tank"
