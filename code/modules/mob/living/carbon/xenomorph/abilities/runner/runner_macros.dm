@@ -25,3 +25,12 @@
 	set hidden = TRUE
 	var/action_name = "For the Hive!"
 	handle_xeno_macro(src, action_name)
+
+// Porcupine Macros
+
+/datum/action/xeno_action/verb/verb_precise_shot()
+	set category = "Alien"
+	set name = "Precise Shards"
+	set hidden = TRUE
+	var/action_name = "Precise Shards (50 shards)"
+	handle_xeno_macro(src, action_name)

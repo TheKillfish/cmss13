@@ -359,6 +359,17 @@
 		if(M.slowed < 6)
 			M.apply_effect(6, SLOW)
 
+/datum/ammo/xeno/bone_chips/spread/porcupine
+	name = "bone chips"
+
+	scatter = 0
+	max_range = 5
+	damage = 10
+	shrapnel_chance = 20
+
+/datum/ammo/xeno/bone_chips/spread/porcupine/scatter
+	scatter = 20
+
 /datum/ammo/xeno/oppressor_tail
 	name = "tail hook"
 	icon_state = "none"

@@ -205,3 +205,47 @@
 	xeno.adjust_effect(behavior_delegate.caboom_timer * -2 - (behavior_delegate.caboom_timer - behavior_delegate.caboom_left + 2) * xeno.life_slow_reduction * 0.5, SUPERSLOW)
 
 	to_chat(xeno, SPAN_XENOWARNING("We remove all our explosive acid before it combusted."))
+
+// Porcupine Abilities
+
+/datum/action/xeno_action/activable/porcupine_shot/use_ability(atom/affected_atom)
+	var/mob/living/carbon/xenomorph/xeno = owner
+
+	if(!action_cooldown_check())
+		return
+
+	if(!affected_atom || affected_atom.layer >= FLY_LAYER || !isturf(xeno.loc) || !xeno.check_state())
+		return
+
+	var/datum/behavior_delegate/runner_porcupine/behavior = xeno.behavior_delegate
+	if (!behavior.check_shards(shard_cost))
+		to_chat(xeno, SPAN_DANGER("Not enough shards! We need [shard_cost - behavior.shards] more!"))
+		return
+	behavior.use_shards(shard_cost)
+
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] fires their spikes at [affected_atom]!"), SPAN_XENOWARNING("We fire our spikes at [affected_atom]!"))
+
+	var/turf/target = locate(affected_atom.x, affected_atom.y, affected_atom.z)
+	var/obj/projectile/projectile = new /obj/projectile(xeno.loc, create_cause_data(initial(xeno.caste_type), xeno))
+
+	var/datum/ammo/ammo_datum = GLOB.ammo_list[ammo_type]
+
+	projectile.generate_bullet(ammo_datum)
+
+	projectile.fire_at(target, xeno, xeno, ammo_datum.max_range, ammo_datum.shell_speed)
+	playsound(xeno, 'sound/effects/spike_spray.ogg', 25, 1)
+
+	apply_cooldown()
+	return ..()
+
+/datum/action/xeno_action/activable/porcupine_shot/action_cooldown_check()
+	if(!owner)
+		return FALSE
+	if (cooldown_timer_id == TIMER_ID_NULL)
+		var/mob/living/carbon/xenomorph/xeno = owner
+		if(!istype(xeno))
+			return FALSE
+		var/datum/behavior_delegate/runner_porcupine/behavior = xeno.behavior_delegate
+		return behavior.check_shards(shard_cost)
+	else
+		return FALSE

@@ -386,6 +386,7 @@
 
 // Runner strain flags
 #define RUNNER_ACIDER "Acider"
+#define RUNNER_PORCUPINE "Porcupine"
 
 // Lurker strain flags
 #define LURKER_VAMPIRE "Vampire"

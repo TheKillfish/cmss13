@@ -51,3 +51,33 @@
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
 	var/minimal_acid = 200
+
+// Porcupine Abilities
+
+/datum/action/xeno_action/activable/porcupine_shot
+	name = "Precise Shards (50 shards)"
+	action_icon_state = "rav_spike"
+	ability_name = "fire spikes"
+	macro_path = /datum/action/xeno_action/verb/verb_precise_shot
+	action_type = XENO_ACTION_CLICK
+	ability_primacy = XENO_PRIMARY_ACTION_1
+	plasma_cost = 0
+	xeno_cooldown = 10 SECONDS
+
+	// Config
+	var/shard_cost = 50
+	var/ammo_type = /datum/ammo/xeno/bone_chips/spread/porcupine
+
+/*/datum/action/xeno_action/activable/porcupine_scatter
+	name = "Scatter Shards (100 shards)"
+	action_icon_state = "rav_shard_shed"
+	ability_name = "spike shed"
+	macro_path = /datum/action/xeno_action/verb/verb_catter_shards
+	action_type = XENO_ACTION_CLICK
+	ability_primacy = XENO_PRIMARY_ACTION_2
+	plasma_cost = 0
+	xeno_cooldown = 20 SECONDS
+
+	// Config
+	var/shard_cost = 100
+	var/ammo_type = /datum/ammo/xeno/bone_chips/spread/porcupine/scatter*/
