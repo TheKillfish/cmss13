@@ -359,16 +359,16 @@
 		if(M.slowed < 6)
 			M.apply_effect(6, SLOW)
 
-/datum/ammo/xeno/bone_chips/spread/porcupine
+/datum/ammo/xeno/bone_chips/porcupine
 	name = "bone chips"
-
-	scatter = 0
 	max_range = 5
-	damage = 10
+	bonus_projectiles_type = /datum/ammo/xeno/bone_chips/porcupine/scatter
+	bonus_projectiles_amount = EXTRA_PROJECTILES_TIER_4
 	shrapnel_chance = 20
 
-/datum/ammo/xeno/bone_chips/spread/porcupine/scatter
+/datum/ammo/xeno/bone_chips/porcupine/scatter
 	scatter = 20
+	bonus_projectiles_amount = 0
 
 /datum/ammo/xeno/oppressor_tail
 	name = "tail hook"

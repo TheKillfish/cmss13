@@ -27,11 +27,13 @@
 	var/max_shards = 300
 	var/shard_gain_onlife = 5
 	var/shards_per_projectile = 10
-	var/stat_per_fifty_shards = 2.50
-	var/speed_loss = 0.05
+	var/armor_per_fifty_shards = 2.50
+	var/speed_per_fifty_shards = 0.25
 
 	// Shard state
 	var/shards = 0
+	var/shards_locked = FALSE
+	var/shard_lock_duration = 100
 
 	// Armor buff state
 	var/times_armor_buffed = 0
@@ -41,9 +43,28 @@
 /datum/behavior_delegate/runner_porcupine/append_to_stat()
 	. = list()
 	. += "Bone Shards: [shards]/[max_shards]"
-	. += "Shards Armor Bonus: [times_armor_buffed*stat_per_fifty_shards]"
+	. += "Shards Armor Bonus: [times_armor_buffed*armor_per_fifty_shards]"
 
-// Return true if we have enough shards, false otherwise
+/datum/behavior_delegate/runner_porcupine/proc/lock_shards()
+
+	if(!bound_xeno)
+		return
+
+	to_chat(bound_xeno, SPAN_XENODANGER("You have shed your spikes and cannot gain any more for [shard_lock_duration/10] seconds!"))
+
+	shards = 0
+	shards_locked = TRUE
+	addtimer(CALLBACK(src, PROC_REF(unlock_shards)), shard_lock_duration)
+
+/datum/behavior_delegate/runner_porcupine/proc/unlock_shards()
+
+	if(!bound_xeno)
+		return
+
+	to_chat(bound_xeno, SPAN_XENODANGER("You feel your ability to gather shards return!"))
+
+	shards_locked = FALSE
+
 /datum/behavior_delegate/runner_porcupine/proc/check_shards(amount)
 	if(!amount)
 		return FALSE
@@ -57,16 +78,18 @@
 
 /datum/behavior_delegate/runner_porcupine/on_life()
 
-	shards = min(max_shards, shards + shard_gain_onlife)
+	if(!shards_locked)
+		shards = min(max_shards, shards + shard_gain_onlife)
 
 	var/stat_count = shards/50
 	// Armor
-	bound_xeno.armor_modifier -= times_armor_buffed * stat_per_fifty_shards
-	bound_xeno.armor_modifier += stat_count * stat_per_fifty_shards
+	bound_xeno.armor_modifier -= times_armor_buffed * armor_per_fifty_shards
+	bound_xeno.armor_modifier += stat_count * armor_per_fifty_shards
 	bound_xeno.recalculate_armor()
 	times_armor_buffed = stat_count
-	bound_xeno.speed_modifier += times_speed_debuffed * stat_per_fifty_shards
-	bound_xeno.speed_modifier -= stat_count * stat_per_fifty_shards
+	// Speed
+	bound_xeno.speed_modifier -= times_speed_debuffed * speed_per_fifty_shards
+	bound_xeno.speed_modifier += stat_count * speed_per_fifty_shards
 	bound_xeno.recalculate_speed()
 	times_speed_debuffed = stat_count
 
@@ -84,5 +107,6 @@
 	holder.overlays.Cut()
 
 /datum/behavior_delegate/runner_porcupine/on_hitby_projectile()
-	shards = min(max_shards, shards + shards_per_projectile)
+	if(!shards_locked)
+		shards = min(max_shards, shards + shards_per_projectile)
 	return

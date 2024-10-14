@@ -249,3 +249,35 @@
 		return behavior.check_shards(shard_cost)
 	else
 		return FALSE
+
+/datum/action/xeno_action/onclick/porcupine_shed/use_ability(atom/affected_atom)
+	var/mob/living/carbon/xenomorph/xeno = owner
+
+	if (!action_cooldown_check())
+		return
+
+	if (!xeno.check_state())
+		return
+
+	var/datum/behavior_delegate/ravager_hedgehog/behavior = xeno.behavior_delegate
+	if (!behavior.check_shards(shard_cost))
+		to_chat(xeno, SPAN_DANGER("Not enough shards! We need [shard_cost - behavior.shards] more!"))
+		return
+	behavior.use_shards(shard_cost)
+	behavior.lock_shards()
+
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] sheds their spikes, firing them in all directions!"), SPAN_XENOWARNING("We shed our spikes, firing them in all directions!!"))
+	xeno.spin_circle()
+	create_shrapnel(get_turf(xeno), shrapnel_amount, null, null, ammo_type, create_cause_data(initial(xeno.caste_type), owner), TRUE)
+	playsound(xeno, 'sound/effects/spike_spray.ogg', 25, 1)
+
+	apply_cooldown()
+	return ..()
+
+/datum/action/xeno_action/onclick/porcupine_shed/action_cooldown_check()
+	if (cooldown_timer_id == TIMER_ID_NULL)
+		var/mob/living/carbon/xenomorph/xeno = owner
+		var/datum/behavior_delegate/ravager_hedgehog/behavior = xeno.behavior_delegate
+		return behavior.check_shards(shard_cost)
+	else
+		return FALSE

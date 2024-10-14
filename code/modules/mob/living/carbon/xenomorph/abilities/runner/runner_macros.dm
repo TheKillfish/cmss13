@@ -28,9 +28,16 @@
 
 // Porcupine Macros
 
-/datum/action/xeno_action/verb/verb_precise_shot()
+/datum/action/xeno_action/verb/verb_scatter_shards()
 	set category = "Alien"
-	set name = "Precise Shards"
+	set name = "Scatter Shards"
 	set hidden = TRUE
-	var/action_name = "Precise Shards (50 shards)"
+	var/action_name = "Scatter Shards (75 shards)"
+	handle_xeno_macro(src, action_name)
+
+/datum/action/xeno_action/verb/verb_shard_dump()
+	set category = "Alien"
+	set name = "Shard Dump"
+	set hidden = TRUE
+	var/action_name = "Shard Dump (100 shards)"
 	handle_xeno_macro(src, action_name)
