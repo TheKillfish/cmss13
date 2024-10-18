@@ -80,5 +80,5 @@
 
 	// Config values
 	var/shard_cost = 100
-	var/ammo_type = /datum/ammo/xeno/bone_chips/porcupine/spread
+	var/ammo_type = /datum/ammo/xeno/bone_chips/porcupine/scatter
 	var/shrapnel_amount = 40
