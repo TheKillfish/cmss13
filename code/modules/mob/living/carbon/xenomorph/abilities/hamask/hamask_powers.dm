@@ -52,7 +52,7 @@
 	xeno.face_atom(carbon)
 
 	switch(target_type_state)
-		if(2) // Shoulderbash to knock target over followed by a kick.
+		if(2) // Target is Pred and Standing; big threat, shoulderbash them to knock them over then a kick.
 			xeno.animation_attack_on(carbon)
 			xeno.flick_attack_overlay(carbon, "disarm")
 			playsound(carbon, 'sound/effects/bang.ogg', 15, 0)
@@ -67,7 +67,7 @@
 			xeno.visible_message(SPAN_XENOWARNING("[xeno] shoulderbashes [carbon] to the ground, then kicks them in the chest!"), \
 			SPAN_XENOWARNING("We shoulderbash [carbon] to the ground, then we kick them while they're down!"))
 
-		if(3) // Stab with tail in CoM.
+		if(3) // Target is Pred and Prone; vulnerable big threat, play safe and stab with tail in CoM.
 			xeno.animation_attack_on(carbon)
 			xeno.flick_attack_overlay(carbon, "tail")
 			playsound(carbon, 'sound/weapons/alien_tail_attack.ogg', 50, TRUE)
