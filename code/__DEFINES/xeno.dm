@@ -406,6 +406,9 @@
 #define PRAETORIAN_WARDEN "Warden"
 #define PRAETORIAN_OPPRESSOR "Oppressor"
 
+// Sentinel strain flags
+#define SENTINEL_BOUNCER "Bouncer"
+
 /////////////////////////////////////////////////////////////////////////////////////
 //
 // Modifiers
