@@ -1,10 +1,10 @@
-#define XENO_QUEEN_AGE_TIME (10 MINUTES)
+#define XENO_QUEEN_AGE_TIME (10 /*MINUTES*/SECONDS)
 #define XENO_QUEEN_DEATH_DELAY (5 MINUTES)
 #define YOUNG_QUEEN_HEALTH_MULTIPLIER 0.5
 
 /datum/caste_datum/queen
 	caste_type = XENO_CASTE_QUEEN
-	tier = 0
+	tier = 4
 
 	melee_damage_lower = XENO_DAMAGE_TIER_4
 	melee_damage_upper = XENO_DAMAGE_TIER_6
@@ -23,13 +23,13 @@
 	evolution_allowed = FALSE
 	fire_immunity = FIRE_IMMUNITY_NO_DAMAGE|FIRE_IMMUNITY_NO_IGNITE
 	caste_desc = "The biggest and baddest xeno. The Queen controls the hive and plants eggs"
-	spit_types = list(/datum/ammo/xeno/toxin/queen, /datum/ammo/xeno/acid/spatter)
-	can_hold_facehuggers = 0
+	spit_types = list(/datum/ammo/xeno/resin)
 	can_hold_eggs = CAN_HOLD_ONE_HAND
 	acid_level = 2
 	weed_level = WEED_LEVEL_STANDARD
 	can_be_revived = FALSE
 
+	available_strains = list(/datum/xeno_strain/queen_test)
 	behavior_delegate_type = /datum/behavior_delegate/queen
 
 	spit_delay = 25
@@ -263,17 +263,15 @@
 	icon_state = "Queen Walking"
 	plasma_types = list(PLASMA_ROYAL,PLASMA_CHITIN,PLASMA_PHEROMONE,PLASMA_NEUROTOXIN)
 	attacktext = "bites"
-	attack_sound = null
-	friendly = "nuzzles"
-	wall_smash = 0
 	pixel_x = -16
 	old_x = -16
 	mob_size = MOB_SIZE_IMMOBILE
 	drag_delay = 6 //pulling a big dead xeno is hard
-	tier = 0 //Queen doesn't count towards population limit.
+	tier = 4
 	hive_pos = XENO_QUEEN
 	small_explosives_stun = FALSE
 	pull_speed = 3 //screech/neurodragging is cancer, at the very absolute least get some runner to do it for teamwork
+	counts_for_slots = FALSE
 	organ_value = 8000 // queen is expensive
 
 	icon_xeno = 'icons/mob/xenos/castes/tier_4/queen.dmi'
@@ -291,27 +289,40 @@
 	var/queen_ovipositor_icon
 	var/queen_standing_icon
 
+	// QUEEN REWORK STUFF
+	//
+	var/queen_stamina = 0 /// Current stamina
+	var/stamina_cap = 600 /// Maximum stamina
+	var/stamina_tier = 0 /// Which tier increment is stamina at? 6 is highest, 0 is lowest.
+	var/stamina_extras_threshold = 300 /// Threshold for stamina extra effects to activate after recovering from full depletion.
+	var/stamina_extras_active = FALSE /// Are extra effects related to stamina active or not?
+	var/stamina_gain = 20
+	// Stamina Drain vars
+	var/stamina_drain = -2
+	var/stamina_drain_delay_duration = 60
+	var/stamina_drain_delay = 60 /// How long after getting off ovi will drain be delayed for?
+	var/stamina_drain_delay_active = FALSE /// Is the delay for stamina draining active?
+	// Stamina Plasma Reserve vars
+	var/reserve_plasma = 0
+	var/reserve_plasma_max
+
 	tileoffset = 0
 	viewsize = 12
 
 	base_actions = list(
+		// Everything here will always be here
 		/datum/action/xeno_action/onclick/xeno_resting,
 		/datum/action/xeno_action/onclick/regurgitate,
 		/datum/action/xeno_action/watch_xeno,
 		/datum/action/xeno_action/activable/tail_stab,
-		/datum/action/xeno_action/activable/place_construction/not_primary, //normally fifth macro but not as important for queen
 		/datum/action/xeno_action/activable/corrosive_acid,
 		/datum/action/xeno_action/onclick/emit_pheromones,
 		/datum/action/xeno_action/onclick/queen_word,
 		/datum/action/xeno_action/onclick/psychic_whisper,
 		/datum/action/xeno_action/onclick/psychic_radiance,
-		/datum/action/xeno_action/activable/gut,
-		/datum/action/xeno_action/onclick/plant_weeds, //first macro, and fits near the resin structure buttons
-		/datum/action/xeno_action/onclick/choose_resin/queen_macro, //fourth macro
-		/datum/action/xeno_action/activable/secrete_resin/queen_macro, //fifth macro
-		/datum/action/xeno_action/onclick/grow_ovipositor,
-		/datum/action/xeno_action/activable/info_marker/queen,
 		/datum/action/xeno_action/onclick/manage_hive,
+		/datum/action/xeno_action/activable/info_marker/queen,
+		/datum/action/xeno_action/onclick/screech, //custom macro, Screech; not usable on ovi
 	)
 
 	inherent_verbs = list(
@@ -326,35 +337,52 @@
 	)
 
 	var/list/mobile_abilities = list(
-		/datum/action/xeno_action/onclick/xeno_resting,
+		// Everything here will always be here
 		/datum/action/xeno_action/onclick/regurgitate,
 		/datum/action/xeno_action/watch_xeno,
-		/datum/action/xeno_action/activable/tail_stab,
-		/datum/action/xeno_action/activable/place_construction/not_primary, //normally fifth macro but not as important for queen
-		/datum/action/xeno_action/activable/corrosive_acid,
 		/datum/action/xeno_action/onclick/emit_pheromones,
 		/datum/action/xeno_action/onclick/queen_word,
 		/datum/action/xeno_action/onclick/psychic_whisper,
 		/datum/action/xeno_action/onclick/psychic_radiance,
-		/datum/action/xeno_action/activable/gut,
-		/datum/action/xeno_action/onclick/plant_weeds, //first macro, and fits near the resin structure buttons
-		/datum/action/xeno_action/onclick/choose_resin/queen_macro, //fourth macro
-		/datum/action/xeno_action/activable/secrete_resin/queen_macro, //fifth macro
-		/datum/action/xeno_action/onclick/grow_ovipositor,
 		/datum/action/xeno_action/onclick/manage_hive,
 		/datum/action/xeno_action/activable/info_marker/queen,
-		/datum/action/xeno_action/onclick/screech, //custom macro, Screech
-		/datum/action/xeno_action/activable/xeno_spit/queen_macro, //third macro
-		/datum/action/xeno_action/onclick/shift_spits,
-		//second macro
+		/datum/action/xeno_action/onclick/screech, //custom macro, Screech; not usable on ovi
+		// Everything here is stuff only added when not on ovi
+		/datum/action/xeno_action/onclick/grow_ovipositor,
+		/datum/action/xeno_action/onclick/plant_weeds, //first macro, and fits near the resin structure buttons
+		/datum/action/xeno_action/activable/gut,
+		/datum/action/xeno_action/activable/pounce/runner // FOR TESTING
 	)
 
-	// Abilities they get when they've successfully aged.
-	var/mobile_aged_abilities = list(
-		/datum/action/xeno_action/onclick/screech, //custom macro, Screech
-		/datum/action/xeno_action/activable/xeno_spit/queen_macro, //third macro
-		/datum/action/xeno_action/onclick/shift_spits, //second macro
+	var/list/immobile_abilities = list(
+		// Everything here will always be here
+		/datum/action/xeno_action/onclick/xeno_resting, // Not usable on ovi
+		/datum/action/xeno_action/onclick/regurgitate,
+		/datum/action/xeno_action/watch_xeno,
+		/datum/action/xeno_action/activable/tail_stab, // Not usable on ovi
+		/datum/action/xeno_action/activable/corrosive_acid, // Not usable on ovi
+		/datum/action/xeno_action/onclick/emit_pheromones,
+		/datum/action/xeno_action/onclick/queen_word,
+		/datum/action/xeno_action/onclick/psychic_whisper,
+		/datum/action/xeno_action/onclick/psychic_radiance,
+		/datum/action/xeno_action/onclick/manage_hive,
+		/datum/action/xeno_action/activable/info_marker/queen,
+		/datum/action/xeno_action/onclick/screech, //custom macro, Screech; not usable on ovi
+		// Everything here is stuff only added when on ovi
+		/datum/action/xeno_action/onclick/remove_eggsac,
+		/datum/action/xeno_action/activable/place_construction/not_primary,
+		/datum/action/xeno_action/activable/expand_weeds, //third macro
+		/datum/action/xeno_action/onclick/choose_resin/queen_macro, //fourth macro
+		/datum/action/xeno_action/activable/secrete_resin/remote/queen, //fifth macro
+		/datum/action/xeno_action/onclick/set_xeno_lead,
+		/datum/action/xeno_action/activable/queen_heal, //first macro
+		/datum/action/xeno_action/activable/queen_give_plasma, //second macro
+		/datum/action/xeno_action/onclick/queen_order,
+		/datum/action/xeno_action/onclick/queen_tacmap,
+		/datum/action/xeno_action/onclick/eye,
+		/datum/action/xeno_action/activable/pounce/runner // FOR TESTING
 	)
+
 	claw_type = CLAW_TYPE_VERY_SHARP
 
 	var/queen_aged = FALSE
@@ -436,8 +464,8 @@
 
 	if(hive.dynamic_evolution && !queen_aged)
 		queen_age_timer_id = addtimer(CALLBACK(src, PROC_REF(make_combat_effective)), XENO_QUEEN_AGE_TIME, TIMER_UNIQUE|TIMER_STOPPABLE)
-	else
-		make_combat_effective()
+
+	add_remove_mobile_abilities()
 
 	AddComponent(/datum/component/footstep, 2 , 35, 11, 4, "alien_footstep_large")
 	RegisterSignal(src, COMSIG_MOVABLE_PRE_MOVE, PROC_REF(check_block))
@@ -503,31 +531,9 @@
 		deltimer(queen_age_timer_id)
 		queen_age_timer_id = TIMER_ID_NULL
 
-	give_combat_abilities()
 	recalculate_actions()
 	recalculate_health()
 	generate_name()
-
-/mob/living/carbon/xenomorph/queen/proc/give_combat_abilities()
-	if(ovipositor)
-		return
-
-	for(var/datum/action/xeno_action/action in actions)
-		action.hide_from(src)
-		// Also update the choose_resin icon since it resets
-		if(istype(action, /datum/action/xeno_action/onclick/choose_resin))
-			var/datum/action/xeno_action/onclick/choose_resin/choose_resin_ability = action
-			if(choose_resin_ability)
-				choose_resin_ability.update_button_icon(selected_resin)
-
-	var/list/abilities_to_give = mobile_abilities.Copy()
-
-	if(!queen_aged)
-		abilities_to_give -= mobile_aged_abilities
-
-	for(var/path in abilities_to_give)
-		give_action(src, path)
-
 
 /mob/living/carbon/xenomorph/queen/recalculate_health()
 	. = ..()
@@ -563,14 +569,99 @@
 			if(observed_xeno.stat == DEAD || QDELETED(observed_xeno))
 				overwatch(observed_xeno, TRUE)
 
-		if(ovipositor && !is_mob_incapacitated(TRUE))
-			egg_amount += 0.07 //one egg approximately every 30 seconds
-			if(egg_amount >= 1)
-				if(isturf(loc))
-					var/turf/T = loc
-					if(length(T.contents) <= 25) //so we don't end up with a million object on that turf.
-						egg_amount--
-						new /obj/item/xeno_egg(loc, hivenumber)
+		switch(queen_stamina)
+			if(0)
+				stamina_tier = 0
+			if(100)
+				stamina_tier = 1
+			if(200)
+				stamina_tier = 2
+			if(300)
+				stamina_tier = 3
+			if(400)
+				stamina_tier = 4
+			if(500)
+				stamina_tier = 5
+			if(600)
+				stamina_tier = 6
+
+		if(ovipositor)
+			if(!is_mob_incapacitated(TRUE))
+				egg_amount += 0.07 //one egg approximately every 30 seconds
+				if(egg_amount >= 1)
+					if(isturf(loc))
+						var/turf/T = loc
+						if(length(T.contents) <= 25) //so we don't end up with a million object on that turf.
+							egg_amount--
+							new /obj/item/xeno_egg(loc, hivenumber)
+				modify_stamina(stamina_gain) // Approx. 1 stamina per second based on how ticks work
+
+		if(!ovipositor)
+			if(stamina_drain_delay_active == TRUE)
+				stamina_drain_delay_countdown(stamina_drain)
+
+			if(queen_stamina > 0)
+				if(stamina_drain_delay_active != TRUE)
+					modify_stamina(stamina_drain) // Also approx. 1 stamina per second
+				stamina_speed_buff(stamina_tier, stamina_extras_active)
+				// stamina_plasma_reserves()
+
+			if(queen_stamina <= 0)
+				stamina_extras_active = FALSE
+
+
+/mob/living/carbon/xenomorph/queen/proc/modify_stamina(amount)
+	queen_stamina += amount
+	if(queen_stamina > stamina_cap)
+		queen_stamina = stamina_cap
+	if(queen_stamina < 0)
+		queen_stamina = 0
+
+/mob/living/carbon/xenomorph/queen/proc/stamina_drain_delay_countdown(amount)
+	stamina_drain_delay += amount
+	if(stamina_drain_delay < 0)
+		stamina_drain_delay = 0
+		stamina_drain_delay_active = FALSE
+
+
+/mob/living/carbon/xenomorph/queen/proc/stamina_speed_buff(gear = 0)
+	var/speed_buff = 0
+	switch(gear)
+		if(0)
+			speed_buff = 0
+		if(1)
+			speed_buff = -0.2
+		if(2)
+			speed_buff = -0.4
+		if(3)
+			speed_buff = -0.6
+		if(4)
+			speed_buff = -0.8
+		if(5)
+			speed_buff = -1
+		if(6)
+			speed_buff = -1.2
+	speed_modifier = speed_buff
+	recalculate_speed()
+
+/mob/living/carbon/xenomorph/queen/proc/add_remove_mobile_abilities(add = TRUE)
+	switch(add)
+		if(TRUE)
+			for(var/action_path in mobile_abilities)
+				give_action(src, action_path)
+		if(FALSE)
+			for(var/action_path in mobile_abilities)
+				remove_action(src, action_path)
+
+/mob/living/carbon/xenomorph/queen/proc/add_remove_immobile_abilities(add = TRUE)
+	switch(add)
+		if(TRUE)
+			for(var/action_path in immobile_abilities)
+				give_action(src, action_path)
+		if(FALSE)
+			for(var/action_path in immobile_abilities)
+				remove_action(src, action_path)
+
 
 /mob/living/carbon/xenomorph/queen/get_status_tab_items()
 	. = ..()
@@ -582,6 +673,10 @@
 	. += "Royal Resin: [hive?.buff_points]"
 	if(!queen_aged && queen_age_timer_id != TIMER_ID_NULL)
 		. += "Maturity: [time2text(timeleft(queen_age_timer_id), "mm:ss")] remaining"
+	. += "TEST, STAMINA: [queen_stamina] / [stamina_cap]"
+	. += "TEST, STAMINA TIER: [stamina_tier]"
+	. += "TEST, STAMINA DRAIN DELAY: [stamina_drain_delay]"
+	. += "TEST, STAMINA DRAIN DELAY ACTIVE: [stamina_drain_delay_active]"
 
 /mob/living/carbon/xenomorph/queen/proc/set_orders()
 	set category = "Alien"
@@ -856,34 +951,8 @@
 			if(choose_resin_ability)
 				choose_resin_ability.update_button_icon(selected_resin)
 
-	var/list/immobile_abilities = list(
-		// These already have their placement locked in:
-		/datum/action/xeno_action/onclick/regurgitate,
-		/datum/action/xeno_action/watch_xeno,
-		/datum/action/xeno_action/activable/place_construction/not_primary,
-		/datum/action/xeno_action/onclick/emit_pheromones,
-		/datum/action/xeno_action/onclick/queen_word,
-		/datum/action/xeno_action/onclick/psychic_whisper,
-		/datum/action/xeno_action/onclick/psychic_radiance,
-		/datum/action/xeno_action/onclick/choose_resin/queen_macro, //fourth macro
-		/datum/action/xeno_action/onclick/manage_hive,
-		/datum/action/xeno_action/activable/info_marker/queen,
-		// Screech is typically new for this list, but its possible they never ovi and it then is forced here:
-		/datum/action/xeno_action/onclick/screech, //custom macro, Screech
-		// These are new and their arrangement matters:
-		/datum/action/xeno_action/onclick/remove_eggsac,
-		/datum/action/xeno_action/onclick/set_xeno_lead,
-		/datum/action/xeno_action/activable/queen_heal, //first macro
-		/datum/action/xeno_action/activable/queen_give_plasma, //second macro
-		/datum/action/xeno_action/onclick/queen_order,
-		/datum/action/xeno_action/activable/expand_weeds, //third macro
-		/datum/action/xeno_action/activable/secrete_resin/remote/queen, //fifth macro
-		/datum/action/xeno_action/onclick/queen_tacmap,
-		/datum/action/xeno_action/onclick/eye,
-	)
-
-	for(var/path in immobile_abilities)
-		give_action(src, path)
+	add_remove_mobile_abilities(FALSE)
+	add_remove_immobile_abilities(TRUE)
 
 	add_verb(src, /mob/living/carbon/xenomorph/proc/xeno_tacmap)
 
@@ -900,6 +969,8 @@
 
 	for(var/mob/living/carbon/xenomorph/leader in hive.xeno_leader_list)
 		leader.handle_xeno_leader_pheromones()
+
+	stamina_drain_delay = stamina_drain_delay_duration
 
 	xeno_message(SPAN_XENOANNOUNCE("The Queen has grown an ovipositor, evolution progress resumed."), 3, hivenumber)
 
@@ -932,7 +1003,9 @@
 	zoom_out()
 
 	set_resin_build_order(GLOB.resin_build_order_drone) // This needs to occur before we update the abilities so we can update the choose resin icon
-	give_combat_abilities()
+
+	add_remove_immobile_abilities(FALSE)
+	add_remove_mobile_abilities(TRUE)
 
 	remove_verb(src, /mob/living/carbon/xenomorph/proc/xeno_tacmap)
 
@@ -953,6 +1026,10 @@
 
 	for(var/mob/living/carbon/xenomorph/L in hive.xeno_leader_list)
 		L.handle_xeno_leader_pheromones()
+
+	if(queen_stamina >= stamina_extras_threshold)
+		stamina_extras_active = TRUE
+	stamina_drain_delay_active = TRUE
 
 	if(!instant_dismount)
 		xeno_message(SPAN_XENOANNOUNCE("The Queen has shed her ovipositor, evolution progress paused."), 3, hivenumber)

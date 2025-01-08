@@ -401,3 +401,14 @@
 
 /datum/ammo/xeno/oppressor_tail/proc/remove_tail_overlay(mob/overlayed_mob, image/tail_image)
 	overlayed_mob.overlays -= tail_image
+
+/datum/ammo/xeno/resin
+	name = "resin spit"
+	icon_state = "none"
+	ping = null
+	flags_ammo_behavior = AMMO_XENO|AMMO_SKIPS_ALIENS|AMMO_STOPPED_BY_COVER
+	damage_type = BRUTE
+
+	damage = 0
+	max_range = 5
+	accuracy = HIT_ACCURACY_TIER_MAX
