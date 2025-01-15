@@ -13,6 +13,16 @@
 	/// A list of action typepaths which should be added when a xeno takes the strain.
 	var/list/actions_to_add
 
+	// Because Queen is a special snowflake
+	/// A list of action typepaths which should be removed from immobile actions when Queen takes the strain.
+	var/immobile_actions_to_remove
+	/// A list of action typepaths which should be added from immobile actions when Queen takes the strain.
+	var/immobile_actions_to_add
+	/// A list of action typepaths which should be removed from mobile actions when Queen takes the strain.
+	var/mobile_actions_to_remove
+	/// A list of action typepaths which should be added from mobile actions when Queen takes the strain.
+	var/mobile_actions_to_add
+
 	/// Typepath of the [/datum/behavior_delegate] to add.
 	var/behavior_delegate_type
 

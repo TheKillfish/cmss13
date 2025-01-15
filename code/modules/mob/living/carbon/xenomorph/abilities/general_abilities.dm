@@ -35,9 +35,13 @@
 	action_type = XENO_ACTION_CLICK
 
 /datum/action/xeno_action/onclick/xeno_resting/can_use_action()
-	var/mob/living/carbon/xenomorph/X = owner
-	if(X && !X.buckled && !X.is_mob_incapacitated())
+	var/mob/living/carbon/xenomorph/xeno = owner
+	if(xeno && !xeno.buckled && !xeno.is_mob_incapacitated())
 		return TRUE
+	if(isqueen(xeno))
+		var/mob/living/carbon/xenomorph/queen/queen = xeno
+		if(queen.ovipositor)
+			return FALSE
 
 /datum/action/xeno_action/onclick/xeno_resting/give_to(mob/living/living_mob)
 	. = ..()
@@ -55,8 +59,8 @@
 	ability_primacy = XENO_PRIMARY_ACTION_2
 
 /datum/action/xeno_action/onclick/shift_spits/can_use_action()
-	var/mob/living/carbon/xenomorph/X = owner
-	if(X && !X.buckled && !X.is_mob_incapacitated())
+	var/mob/living/carbon/xenomorph/xeno = owner
+	if(xeno && !xeno.buckled && !xeno.is_mob_incapacitated())
 		return TRUE
 
 // Regurgitate
@@ -98,9 +102,9 @@
 	if(!.)
 		return FALSE
 
-	var/mob/living/carbon/xenomorph/X = owner
-	if(X)
-		return X.selected_resin
+	var/mob/living/carbon/xenomorph/xeno = owner
+	if(xeno)
+		return xeno.selected_resin
 	else
 		return FALSE
 
@@ -142,6 +146,13 @@
 	ability_primacy = XENO_CORROSIVE_ACID
 	action_type = XENO_ACTION_CLICK
 
+/datum/action/xeno_action/activable/corrosive_acid/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(queen.ovipositor)
+			return FALSE
+
 /datum/action/xeno_action/activable/corrosive_acid/New()
 	update_level()
 	. = ..()
@@ -181,8 +192,8 @@
 	action_type = XENO_ACTION_CLICK
 
 /datum/action/xeno_action/onclick/emit_pheromones/can_use_action()
-	var/mob/living/carbon/xenomorph/X = owner
-	if(X && !X.buckled && !X.is_mob_incapacitated() && (!X.current_aura || X.plasma_stored >= plasma_cost))
+	var/mob/living/carbon/xenomorph/xeno = owner
+	if(xeno && !xeno.buckled && !xeno.is_mob_incapacitated() && (!xeno.current_aura || xeno.plasma_stored >= plasma_cost))
 		return TRUE
 
 // Pounce
@@ -255,11 +266,11 @@
 /datum/action/xeno_action/activable/pounce/proc/end_pounce_freeze()
 	if(freeze_timer_id == TIMER_ID_NULL)
 		return
-	var/mob/living/carbon/xenomorph/X = owner
-	REMOVE_TRAIT(X, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Pounce"))
+	var/mob/living/carbon/xenomorph/xeno = owner
+	REMOVE_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Pounce"))
 	deltimer(freeze_timer_id)
 	freeze_timer_id = TIMER_ID_NULL
-	to_chat(X, SPAN_XENONOTICE("Slashing frenzies us! We feel free to move immediately!"))
+	to_chat(xeno, SPAN_XENONOTICE("Slashing frenzies us! We feel free to move immediately!"))
 
 /// Any effects to apply to the xenomorph before the windup occurs
 /datum/action/xeno_action/activable/pounce/proc/pre_windup_effects()
@@ -479,6 +490,13 @@
 	var/stab_range = 2
 	/// Used for defender's tail 'stab'.
 	var/blunt_stab = FALSE
+
+/datum/action/xeno_action/activable/tail_stab/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(queen.ovipositor)
+			return FALSE
 
 /datum/action/xeno_action/onclick/evolve
 	name = "Evolve"

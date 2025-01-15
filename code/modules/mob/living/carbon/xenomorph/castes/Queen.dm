@@ -310,52 +310,6 @@
 	viewsize = 12
 
 	base_actions = list(
-		// Everything here will always be here
-		/datum/action/xeno_action/onclick/xeno_resting,
-		/datum/action/xeno_action/onclick/regurgitate,
-		/datum/action/xeno_action/watch_xeno,
-		/datum/action/xeno_action/activable/tail_stab,
-		/datum/action/xeno_action/activable/corrosive_acid,
-		/datum/action/xeno_action/onclick/emit_pheromones,
-		/datum/action/xeno_action/onclick/queen_word,
-		/datum/action/xeno_action/onclick/psychic_whisper,
-		/datum/action/xeno_action/onclick/psychic_radiance,
-		/datum/action/xeno_action/onclick/manage_hive,
-		/datum/action/xeno_action/activable/info_marker/queen,
-		/datum/action/xeno_action/onclick/screech, //custom macro, Screech; not usable on ovi
-	)
-
-	inherent_verbs = list(
-		/mob/living/carbon/xenomorph/proc/claw_toggle,
-		/mob/living/carbon/xenomorph/proc/construction_toggle,
-		/mob/living/carbon/xenomorph/proc/destruction_toggle,
-		/mob/living/carbon/xenomorph/proc/toggle_unnesting,
-		/mob/living/carbon/xenomorph/queen/proc/set_orders,
-		/mob/living/carbon/xenomorph/queen/proc/hive_message,
-		/mob/living/carbon/xenomorph/proc/rename_tunnel,
-		/mob/living/carbon/xenomorph/proc/set_hugger_reserve_for_morpher,
-	)
-
-	var/list/mobile_abilities = list(
-		// Everything here will always be here
-		/datum/action/xeno_action/onclick/regurgitate,
-		/datum/action/xeno_action/watch_xeno,
-		/datum/action/xeno_action/onclick/emit_pheromones,
-		/datum/action/xeno_action/onclick/queen_word,
-		/datum/action/xeno_action/onclick/psychic_whisper,
-		/datum/action/xeno_action/onclick/psychic_radiance,
-		/datum/action/xeno_action/onclick/manage_hive,
-		/datum/action/xeno_action/activable/info_marker/queen,
-		/datum/action/xeno_action/onclick/screech, //custom macro, Screech; not usable on ovi
-		// Everything here is stuff only added when not on ovi
-		/datum/action/xeno_action/onclick/grow_ovipositor,
-		/datum/action/xeno_action/onclick/plant_weeds, //first macro, and fits near the resin structure buttons
-		/datum/action/xeno_action/activable/gut,
-		/datum/action/xeno_action/activable/pounce/runner // FOR TESTING
-	)
-
-	var/list/immobile_abilities = list(
-		// Everything here will always be here
 		/datum/action/xeno_action/onclick/xeno_resting, // Not usable on ovi
 		/datum/action/xeno_action/onclick/regurgitate,
 		/datum/action/xeno_action/watch_xeno,
@@ -367,20 +321,39 @@
 		/datum/action/xeno_action/onclick/psychic_radiance,
 		/datum/action/xeno_action/onclick/manage_hive,
 		/datum/action/xeno_action/activable/info_marker/queen,
-		/datum/action/xeno_action/onclick/screech, //custom macro, Screech; not usable on ovi
-		// Everything here is stuff only added when on ovi
+		/datum/action/xeno_action/onclick/screech, // Custom macro, needs to be mature to use
+		// Mobile Abilities
+		/datum/action/xeno_action/onclick/grow_ovipositor,
+		/datum/action/xeno_action/onclick/plant_weeds, // First macro
+		// Rework Ability 1
+		// Rework Ability 2
+		// Rework Ability 3 Ram // Third macro, needs to be mature to use
+		// Rework Ability 4 Brutality // Needs to be mature to use
+		// Rework Ability 5 Resin Spit // Second macro
+		/datum/action/xeno_action/activable/gut,
+		// Immobile Abilities
 		/datum/action/xeno_action/onclick/remove_eggsac,
 		/datum/action/xeno_action/activable/place_construction/not_primary,
-		/datum/action/xeno_action/activable/expand_weeds, //third macro
-		/datum/action/xeno_action/onclick/choose_resin/queen_macro, //fourth macro
-		/datum/action/xeno_action/activable/secrete_resin/remote/queen, //fifth macro
+		/datum/action/xeno_action/activable/expand_weeds, // Third macro
+		/datum/action/xeno_action/onclick/choose_resin/queen_macro, // Fourth macro
+		/datum/action/xeno_action/activable/secrete_resin/remote/queen, // Fifth macro
 		/datum/action/xeno_action/onclick/set_xeno_lead,
-		/datum/action/xeno_action/activable/queen_heal, //first macro
-		/datum/action/xeno_action/activable/queen_give_plasma, //second macro
+		/datum/action/xeno_action/activable/queen_heal, // First macro
+		/datum/action/xeno_action/activable/queen_give_plasma, // Second macro
 		/datum/action/xeno_action/onclick/queen_order,
 		/datum/action/xeno_action/onclick/queen_tacmap,
 		/datum/action/xeno_action/onclick/eye,
-		/datum/action/xeno_action/activable/pounce/runner // FOR TESTING
+	)
+
+	inherent_verbs = list(
+		/mob/living/carbon/xenomorph/proc/claw_toggle,
+		/mob/living/carbon/xenomorph/proc/construction_toggle,
+		/mob/living/carbon/xenomorph/proc/destruction_toggle,
+		/mob/living/carbon/xenomorph/proc/toggle_unnesting,
+		/mob/living/carbon/xenomorph/queen/proc/set_orders,
+		/mob/living/carbon/xenomorph/queen/proc/hive_message,
+		/mob/living/carbon/xenomorph/proc/rename_tunnel,
+		/mob/living/carbon/xenomorph/proc/set_hugger_reserve_for_morpher,
 	)
 
 	claw_type = CLAW_TYPE_VERY_SHARP
@@ -464,8 +437,6 @@
 
 	if(hive.dynamic_evolution && !queen_aged)
 		queen_age_timer_id = addtimer(CALLBACK(src, PROC_REF(make_combat_effective)), XENO_QUEEN_AGE_TIME, TIMER_UNIQUE|TIMER_STOPPABLE)
-
-	add_remove_mobile_abilities()
 
 	AddComponent(/datum/component/footstep, 2 , 35, 11, 4, "alien_footstep_large")
 	RegisterSignal(src, COMSIG_MOVABLE_PRE_MOVE, PROC_REF(check_block))
@@ -643,25 +614,6 @@
 			speed_buff = -1.2
 	speed_modifier = speed_buff
 	recalculate_speed()
-
-/mob/living/carbon/xenomorph/queen/proc/add_remove_mobile_abilities(add = TRUE)
-	switch(add)
-		if(TRUE)
-			for(var/action_path in mobile_abilities)
-				give_action(src, action_path)
-		if(FALSE)
-			for(var/action_path in mobile_abilities)
-				remove_action(src, action_path)
-
-/mob/living/carbon/xenomorph/queen/proc/add_remove_immobile_abilities(add = TRUE)
-	switch(add)
-		if(TRUE)
-			for(var/action_path in immobile_abilities)
-				give_action(src, action_path)
-		if(FALSE)
-			for(var/action_path in immobile_abilities)
-				remove_action(src, action_path)
-
 
 /mob/living/carbon/xenomorph/queen/get_status_tab_items()
 	. = ..()
@@ -951,9 +903,6 @@
 			if(choose_resin_ability)
 				choose_resin_ability.update_button_icon(selected_resin)
 
-	add_remove_mobile_abilities(FALSE)
-	add_remove_immobile_abilities(TRUE)
-
 	add_verb(src, /mob/living/carbon/xenomorph/proc/xeno_tacmap)
 
 	ADD_TRAIT(src, TRAIT_ABILITY_NO_PLASMA_TRANSFER, TRAIT_SOURCE_ABILITY("Ovipositor"))
@@ -1003,9 +952,6 @@
 	zoom_out()
 
 	set_resin_build_order(GLOB.resin_build_order_drone) // This needs to occur before we update the abilities so we can update the choose resin icon
-
-	add_remove_immobile_abilities(FALSE)
-	add_remove_mobile_abilities(TRUE)
 
 	remove_verb(src, /mob/living/carbon/xenomorph/proc/xeno_tacmap)
 
