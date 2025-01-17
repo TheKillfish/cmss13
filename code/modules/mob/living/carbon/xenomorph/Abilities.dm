@@ -180,6 +180,15 @@
 	plasma_cost = 200
 	cooldown_message = "You feel your anger return. You are ready to gut again."
 
+/datum/action/xeno_action/activable/gut/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(queen.ovipositor)
+			hide_from(queen)
+		if(!queen.ovipositor)
+			unhide_from(queen)
+
 /datum/action/xeno_action/activable/gut/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
 	if(!action_cooldown_check())
@@ -293,6 +302,15 @@
 	ability_primacy = XENO_PRIMARY_ACTION_2
 	xeno_cooldown = 12 SECONDS
 
+/datum/action/xeno_action/activable/queen_give_plasma/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
+
 /datum/action/xeno_action/activable/queen_give_plasma/use_ability(atom/A)
 	var/mob/living/carbon/xenomorph/queen/X = owner
 	if(!X.check_state())
@@ -336,6 +354,15 @@
 	action_icon_state = "queen_order"
 	plasma_cost = 100
 
+/datum/action/xeno_action/onclick/queen_order/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
+
 /datum/action/xeno_action/onclick/queen_order/use_ability(atom/A)
 	var/mob/living/carbon/xenomorph/queen/X = owner
 	if(!X.check_state())
@@ -377,6 +404,15 @@
 	name = "View Xeno Tacmap"
 	action_icon_state = "toggle_queen_zoom"
 	plasma_cost = 0
+
+/datum/action/xeno_action/onclick/queen_tacmap/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
 
 /datum/action/xeno_action/onclick/queen_tacmap/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner

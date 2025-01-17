@@ -645,6 +645,15 @@
 	action_icon_state = "queen_eye"
 	plasma_cost = 0
 
+/datum/action/xeno_action/onclick/eye/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
+
 /datum/action/xeno_action/onclick/eye/use_ability(atom/A)
 	. = ..()
 	if(!owner)

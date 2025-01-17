@@ -3,6 +3,15 @@
 	action_icon_state = "grow_ovipositor"
 	plasma_cost = 0
 
+/datum/action/xeno_action/onclick/remove_eggsac/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
+
 /datum/action/xeno_action/onclick/grow_ovipositor
 	name = "Grow Ovipositor (500)"
 	action_icon_state = "grow_ovipositor"
@@ -11,11 +20,29 @@
 	cooldown_message = "You are ready to grow an ovipositor again."
 	no_cooldown_msg = FALSE // Needed for onclick actions
 
+/datum/action/xeno_action/onclick/grow_ovipositor/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(queen.ovipositor)
+			hide_from(queen)
+		if(!queen.ovipositor)
+			unhide_from(queen)
+
 /datum/action/xeno_action/onclick/set_xeno_lead
 	name = "Choose/Follow Xenomorph Leaders"
 	action_icon_state = "xeno_lead"
 	plasma_cost = 0
 	xeno_cooldown = 3 SECONDS
+
+/datum/action/xeno_action/onclick/set_xeno_lead/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
 
 /datum/action/xeno_action/activable/queen_heal
 	name = "Heal Xenomorph (600)"
@@ -25,6 +52,15 @@
 	ability_primacy = XENO_PRIMARY_ACTION_1
 	action_type = XENO_ACTION_CLICK
 	xeno_cooldown = 8 SECONDS
+
+/datum/action/xeno_action/activable/queen_heal/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
 
 /datum/action/xeno_action/activable/expand_weeds
 	name = "Expand Weeds (50)"
@@ -37,6 +73,15 @@
 	var/node_plant_cooldown = 7 SECONDS
 	var/node_plant_plasma_cost = 300
 	var/turf_build_cooldown = 10 SECONDS
+
+/datum/action/xeno_action/activable/expand_weeds/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
 
 /datum/action/xeno_action/onclick/manage_hive
 	name = "Manage The Hive"
@@ -54,6 +99,15 @@
 	build_speed_mod = 1.5
 
 	var/boosted = FALSE
+
+/datum/action/xeno_action/activable/secrete_resin/remote/queen/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
 
 /datum/action/xeno_action/activable/secrete_resin/remote/queen/use_ability(atom/target_atom, mods)
 	if(boosted)

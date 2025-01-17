@@ -28,6 +28,15 @@
 	var/plant_on_semiweedable = FALSE
 	var/node_type = /obj/effect/alien/weeds/node
 
+/datum/action/xeno_action/onclick/plant_weeds/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(queen.ovipositor)
+			hide_from(queen)
+		if(!queen.ovipositor)
+			unhide_from(queen)
+
 // Resting
 /datum/action/xeno_action/onclick/xeno_resting
 	name = "Rest"
@@ -82,6 +91,15 @@
 
 /datum/action/xeno_action/onclick/choose_resin/queen_macro //so it doesn't screw other macros up
 	ability_primacy = XENO_PRIMARY_ACTION_4 //it's important that hivelord and drone have the same macros because their playstyle is similar, but it's not as important for queen since her playstyle is very different
+
+/datum/action/xeno_action/onclick/choose_resin/queen_macro/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
 
 // Secrete Resin
 /datum/action/xeno_action/activable/secrete_resin
@@ -446,6 +464,15 @@
 
 /datum/action/xeno_action/activable/place_construction/not_primary //so it doesn't screw other macros up
 	ability_primacy = XENO_NOT_PRIMARY_ACTION
+
+/datum/action/xeno_action/activable/place_construction/can_use_action()
+	. = ..()
+	if(isqueen(owner))
+		var/mob/living/carbon/xenomorph/queen/queen = owner
+		if(!queen.ovipositor)
+			hide_from(queen)
+		if(queen.ovipositor)
+			unhide_from(queen)
 
 /datum/action/xeno_action/activable/xeno_spit
 	name = "Xeno Spit"

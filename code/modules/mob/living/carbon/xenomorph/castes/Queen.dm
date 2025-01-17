@@ -896,7 +896,6 @@
 
 	set_resin_build_order(GLOB.resin_build_order_ovipositor) // This needs to occur before we update the abilities so we can update the choose resin icon
 	for(var/datum/action/xeno_action/action in actions)
-		action.hide_from(src)
 		// Also update the choose_resin icon since it resets
 		if(istype(action, /datum/action/xeno_action/onclick/choose_resin))
 			var/datum/action/xeno_action/onclick/choose_resin/choose_resin_ability = action
