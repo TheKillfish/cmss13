@@ -50,3 +50,18 @@
 	var/shield_duration = 10 SECONDS
 	var/area_of_effect = 6
 	var/shield_amount = 200
+
+/// Dragon Abilities
+
+/// Channel for massive damage VS targeted mobs, instantly destroys targeted walls, cades and items
+/datum/action/xeno_action/activable/smelt
+
+/// Switch between breathing a stream of fire or a fireball
+/datum/action/xeno_action/onclick/select_fire
+
+/// Actually breath a stream of fire or a fireball
+/datum/action/xeno_action/activable/fire_attack
+
+/// Roar that extinguishes nearby allies and active fires
+/datum/action/xeno_action/onclick/extinguish_roar
+

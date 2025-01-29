@@ -18,6 +18,7 @@
 	evolution_allowed = FALSE
 	can_vent_crawl = FALSE
 
+	available_strains = list(/datum/xeno_strain/dragon)
 	behavior_delegate_type = /datum/behavior_delegate/king_base
 
 	tackle_min = 6

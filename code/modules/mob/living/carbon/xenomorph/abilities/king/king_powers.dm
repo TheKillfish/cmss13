@@ -301,3 +301,35 @@
 
 /datum/action/xeno_action/activable/destroy/proc/second_template(turf/template_turf)
 	new /obj/effect/xenomorph/xeno_telegraph/king_attack_template(template_turf, 10)
+
+// Dragon Abilities
+
+/*
+	SMELT ABILITY
+	Dragon blasts a chosen target with acid-fire.
+	Requires channel based off target, deals massive damage to Mob targets while destroying walls and loose items.
+*/
+
+/datum/action/xeno_action/activable/smelt/use_ability(atom/target)
+
+/*
+	SWITCH FIRE ABILITY
+	Switch between breathing a stream of fire or a fireball.
+	Nothing particularly special.
+*/
+
+/datum/action/xeno_action/onclick/select_fire/use_ability(atom/target)
+
+/*
+	BREATH FIRE ABILITY
+	Breath a stream of fire or a fireball, depending on what was selected.
+	Usable anywhere onscreen. Stream is 3 tiles wide, Fireball explodes violently
+*/
+
+/datum/action/xeno_action/activable/fire_attack/use_ability(atom/target)
+
+/*
+	EXTINGUISHING ROAR ABILITY
+	Breath a stream of fire or a fireball, depending on what was selected.
+	Usable anywhere onscreen. Stream is 3 tiles wide, Fireball explodes violently
+*/
