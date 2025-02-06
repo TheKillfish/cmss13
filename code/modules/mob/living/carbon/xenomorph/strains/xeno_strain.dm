@@ -161,4 +161,10 @@
 		to_chat(src, SPAN_WARNING("We cannot take a strain while in this stance."))
 		return FALSE
 
+	if(isqueen(src))
+		var/mob/living/carbon/xenomorph/queen/queen = src
+		if(!queen.queen_aged)
+			to_chat(src, SPAN_WARNING("We are not mature enough to take a strain."))
+			return FALSE
+
 	return TRUE

@@ -24,6 +24,7 @@
 	action_type = XENO_ACTION_CLICK
 	xeno_cooldown = 10
 	ability_primacy = XENO_PRIMARY_ACTION_1
+	hide_on_ovipositor = TRUE
 
 	var/plant_on_semiweedable = FALSE
 	var/node_type = /obj/effect/alien/weeds/node
@@ -33,6 +34,7 @@
 	name = "Rest"
 	action_icon_state = "resting"
 	action_type = XENO_ACTION_CLICK
+	block_on_ovi = TRUE
 
 /datum/action/xeno_action/onclick/xeno_resting/can_use_action()
 	var/mob/living/carbon/xenomorph/X = owner
@@ -78,6 +80,7 @@
 
 /datum/action/xeno_action/onclick/choose_resin/queen_macro //so it doesn't screw other macros up
 	ability_primacy = XENO_PRIMARY_ACTION_4 //it's important that hivelord and drone have the same macros because their playstyle is similar, but it's not as important for queen since her playstyle is very different
+	hide_off_ovipositor = TRUE
 
 // Secrete Resin
 /datum/action/xeno_action/activable/secrete_resin
@@ -141,6 +144,7 @@
 	macro_path = /datum/action/xeno_action/verb/verb_corrosive_acid
 	ability_primacy = XENO_CORROSIVE_ACID
 	action_type = XENO_ACTION_CLICK
+	block_on_ovi = TRUE
 
 /datum/action/xeno_action/activable/corrosive_acid/New()
 	update_level()
@@ -435,6 +439,7 @@
 
 /datum/action/xeno_action/activable/place_construction/not_primary //so it doesn't screw other macros up
 	ability_primacy = XENO_NOT_PRIMARY_ACTION
+	hide_off_ovipositor = TRUE
 
 /datum/action/xeno_action/activable/xeno_spit
 	name = "Xeno Spit"
@@ -476,6 +481,7 @@
 	charge_time = 1 SECONDS
 	xeno_cooldown = 10 SECONDS
 	ability_primacy = XENO_TAIL_STAB
+	block_on_ovi = TRUE
 	var/stab_range = 2
 	/// Used for defender's tail 'stab'.
 	var/blunt_stab = FALSE

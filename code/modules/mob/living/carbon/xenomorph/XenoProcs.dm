@@ -46,15 +46,17 @@
 	. += ""
 
 	. += "Health: [floor(health)]/[floor(maxHealth)]"
-	. += "Armor: [floor(0.01*armor_integrity*armor_deflection)+(armor_deflection_buff-armor_deflection_debuff)]/[floor(armor_deflection)]"
-	. += "Plasma: [floor(plasma_stored)]/[floor(plasma_max)]"
+	if(armor_deflection != 0)
+		. += "Armor: [floor(0.01*armor_integrity*armor_deflection)+(armor_deflection_buff-armor_deflection_debuff)]/[floor(armor_deflection)]"
+	if(plasma_max != 0)
+		. += "Plasma: [floor(plasma_stored)]/[floor(plasma_max)]"
 	. += "Slash Damage: [floor((melee_damage_lower+melee_damage_upper)/2)]"
 
 	var/shieldtotal = 0
 	for (var/datum/xeno_shield/XS in xeno_shields)
 		shieldtotal += XS.amount
-
-	. += "Shield: [shieldtotal]"
+	if(shieldtotal != 0)
+		. += "Shield: [shieldtotal]"
 
 	if(selected_ability)
 		. += ""

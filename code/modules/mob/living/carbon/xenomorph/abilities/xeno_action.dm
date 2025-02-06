@@ -26,6 +26,16 @@
 
 	var/charges = NO_ACTION_CHARGES
 
+	// Restrictions
+	/// If Queen shouldn't have the ability while immature
+	var/queen_maturity_restricted = FALSE
+	/// If Queen shouldn't be able to use ability while on ovi but it shouldn't be shuffled around
+	var/block_on_ovi = FALSE
+	/// If Queen shouldn't have the ability while on ovi
+	var/hide_on_ovipositor = FALSE
+	/// If Queen shouldn't have the ability while off ovi
+	var/hide_off_ovipositor = FALSE
+
 /datum/action/xeno_action/New(Target, override_icon_state)
 	. = ..()
 	if(charges != NO_ACTION_CHARGES)
@@ -69,8 +79,26 @@
 /datum/action/xeno_action/can_use_action()
 	if(!owner)
 		return FALSE
-	var/mob/living/carbon/xenomorph/X = owner
-	if(X && !X.is_mob_incapacitated() && !HAS_TRAIT(X, TRAIT_DAZED) && X.body_position == STANDING_UP && !X.buckled && X.plasma_stored >= plasma_cost)
+	var/mob/living/carbon/xenomorph/xeno = owner
+	if(isqueen(xeno))
+		var/mob/living/carbon/xenomorph/queen/queen = xeno
+		if(hide_on_ovipositor)
+			if(!queen.ovipositor)
+				unhide_from(queen)
+			if(queen.ovipositor)
+				hide_from(queen)
+				return FALSE
+		if(hide_off_ovipositor)
+			if(!queen.ovipositor)
+				hide_from(queen)
+				return FALSE
+			if(queen.ovipositor)
+				unhide_from(queen)
+		if(!queen.queen_aged && queen_maturity_restricted)
+			return FALSE
+		if(queen.ovipositor && block_on_ovi)
+			return FALSE
+	if(xeno && !xeno.is_mob_incapacitated() && !HAS_TRAIT(xeno, TRAIT_DAZED) && xeno.body_position == STANDING_UP && !xeno.buckled && xeno.plasma_stored >= plasma_cost)
 		return TRUE
 
 /datum/action/xeno_action/give_to(mob/living/L)
@@ -148,9 +176,6 @@
 // Activable actions - most abilities in the game. Require Shift/Middle click to do their 'main' effects.
 // The action_activate code of these actions does NOT call use_ability.
 /datum/action/xeno_action/activable
-
-/datum/action/xeno_action/activable/can_use_action()
-	return TRUE
 
 // Called when the action is clicked on.
 // For non-activable Xeno actions, this is used to
