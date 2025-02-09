@@ -108,3 +108,55 @@
 	. = ..()
 	if(chained)
 		. += SPAN_RED("They are chained with [chained].")
+
+// Sandals
+/obj/item/clothing/shoes/sandal
+	desc = "A pair of rather plain, wooden sandals."
+	name = "sandals"
+	icon_state = "sandals"
+	flags_armor_protection = 0
+
+/obj/item/clothing/shoes/sandal/black
+	desc = "A pair of black rubber flip-flops."
+	name = "black flip-flops"
+	icon_state = "flipflops_black"
+
+/obj/item/clothing/shoes/sandal/white
+	desc = "A pair of white rubber flip-flops."
+	name = "white flip-flops"
+	icon_state = "flipflops_white"
+
+/obj/item/clothing/shoes/sandal/red
+	desc = "A pair of red rubber flip-flops."
+	name = "red flip-flops"
+	icon_state = "flipflops_red"
+
+/obj/item/clothing/shoes/sandal/green
+	desc = "A pair of green rubber flip-flops."
+	name = "green flip-flops"
+	icon_state = "flipflops_green"
+
+/obj/item/clothing/shoes/sandal/blue
+	desc = "A pair of blue rubber flip-flops."
+	name = "blue flip-flops"
+	icon_state = "flipflops_blue"
+
+/obj/item/clothing/shoes/sandal/yellow
+	desc = "A pair of yellow rubber flip-flops."
+	name = "yellow flip-flops"
+	icon_state = "flipflops_yellow"
+
+/obj/item/clothing/shoes/sandal/orange
+	desc = "A pair of orange rubber flip-flops."
+	name = "orange flip-flops"
+	icon_state = "flipflops_orange"
+
+/obj/item/clothing/shoes/sandal/purple
+	desc = "A pair of purple rubber flip-flops."
+	name = "purple flip-flops"
+	icon_state = "flipflops_purple"
+
+/obj/item/clothing/shoes/sandal/pink
+	desc = "A pair of pink rubber flip-flops."
+	name = "pink flip-flops"
+	icon_state = "flipflops_pink"

@@ -54,12 +54,6 @@
 	icon_state = "sandals"
 	flags_armor_protection = 0
 
-/obj/item/clothing/shoes/sandal/marisa
-	desc = "A pair of magic, black shoes."
-	name = "magic shoes"
-	icon_state = "black"
-	flags_armor_protection = BODY_FLAG_FEET
-
 /obj/item/clothing/shoes/galoshes
 	desc = "Rubber boots"
 	name = "galoshes"
