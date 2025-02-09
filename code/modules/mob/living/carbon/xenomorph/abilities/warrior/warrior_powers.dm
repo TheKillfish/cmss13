@@ -171,3 +171,81 @@
 	warrior.flick_attack_overlay(carbon, "punch")
 	shake_camera(carbon, 2, 1)
 	step_away(carbon, warrior, 2)
+
+// Demolisher Powers
+/datum/action/xeno_action/activable/wrecking_tail/use_ability(atom/targetted_atom)
+	var/mob/living/carbon/xenomorph/demolisher = owner
+	if(!demolisher.check_state())
+		return
+
+	if(!action_cooldown_check())
+		return
+
+	if(demolisher.Adjacent(targetted_atom))
+		var/obj/structure/target_structure = targetted_atom
+		if(istype(targetted_atom, /obj/structure) && !target_structure.unslashable)
+			// Tables don't stand a chance against the weighty tail of Demolisher
+			var/obj/structure/surface/table/target_table
+			if(istype(target_structure, /obj/structure/surface/table))
+				playsound(get_turf(target_window), 'sound/effects/metalhit.ogg', 30, TRUE)
+				target_table.deconstruct()
+				apply_cooldown(0.25)
+
+			// Demolisher shatters breakable windows with ease
+			var/obj/structure/window/framed/target_window = target_structure
+			if(istype(target_structure, /obj/structure/window/framed))
+				playsound(get_turf(target_window), "windowshatter", 30, TRUE)
+				target_window.shatter_window(TRUE)
+				apply_cooldown(0.25)
+
+			// Window frames similarly cannot endure the smashing of Demolisher's tail
+			var/obj/structure/window_frame/target_frame = target_structure
+			if(istype(target_structure, /obj/structure/window_frame))
+				playsound(get_turf(target_window), 'sound/effects/metalhit.ogg', 30, TRUE)
+				target_frame.deconstruct()
+				apply_cooldown(0.25)
+
+			// Doors will take a bit more to break but will go faster than from slashing
+			var/obj/structure/machinery/door/airlock/target_airlock = target_structure
+			if(istype(target_structure, /obj/structure/machinery/door/airlock))
+				if(target_airlock.isElectrified() && target_airlock.arePowerSystemsOn())
+					var/datum/effect_system/spark_spread/sparks = new /datum/effect_system/spark_spread
+					sparks.set_up(5, 1, target_airlock)
+					sparks.start()
+					to_chat(demolisher, SPAN_WARNING("We feel a sting from our tail!"))
+					demolisher.apply_damage(5, BURN)
+
+				playsound(target_airlock, 'sound/effects/metalhit.ogg', 50, TRUE)
+				target_airlock.take_damage(target_airlock.damage_cap / 4, demolisher)
+				apply_cooldown(0.5)
+
+			// Normal cades will still take a bit of a beating to break, but wood or snow ones will be instantly broken
+			var/obj/structure/barricade/target_cade = target_structure
+			if(istype(target_structure, /obj/structure/barricade))
+				if(target_cade.is_wired)
+					to_chat(demolisher, SPAN_WARNING("We feel something cut into our rail"))
+					demolisher.apply_damage(5, BRUTE)
+
+				playsound(target_cade, target_cade.barricade_hitsound, 50, TRUE)
+				if(istype(target_cade, /obj/structure/barricade/wooden || /obj/structure/barricade/snow))
+					target_cade.update_health(target_cade.maxhealth + 10)
+				else
+					target_cade.take_damage(target_cade.maxhealth / 6)
+				apply_cooldown(0.75)
+
+		var/turf/closed/wall/target_wall = targetted_atom
+		if(istype(targetted_atom, /turf/closed/wall) && !(target_wall.turf_flags & TURF_HULL))
+			if(target_wall.claws_minimum == CLAW_TYPE_SHARP)
+				if(!do_after(demolisher, wrecking_delay, INTERRUPT_ALL | BEHAVIOR_IMMOBILE, BUSY_ICON_HOSTILE))
+					return
+				playsound(target_wall, 'sound/effects/metalhit.ogg', 50, TRUE)
+				target_wall.take_damage(wrecking_wall_damage)
+				apply_cooldown()
+
+		if(target_wall.acided_hole)
+			target_wall.acided_hole.expand_hole(demolisher)
+
+		demolisher.visible_message(SPAN_XENOWARNING("\The [demolisher] violently smashes \the [target_structure] with their tail!"), \
+		SPAN_XENOWARNING("We smash \the [target_structure] with our tail!"))
+
+		return ..()

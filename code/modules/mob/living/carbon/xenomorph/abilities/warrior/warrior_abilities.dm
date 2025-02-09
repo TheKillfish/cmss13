@@ -40,3 +40,47 @@
 	var/base_punch_damage_synth = 30
 	var/base_punch_damage_pred = 25
 	var/damage_variance = 5
+
+// Demolisher Abilities
+/datum/action/xeno_action/activable/wrecking_tail
+	name = "Wrecking Tail"
+	action_icon_state = "tail_attack"
+	action_type = XENO_ACTION_CLICK
+	charge_time = 2.5 SECONDS
+	xeno_cooldown = 14 SECONDS
+	ability_primacy = XENO_TAIL_STAB
+
+	// Configs
+	var/wrecking_delay = 5 SECONDS
+	var/wrecking_wall_damage = 1000
+
+/datum/action/xeno_action/activable/corrosive_slime
+	name = "Corrosive Slime"
+	action_icon_state = "corrosive_acid"
+	action_type = XENO_ACTION_CLICK
+	xeno_cooldown = 5 SECONDS
+	ability_primacy = XENO_PRIMARY_ACTION_1
+
+	// Configs
+	var/acid_type = /obj/effect/xenomorph/acid // Medium strength acid, should be fair
+
+/datum/action/xeno_action/activable/demolisher_hook_punch
+	name = "Hook Punch"
+	action_icon_state = "punch"
+	action_type = XENO_ACTION_CLICK
+	xeno_cooldown = 6 SECONDS
+	ability_primacy = XENO_PRIMARY_ACTION_2
+
+	// Configs
+	var/punching_wall_damage = 500
+
+/datum/action/xeno_action/activable/demolisher_lunge_punch
+	name = "Lunge Punch"
+	action_icon_state = "lunge"
+	action_type = XENO_ACTION_CLICK
+	xeno_cooldown = 8 SECONDS
+	ability_primacy = XENO_PRIMARY_ACTION_3
+
+	// Configs
+	var/range = 5
+	var/fling_distance = 2
