@@ -119,3 +119,123 @@
 			qdel(acid_effect)
 			break
 		new /datum/effects/acid(target, bound_xeno, initial(bound_xeno.caste_type))
+
+// Powers
+
+/datum/action/xeno_action/activable/wrecking_tail/use_ability(atom/targetted_atom)
+	var/mob/living/carbon/xenomorph/demolisher = owner
+	if(!demolisher.check_state())
+		return
+
+	if(!action_cooldown_check())
+		return
+
+	if(!demolisher.Adjacent(targetted_atom))
+		return
+
+	var/turf/closed/wall/target_wall = targetted_atom
+	if(istype(targetted_atom, /turf/closed/wall) && !(target_wall.turf_flags & TURF_HULL))
+		if(target_wall.claws_minimum == CLAW_TYPE_SHARP)
+			if(!do_after(demolisher, wrecking_delay, INTERRUPT_ALL | BEHAVIOR_IMMOBILE, BUSY_ICON_HOSTILE))
+				return
+			playsound(target_wall, 'sound/effects/metalhit.ogg', 50, TRUE)
+			target_wall.take_damage(wrecking_wall_damage)
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently smashes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We smash \the [targetted_atom] with our tail!"))
+
+		if(target_wall.acided_hole)
+			target_wall.acided_hole.expand_hole(demolisher)
+			return
+		var/obj/effect/acid_hole/target_acid_hole = targetted_atom
+		if(istype(targetted_atom, /obj/effect/acid_hole))
+			target_acid_hole.expand_hole(demolisher)
+			return
+		apply_cooldown()
+
+	var/mob/living/target_carbon = targetted_atom
+	if(isxeno_human(targetted_atom))
+		if(demolisher.can_not_harm(target_carbon))
+			return
+		// Smack the target to the ground. Larger targets just get stunned
+		if(target_carbon.mob_size < MOB_SIZE_BIG)
+			target_carbon.KnockDown(2)
+		else
+			target_carbon.Slow(3)
+		playsound(target, "punch", 50, TRUE)
+		shake_camera(target_carbon)
+		demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently clobbers [targetted_atom] with their tail!"), SPAN_XENOWARNING("We clobber [targetted_atom] with our tail!"))
+		apply_cooldown()
+
+	var/obj/structure/target_structure = targetted_atom
+	if(istype(targetted_atom, /obj/structure) && !target_structure.unslashable)
+		// Tables don't stand a chance against the weighty tail of Demolisher
+		var/obj/structure/surface/table/target_table
+		if(istype(target_structure, /obj/structure/surface/table))
+			playsound(get_turf(target_table), 'sound/effects/metalhit.ogg', 30, TRUE)
+			target_table.deconstruct()
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] smashes \the [targetted_atom] apart with their tail!"), SPAN_XENOWARNING("We smash \the [targetted_atom] apart with our tail!"))
+			apply_cooldown(0.3)
+
+		// Demolisher shatters breakable windows with ease
+		var/obj/structure/window/framed/target_window = target_structure
+		if(istype(target_structure, /obj/structure/window/framed))
+			playsound(get_turf(target_window), "windowshatter", 30, TRUE)
+			target_window.shatter_window(TRUE)
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] effortlessly shatters \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We shatter \the [targetted_atom] with our tail!"))
+			apply_cooldown(0.3)
+
+		// Window frames similarly cannot endure the smashing of Demolisher's tail
+		var/obj/structure/window_frame/target_frame = target_structure
+		if(istype(target_structure, /obj/structure/window_frame))
+			playsound(get_turf(target_window), 'sound/effects/metalhit.ogg', 30, TRUE)
+			target_frame.deconstruct()
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] crushes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We crush \the [targetted_atom] with our tail!"))
+			apply_cooldown(0.3)
+
+		// Doors will take a bit more to break but will go faster than from slashing
+		var/obj/structure/machinery/door/airlock/target_airlock = target_structure
+		if(istype(target_structure, /obj/structure/machinery/door/airlock))
+			if(target_airlock.isElectrified() && target_airlock.arePowerSystemsOn())
+				var/datum/effect_system/spark_spread/sparks = new /datum/effect_system/spark_spread
+				sparks.set_up(5, 1, target_airlock)
+				sparks.start()
+				to_chat(demolisher, SPAN_WARNING("We feel a sting from our tail!"))
+				demolisher.apply_damage(5, BURN)
+
+			playsound(target_airlock, 'sound/effects/metalhit.ogg', 50, TRUE)
+			target_airlock.take_damage(target_airlock.damage_cap / 4, demolisher)
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently bashes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We bash \the [targetted_atom] with our tail!"))
+			apply_cooldown(0.6)
+
+		// Normal cades will still take a bit of a beating to break, but wood or snow ones will be instantly broken
+		var/obj/structure/barricade/target_cade = target_structure
+		if(istype(target_structure, /obj/structure/barricade))
+			if(target_cade.is_wired)
+				to_chat(demolisher, SPAN_WARNING("We feel something cut into our rail"))
+				demolisher.apply_damage(5, BRUTE)
+
+			playsound(target_cade, target_cade.barricade_hitsound, 50, TRUE)
+			if(istype(target_cade, /obj/structure/barricade/wooden || /obj/structure/barricade/snow))
+				target_cade.update_health(target_cade.maxhealth + 10) // Extra 10 damage is for posterity in ensuring the cade is destroyed
+			else
+				target_cade.take_damage(target_cade.maxhealth / 6)
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently strikes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We strike \the [targetted_atom] with our tail!"))
+			apply_cooldown(0.8)
+
+	var/last_dir = demolisher.dir
+	var/swing_direction
+
+	// Animation code taken from tail stab pretty much verbatim
+	swing_direction = turn(demolisher.dir, pick(90, -90))
+	demolisher.animation_attack_on(target)
+	demolisher.flick_attack_overlay(target, "slam")
+
+	if(last_dir != swing_direction)
+		demolisher.setDir(swing_direction)
+		demolisher.emote("tail")
+		var/new_dir = demolisher.dir
+		addtimer(CALLBACK(src, PROC_REF(reset_direction), demolisher, last_dir, new_dir), 0.5 SECONDS)
+	return ..()
+
+/datum/action/xeno_action/activable/wrecking_tail/proc/reset_direction(mob/living/carbon/xenomorph/demolisher, last_dir, new_dir)
+	if(new_dir == demolisher.dir)
+		demolisher.setDir(last_dir)
