@@ -257,13 +257,18 @@
 
 	var/list/icon_data = list(
 		list("Mar", null),
-		list("ass", "hudsquad_ass"),
+		list("spotter", "hudsquad_spotter"),
 		list("load", "hudsquad_load"),
 		list("Eng", "hudsquad_engi"),
 		list("Med", "hudsquad_med"),
 		list("medk9", "hudsquad_medk9"),
 		list("SG", "hudsquad_gun"),
 		list("Spc", "hudsquad_spec"),
+		list("scout", "hudsquad_scout"),
+		list("demolition", "hudsquad_demo"),
+		list("sniper", "hudsquad_sniper"),
+		list("grenadier", "hudsquad_grenadier"),
+		list("pyro", "hudsquad_pyro"),
 		list("TL", "hudsquad_tl"),
 		list("SL", "hudsquad_leader"),
 	)

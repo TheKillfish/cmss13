@@ -53,6 +53,8 @@
 	VAR_PROTECTED/name = "" as text
 	/// What is the role title that should go on ID cards
 	VAR_PROTECTED/role_name = "" as text
+	/// What icon shall override the minimap and hudsquad
+	VAR_PROTECTED/icon_override = "" as text
 	/// How many more of this spec set can be picked from spec vendors
 	VAR_PRIVATE/available_vendor_num = 1 as num
 	/// How many more of this spec set can be picked from /obj/item/spec_kit
@@ -97,7 +99,12 @@
 	ADD_TRAIT(redeemer, TRAIT_SPEC(trait_to_give), TRAIT_SOURCE_INHERENT)
 	var/obj/item/card/id/idcard = redeemer.get_idcard()
 	if(idcard)
+		redeemer.rank_fallback = icon_override
+		redeemer.hud_set_squad()
+
 		idcard.set_assignment((redeemer.assigned_squad ? (redeemer.assigned_squad.name + " ") : "") + JOB_SQUAD_SPECIALIST + " ([role_name])")
+		idcard.minimap_icon_override = icon_override
+		redeemer.update_minimap_icon()
 		GLOB.data_core.manifest_modify(redeemer.real_name, WEAKREF(redeemer), idcard.assignment)
 	return TRUE
 
@@ -125,6 +132,7 @@
 /datum/specialist_set/sadar
 	name = "Demolitionist Set"
 	role_name = "Demo"
+	icon_override = "demolition"
 	skill_to_give = SKILL_SPEC_ROCKET
 	trait_to_give = "demo"
 	kit_typepath = /obj/item/storage/box/spec/demolitionist
@@ -141,6 +149,7 @@
 /datum/specialist_set/scout
 	name = "Scout Set"
 	role_name = "Scout"
+	icon_override = "scout"
 	skill_to_give = SKILL_SPEC_SCOUT
 	trait_to_give = "scout"
 	kit_typepath = /obj/item/storage/box/spec/scout
@@ -157,6 +166,7 @@
 /datum/specialist_set/sniper
 	name = "Sniper Set"
 	role_name = "Sniper"
+	icon_override = "sniper"
 	skill_to_give = SKILL_SPEC_SNIPER
 	trait_to_give = "sniper"
 	kit_typepath = /obj/item/storage/box/spec/sniper
@@ -167,6 +177,7 @@
 /datum/specialist_set/anti_mat_sniper
 	name = "Anti-Materiel Sniper Set"
 	role_name = "Heavy Sniper"
+	icon_override = "sniper"
 	skill_to_give = SKILL_SPEC_SNIPER
 	trait_to_give = "antimat_sniper"
 	kit_typepath = /obj/item/storage/box/spec/sniper/anti_materiel
@@ -177,6 +188,7 @@
 /datum/specialist_set/grenadier
 	name = "Heavy Grenadier Set"
 	role_name = "Grenadier"
+	icon_override = "grenadier"
 	skill_to_give = SKILL_SPEC_GRENADIER
 	trait_to_give = "grenadier"
 	kit_typepath = /obj/item/storage/box/spec/heavy_grenadier
@@ -184,6 +196,7 @@
 /datum/specialist_set/pyro
 	name = "Pyro Set"
 	role_name = "Pyro"
+	icon_override = "pyro"
 	skill_to_give = SKILL_SPEC_PYRO
 	trait_to_give = "pyro"
 	kit_typepath = /obj/item/storage/box/spec/pyro
