@@ -66,23 +66,23 @@
 
 	var/currently_onfire = FALSE // To ensure de/buffs don't stack
 	var/onfire_speed = -0.6 // Speed gain when on fire
-	var/onfire_attack = -1 // Slash speed when on fire
+	var/onfire_attack = -2 // Slash speed when on fire
+
+/mob/living/carbon/xenomorph/wyrm/Initialize()
+	. = ..()
+	RegisterSignal(src, COMSIG_LIVING_PREIGNITION, PROC_REF(onfire_buff_gain))
+
+/mob/living/carbon/xenomorph/wyrm/Destroy()
+	UnregisterSignal(src, COMSIG_LIVING_PREIGNITION)
+	return ..()
 
 /mob/living/carbon/xenomorph/wyrm/resist_fire()
-	..()
-	SetKnockDown(0.1 SECONDS)
-
-/mob/living/carbon/xenomorph/wyrm/IgniteMob()
 	. = ..()
-	if(!src.stat == DEAD)
-		onfire_buff_gain()
-
+	SetKnockDown(0.1 SECONDS)
 
 /mob/living/carbon/xenomorph/wyrm/ExtinguishMob()
 	. = ..()
-	if(!src.stat == DEAD)
-		onfire_buff_remove()
-
+	onfire_buff_remove()
 
 /mob/living/carbon/xenomorph/wyrm/proc/onfire_buff_gain()
 	if(currently_onfire == FALSE)
@@ -90,6 +90,7 @@
 		speed_modifier += onfire_speed
 		attack_speed_modifier += onfire_attack
 		recalculate_everything()
+		to_chat(src, "FIREBUFF ON")
 
 /mob/living/carbon/xenomorph/wyrm/proc/onfire_buff_remove()
 	if(currently_onfire == TRUE)
@@ -97,8 +98,8 @@
 		speed_modifier -= onfire_speed
 		attack_speed_modifier -= onfire_attack
 		recalculate_everything()
+		to_chat(src, "FIREBUFF OFF")
 
 /datum/behavior_delegate/wyrm_base
 	name = "Base Wyrm Behavior Delegate"
-
 
