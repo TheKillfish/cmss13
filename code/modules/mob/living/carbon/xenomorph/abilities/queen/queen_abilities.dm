@@ -25,7 +25,7 @@
 	cooldown_message = "You feel your throat muscles vibrate. You are ready to screech again."
 	no_cooldown_msg = FALSE // Needed for onclick actions
 	ability_primacy = XENO_SCREECH
-	queen_maturity_restricted = TRUE
+	maturity_restricted = TRUE
 
 // Restricted to off Ovi
 /datum/action/xeno_action/onclick/grow_ovipositor
@@ -35,55 +35,70 @@
 	xeno_cooldown = 5 MINUTES
 	cooldown_message = "You are ready to grow an ovipositor again."
 	no_cooldown_msg = FALSE // Needed for onclick actions
-	hide_on_ovipositor = TRUE
+	hide_on_special_state = TRUE
 
-/*
-/datum/action/xeno_action/FIRST_NEW_ABILITY
-	name = ""
-	action_icon_state = ""
-	macro_path = /datum/action/xeno_action/verb/
+
+/datum/action/xeno_action/activable/frontal_assault
+	name = "Frontal Assault"
+	action_icon_state = "rav_eviscerate"
+	//macro_path = /datum/action/xeno_action/verb/
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
-	xeno_cooldown =
-	plasma_cost =
+	xeno_cooldown = 6 SECONDS
+	plasma_cost = 25
+	hide_on_special_state = TRUE
 
-/datum/action/xeno_action/SECOND_NEW_ABILITY
-	name = ""
-	action_icon_state = ""
-	macro_path = /datum/action/xeno_action/verb/
+/datum/action/xeno_action/onclick/disarming_sweep
+	name = "Disarming Sweep"
+	action_icon_state = "tail_sweep"
+	//macro_path = /datum/action/xeno_action/verb/
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_3
-	xeno_cooldown =
-	plasma_cost =
+	xeno_cooldown = 8 SECONDS
+	plasma_cost = 35
+	hide_on_special_state = TRUE
 
-/datum/action/xeno_action/activable/pounce/ram
+/datum/action/xeno_action/activable/ram
 	name = "Ram"
 	action_icon_state = "ram"
-	macro_path = /datum/action/xeno_action/verb/verb_ram
+	//macro_path = /datum/action/xeno_action/verb/verb_ram
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_4
-	xeno_cooldown =
+	xeno_cooldown = 14 SECONDS
 	plasma_cost = 50
-	queen_maturity_restricted = TRUE
-	hide_on_ovipositor = TRUE
+	maturity_restricted = TRUE
+	hide_on_special_state = TRUE
+	// Configs
+	var/max_distance = 5
+	var/windup_duration = 3 SECONDS
+	var/list/ram_callbacks = null
+
+/datum/action/xeno_action/activable/ram/New()
+	. = ..()
+	ram_callbacks = list()
+	ram_callbacks[/mob] = DYNAMIC(/mob/living/carbon/xenomorph/queen/proc/ram_mob)
+	ram_callbacks[/obj] = DYNAMIC(/mob/living/carbon/xenomorph/queen/proc/ram_obj)
+	ram_callbacks[/turf] = DYNAMIC(/mob/living/carbon/xenomorph/queen/proc/ram_turf)
 
 /datum/action/xeno_action/activable/brutality
 	name = "Brutality"
-	action_icon_state = ""
-	macro_path = /datum/action/xeno_action/verb/verb_brutality
+	action_icon_state = "lunge"
+	//macro_path = /datum/action/xeno_action/verb/verb_brutality
 	action_type = XENO_ACTION_CLICK
-	xeno_cooldown =
+	xeno_cooldown = 30 SECONDS
 	plasma_cost = 200
-	queen_maturity_restricted = TRUE
-	hide_on_ovipositor = TRUE
-
+	maturity_restricted = TRUE
+	hide_on_special_state = TRUE
+	// Configs
+	var/max_range = 3
+/*
 /datum/aciton/xeno_action/activable/resin_spit
 	name = "Resin Spit"
-	action_icon_state = ""
-	macro_path = /datum/action/xeno_action/verb/verb_resin_spit
+	action_icon_state = "shift_spit_sticky"
+	//macro_path = /datum/action/xeno_action/verb/verb_resin_spit
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_5
-	xeno_cooldown =
+	xeno_cooldown = 3 SECONDS
 	plasma_cost = 25
 
 */
@@ -96,7 +111,7 @@
 	xeno_cooldown = 15 MINUTES
 	plasma_cost = 200
 	cooldown_message = "You feel your anger return. You are ready to gut again."
-	hide_on_ovipositor = TRUE
+	hide_on_special_state = TRUE
 
 // Restricted to on Ovi
 
@@ -104,7 +119,7 @@
 	name = "Remove Eggsac"
 	action_icon_state = "grow_ovipositor"
 	plasma_cost = 0
-	hide_off_ovipositor = TRUE
+	hide_off_special_state = TRUE
 
 /datum/action/xeno_action/activable/expand_weeds
 	name = "Expand Weeds (50)"
@@ -113,7 +128,7 @@
 	ability_primacy = XENO_PRIMARY_ACTION_3
 	action_type = XENO_ACTION_CLICK
 	xeno_cooldown = 0.5 SECONDS
-	hide_off_ovipositor = TRUE
+	hide_off_special_state = TRUE
 
 	var/node_plant_cooldown = 7 SECONDS
 	var/node_plant_plasma_cost = 300
@@ -125,7 +140,7 @@
 	plasma_cost = 100
 	xeno_cooldown = 2 SECONDS
 	ability_primacy = XENO_PRIMARY_ACTION_5
-	hide_off_ovipositor = TRUE
+	hide_off_special_state = TRUE
 
 	care_about_adjacency = FALSE
 	build_speed_mod = 1.2
@@ -137,7 +152,7 @@
 	action_icon_state = "xeno_lead"
 	plasma_cost = 0
 	xeno_cooldown = 3 SECONDS
-	hide_off_ovipositor = TRUE
+	hide_off_special_state = TRUE
 
 /datum/action/xeno_action/activable/queen_heal
 	name = "Heal Xenomorph (600)"
@@ -147,7 +162,7 @@
 	ability_primacy = XENO_PRIMARY_ACTION_1
 	action_type = XENO_ACTION_CLICK
 	xeno_cooldown = 8 SECONDS
-	hide_off_ovipositor = TRUE
+	hide_off_special_state = TRUE
 
 /datum/action/xeno_action/activable/queen_give_plasma
 	name = "Give Plasma (400)"
@@ -157,10 +172,39 @@
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
 	xeno_cooldown = 12 SECONDS
-	hide_off_ovipositor = TRUE
+	hide_off_special_state = TRUE
 
 /datum/action/xeno_action/onclick/queen_tacmap
 	name = "View Xeno Tacmap"
 	action_icon_state = "toggle_queen_zoom"
 	plasma_cost = 0
-	hide_off_ovipositor = TRUE
+	hide_off_special_state = TRUE
+
+// Queen variants of basic abilities for special state restrictions
+
+/datum/action/xeno_action/activable/corrosive_acid/queen
+	block_on_special_state = TRUE
+
+/datum/action/xeno_action/activable/info_marker/queen
+	max_markers = 5
+
+/datum/action/xeno_action/onclick/xeno_resting/queen
+	block_on_special_state = TRUE
+
+/datum/action/xeno_action/onclick/plant_weeds/queen
+	hide_on_special_state = TRUE
+
+/datum/action/xeno_action/onclick/choose_resin/queen_macro
+	ability_primacy = XENO_PRIMARY_ACTION_4
+	hide_off_special_state = TRUE
+
+/datum/action/xeno_action/activable/secrete_resin/queen_macro
+	ability_primacy = XENO_PRIMARY_ACTION_5
+	hide_off_special_state = TRUE
+
+/datum/action/xeno_action/activable/place_construction/queen
+	ability_primacy = XENO_NOT_PRIMARY_ACTION
+	hide_off_special_state = TRUE
+
+/datum/action/xeno_action/activable/tail_stab/queen
+	block_on_special_state = TRUE

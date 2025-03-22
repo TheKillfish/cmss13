@@ -27,14 +27,14 @@
 	var/charges = NO_ACTION_CHARGES
 
 	// Restrictions
-	/// If Queen shouldn't have the ability while immature
-	var/queen_maturity_restricted = FALSE
+	/// If the ability shouldn't be usable while immature
+	var/maturity_restricted = FALSE
 	/// If Queen shouldn't be able to use ability while on ovi but it shouldn't be shuffled around
-	var/block_on_ovi = FALSE
+	var/block_on_special_state = FALSE
 	/// If Queen shouldn't have the ability while on ovi
-	var/hide_on_ovipositor = FALSE
+	var/hide_on_special_state = FALSE
 	/// If Queen shouldn't have the ability while off ovi
-	var/hide_off_ovipositor = FALSE
+	var/hide_off_special_state = FALSE
 
 /datum/action/xeno_action/New(Target, override_icon_state)
 	. = ..()
@@ -80,23 +80,22 @@
 	if(!owner)
 		return FALSE
 	var/mob/living/carbon/xenomorph/xeno = owner
-	if(isqueen(xeno))
-		var/mob/living/carbon/xenomorph/queen/queen = xeno
-		if(hide_on_ovipositor)
-			if(!queen.ovipositor)
-				unhide_from(queen)
-			if(queen.ovipositor)
-				hide_from(queen)
+	if(xeno.needs_maturity && maturity_restricted && !xeno.is_mature)
+		return FALSE
+	if(xeno.utilizes_special_states)
+		if(hide_on_special_state)
+			if(!xeno.special_state)
+				unhide_from(xeno)
+			if(xeno.special_state)
+				hide_from(xeno)
 				return FALSE
-		if(hide_off_ovipositor)
-			if(!queen.ovipositor)
-				hide_from(queen)
+		if(hide_off_special_state)
+			if(!xeno.special_state)
+				hide_from(xeno)
 				return FALSE
-			if(queen.ovipositor)
-				unhide_from(queen)
-		if(!queen.queen_aged && queen_maturity_restricted)
-			return FALSE
-		if(queen.ovipositor && block_on_ovi)
+			if(xeno.special_state)
+				unhide_from(xeno)
+		if(xeno.special_state && block_on_special_state)
 			return FALSE
 	if(xeno && !xeno.is_mob_incapacitated() && !HAS_TRAIT(xeno, TRAIT_DAZED) && xeno.body_position == STANDING_UP && !xeno.buckled && xeno.plasma_stored >= plasma_cost)
 		return TRUE

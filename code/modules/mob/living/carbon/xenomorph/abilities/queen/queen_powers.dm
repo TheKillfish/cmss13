@@ -723,9 +723,469 @@
 	xeno.mount_ovipositor()
 	return ..()
 
+
+/datum/action/xeno_action/activable/frontal_assault/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/queen/xeno = owner
+
+	if(!istype(xeno) || !xeno.check_state() || !action_cooldown_check())
+		return
+
+	if(!target || target.layer >= FLY_LAYER || !isturf(xeno.loc))
+		return
+
+	xeno.face_atom(target)
+
+	// Transient turf list
+	var/list/target_turfs = list()
+	var/list/temp_turfs = list()
+	var/list/telegraph_atom_list = list()
+
+	// Code to get a 2x3 area of turfs
+	var/turf/root = get_turf(xeno)
+	var/facing = Get_Compass_Dir(xeno, target)
+	var/turf/infront = get_step(root, facing)
+	var/turf/left = get_step(root, turn(facing, 90))
+	var/turf/right = get_step(root, turn(facing, -90))
+	var/turf/infront_left = get_step(root, turn(facing, 45))
+	var/turf/infront_right = get_step(root, turn(facing, -45))
+	temp_turfs += infront
+	if(!(!infront || infront.density) && !(!left || left.density))
+		temp_turfs += infront_left
+	if(!(!infront || infront.density) && !(!right || right.density))
+		temp_turfs += infront_right
+
+	for(var/turf/range_turf in temp_turfs)
+		if (!istype(range_turf))
+			continue
+
+		if (range_turf.density)
+			continue
+
+		target_turfs += range_turf
+		telegraph_atom_list += new /obj/effect/xenomorph/xeno_telegraph/red(range_turf, 0.25 SECONDS)
+
+		var/turf/next_turf = get_step(range_turf, facing)
+		if (!istype(next_turf) || next_turf.density)
+			continue
+
+		target_turfs += next_turf
+		telegraph_atom_list += new /obj/effect/xenomorph/xeno_telegraph/red(next_turf, 0.25 SECONDS)
+
+	if(!length(target_turfs))
+		to_chat(xeno, SPAN_XENOWARNING("We don't have enough room!"))
+		return
+
+	if(!check_and_use_plasma_owner())
+		return
+
+	xeno.visible_message(SPAN_XENODANGER("[xeno] madly swings its claws infront of it!"), \
+	SPAN_XENODANGER("We slash madly infront of us!"))
+	xeno.emote("roar")
+
+	for(var/turf/range in target_turfs)
+		for(var/mob/living/carbon/carbon_target in range)
+			if(carbon_target.stat == DEAD)
+				continue
+
+			if(!isxeno_human(carbon_target) || xeno.can_not_harm(carbon_target))
+				continue
+
+			if(HAS_TRAIT(carbon_target, TRAIT_NESTED))
+				continue
+
+			var/random_limb_target = rand_zone("chest", 20)
+			var/obj/limb/affected_limb = carbon_target.get_limb(random_limb_target) // CoM probably going to be hit more often
+			if(ishuman(carbon_target) && (!affected_limb || (affected_limb.status & LIMB_DESTROYED))) // Failsafe just in case
+				affected_limb = carbon_target.get_limb("chest")
+
+			carbon_target.apply_armoured_damage(get_xeno_damage_slash(carbon_target, xeno.melee_damage_upper * 1.4), ARMOR_MELEE, BRUTE, random_limb_target)
+			carbon_target.last_damage_data = create_cause_data(xeno.caste_type, xeno)
+			if(xeno.stamina_extras_active && ishuman(carbon_target))
+				affected_limb.add_bleeding(damage_amount = xeno.melee_damage_lower)
+
+			xeno.flick_attack_overlay(carbon_target, "slash")
+			to_chat(carbon_target, SPAN_DANGER("[xeno] violently gashes you in [affected_limb ? affected_limb.display_name : "chest"]!"))
+			playsound(carbon_target, "alien_claw_flesh", 20) // Since there's one per affected target, keep it quiet so attacks aren't deafening
+			shake_camera(carbon_target, 2, 1)
+
+	apply_cooldown()
+	return ..()
+
+/datum/action/xeno_action/onclick/disarming_sweep/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/queen/xeno = owner
+	if(!istype(xeno) || !xeno.check_state() || !action_cooldown_check())
+		return
+
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] sweeps its tail in a wide circle!"), \
+	SPAN_XENOWARNING("We sweep our tail in a wide circle!"))
+	xeno.emote("tail")
+	xeno.spin_circle()
+
+	if(!check_and_use_plasma_owner())
+		return
+
+	for(var/mob/living/carbon/carbon_target in orange(2, get_turf(xeno)))
+		if(carbon_target.stat == DEAD)
+			continue
+
+		if(!isxeno_human(carbon_target) || xeno.can_not_harm(carbon_target))
+			continue
+
+		if(HAS_TRAIT(carbon_target, TRAIT_NESTED))
+			continue
+
+		if(xeno.stamina_extras_active && carbon_target.mob_size < MOB_SIZE_BIG)
+			new /datum/effects/xeno_slow(carbon_target, xeno, ttl = get_xeno_stun_duration(carbon_target, 2.5 SECONDS))
+			carbon_target.apply_effect(get_xeno_stun_duration(carbon_target, 1.5 SECONDS), WEAKEN)
+			to_chat(carbon_target, SPAN_XENOWARNING("You are swept off your feet by [xeno]'s tail sweep!"))
+		else
+			new /datum/effects/xeno_slow(carbon_target, xeno, ttl = get_xeno_stun_duration(carbon_target, 1.5 SECONDS))
+			if(ishuman(carbon_target))
+				carbon_target.drop_held_items()
+				to_chat(carbon_target, SPAN_XENOWARNING("[xeno]'s tail knocks into you, causing you to stumble and drop what you were holding!"))
+			else
+				to_chat(carbon_target, SPAN_XENOWARNING("[xeno]'s tail knocks into you, causing you to stumble!"))
+
+		xeno.flick_attack_overlay(carbon_target, "punch")
+		playsound(carbon_target,'sound/weapons/alien_claw_block.ogg', 50, 1)
+		shake_camera(carbon_target, 2, 1)
+
+	apply_cooldown()
+	return ..()
+
+/datum/action/xeno_action/activable/ram/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/queen/xeno = owner
+
+	if(!istype(xeno) || !xeno.check_state() || !action_cooldown_check())
+		return
+
+	if(!target || target.layer >= FLY_LAYER || !isturf(xeno.loc))
+		return
+
+	if(!check_and_use_plasma_owner())
+		return
+
+	if(get_dist(xeno, target) > max_distance)
+		return
+
+	switch(xeno.stamina_tier)
+		if(0)
+			windup_duration = 3 SECONDS
+		if(1)
+			windup_duration = 2.5 SECONDS
+		if(2)
+			windup_duration = 2 SECONDS
+		if(3)
+			windup_duration = 1.5 SECONDS
+		if(4)
+			windup_duration = 1 SECONDS
+		if(5, 6)
+			windup_duration = 0.5 SECONDS
+
+	xeno.face_atom(target)
+
+	ADD_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
+	xeno.anchored = TRUE
+
+	if(!do_after(xeno, windup_duration, INTERRUPT_NO_NEEDHAND, BUSY_ICON_HOSTILE))
+		// Just in case
+		to_chat(xeno, SPAN_XENODANGER("We fail to charge!"))
+		REMOVE_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
+		xeno.anchored = FALSE
+		return
+
+	REMOVE_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
+	xeno.anchored = FALSE
+
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] charges at [target]!"), \
+	SPAN_XENOWARNING("We charge at [target]!"))
+
+	while(xeno.loc != target) // Due to how throw_atom works, check to see if we're at our desired target and repeat...
+		xeno.throw_atom(target, max_distance, SPEED_FAST, xeno, launch_type = LOW_LAUNCH, pass_flags = PASS_OVER_THROW_MOB, collision_callbacks = ram_callbacks)
+		if(xeno.loc == target || !ram_callbacks) // ...Until we are at our target location or we hit a thing we're not supposed to charge through
+			break
+
+	xeno.update_icons()
+
+	apply_cooldown()
+	return ..()
+
+/mob/living/carbon/xenomorph/queen/proc/ram_mob(mob/living/carbon/target)
+	if(target.stat == DEAD || can_not_harm(target) || target == src)
+		throwing = FALSE
+		return
+
+	target.apply_effect(2, WEAKEN)
+	target.apply_armoured_damage(get_xeno_damage_slash(target, src.melee_damage_upper), ARMOR_MELEE, BRUTE)
+	target.last_damage_data = create_cause_data(src.caste_type, src)
+	playsound(target, "punch", 30) // Quieter than most other instances since there could be a lot being hit at the same time
+
+	if(!target.mob_size >= MOB_SIZE_BIG)
+		src.visible_message(SPAN_XENODANGER("[src] crashes into [target], violently flinging them!"), \
+	SPAN_XENODANGER("We violently fling [target] as we crash into them!"))
+		src.throw_carbon(target, angle2dir(rand(1, 360)), rand(1, 2))
+		return TRUE
+	else
+		src.visible_message(SPAN_XENODANGER("[src] crashes into [target], violently knocking them back!"), \
+	SPAN_XENODANGER("We knock [target] back as we crash into them!"))
+		step_away(target, src, 1)
+		return FALSE // Small targets are easy to bash through, bigger targets are more wall-like
+
+/mob/living/carbon/xenomorph/queen/proc/ram_obj(obj/target)
+	var/datum/action/xeno_action/activable/ram/ramAction = get_action(src, /datum/action/xeno_action/activable/ram)
+
+	if(!check_state() || (!throwing && !ramAction.action_cooldown_check()))
+		obj_launch_collision(target)
+		return FALSE
+
+	if(!target)
+		return FALSE
+
+	else if(istype(target, /obj/structure/barricade))
+		var/obj/structure/barricade/cade_target = target
+		visible_message(SPAN_DANGER("[src] plows straight through [cade_target]!"), null, null, 5)
+		playsound(cade_target, cade_target.barricade_hitsound, 50)
+		cade_target.deconstruct(FALSE)
+		return TRUE
+
+	else if(istype(target, /obj/structure/surface/table) || istype(target, /obj/structure/surface/rack) || istype(target, /obj/structure/window_frame))
+		var/obj/structure/structure_target = target
+		visible_message(SPAN_DANGER("[src] plows straight through [structure_target]!"), null, null, 5)
+		playsound(structure_target, "metalbang", 20)
+		structure_target.deconstruct(FALSE)
+		return TRUE
+
+	else if (istype(target, /obj/structure/window))
+		var/obj/structure/window/window_target = target
+		if(window_target.unacidable)
+			playsound(window_target, 'sound/effects/glassbash.ogg', 30)
+			target.hitby(src)
+			return FALSE
+		else
+			playsound(window_target, "windowshatter", 50)
+			window_target.shatter_window(TRUE)
+			visible_message(SPAN_DANGER("[src] plows straight through [window_target]!"), null, null, 5)
+			return TRUE
+
+	else if(istype(target, /obj/structure/machinery/door/airlock))
+		var/obj/structure/machinery/door/airlock/airlock_target = target
+		if(airlock_target.unacidable)
+			target.hitby(src)
+			return FALSE
+		else
+			playsound(airlock_target, 'sound/effects/metal_crash.ogg', 20, 1)
+			airlock_target.deconstruct(FALSE)
+			return TRUE
+
+	else if(istype(target, /obj/structure/machinery/vending))
+		var/obj/structure/machinery/vending/vendor_target = target
+		if(vendor_target.unslashable)
+			target.hitby(src)
+		else
+			visible_message(SPAN_DANGER("[src] smashes straight into [vendor_target]!"), SPAN_XENODANGER("We smash straight into [vendor_target]!"))
+			playsound(loc, "punch", 25, 1)
+			vendor_target.tip_over()
+
+			var/impact_range = 1
+			var/turf/TA = get_diagonal_step(vendor_target, dir)
+			TA = get_step_away(TA, src)
+			var/launch_speed = 2
+			launch_towards(TA, impact_range, launch_speed)
+
+			vendor_target.hitby(src)
+			return FALSE
+
+	else if(istype(target, /obj/structure/machinery/cm_vending))
+		var/obj/structure/machinery/cm_vending/cm_vendor_target = target
+		if(cm_vendor_target.unslashable)
+			target.hitby(src)
+		else
+			visible_message(SPAN_DANGER("[src] smashes straight into [cm_vendor_target]!"), SPAN_XENODANGER("We smash straight into [cm_vendor_target]!"))
+			playsound(loc, "punch", 25, 1)
+			cm_vendor_target.tip_over()
+
+			var/impact_range = 1
+			var/turf/TA = get_diagonal_step(cm_vendor_target, dir)
+			TA = get_step_away(TA, src)
+			var/launch_speed = 2
+			throw_atom(TA, impact_range, launch_speed)
+
+			cm_vendor_target.hitby(src)
+			return FALSE
+
+	else if(istype(target, /obj/vehicle/multitile))
+		var/obj/vehicle/multitile/multi_target = target
+		visible_message(SPAN_DANGER("[src] rams into [multi_target] and skids to a halt!"), SPAN_XENOWARNING("We ram into [multi_target] and skid to a halt!"))
+		multi_target.Collided(src)
+		return FALSE
+
+	else if(istype(target, /obj/structure/machinery/m56d_hmg))
+		var/obj/structure/machinery/m56d_hmg/HMG_target = target
+		visible_message(SPAN_DANGER("[src] rams [HMG_target]!"), SPAN_XENODANGER("We ram [HMG_target]!"))
+		playsound(HMG_target, "punch", 25, 1)
+		HMG_target.CrusherImpact()
+		HMG_target.hitby(src)
+		return FALSE
+
+	else if(istype(target, /obj/structure/machinery/defenses))
+		var/obj/structure/machinery/defenses/DF_target = target
+		visible_message(SPAN_DANGER("[src] rams into [DF_target]!"), SPAN_XENODANGER("We ram straight into [DF_target]!"))
+
+		if(DF_target.unacidable)
+			target.hitby(src)
+			return FALSE
+		else
+			playsound(DF_target, "punch", 25, 1)
+			DF_target.destroyed_action()
+			return TRUE
+
+/mob/living/carbon/xenomorph/queen/proc/ram_turf(turf/target)
+	if(!target.density)
+		for(var/mob/living/carbon/mob in target)
+			ram_mob(mob)
+			break
+	else
+		turf_launch_collision(target)
+		return FALSE
+
+/*mob/living/carbon/xenomorph/queen/proc/handle_ram_obstacles(atom/target)
+	if(!target)
+		return FALSE
+
+	else if(istype(target, /obj/structure/grille))
+		var/obj/structure/grille/grille = target
+		if(grille.unacidable)
+			. =  FALSE
+		else
+			grille.health -=  80 //Usually knocks it down.
+			grille.healthcheck()
+			. = TRUE
+
+	else if(istype(target, /obj/structure/fence/electrified))
+		var/obj/structure/fence/electrified/fence = target
+		if (fence.cut)
+			. = FALSE
+		else
+			src.visible_message(SPAN_DANGER("[src] smashes into [fence]!"))
+			fence.cut_grille()
+			. = TRUE
+
+	// Anything else?
+	else
+		if(isobj(target))
+			var/obj/obj_target = target
+			if (obj_target.unacidable)
+				. = FALSE
+			else if (obj_target.anchored)
+				visible_message(SPAN_DANGER("[src] crushes [obj_target]!"), SPAN_XENODANGER("We crush [obj_target]!"))
+				if(length(obj_target.contents)) //Hopefully won't auto-delete things inside crushed stuff.
+					var/turf/T = get_turf(src)
+					for(var/atom/movable/S in T.contents) S.forceMove(T)
+
+				qdel(obj_target)
+				. = TRUE
+
+			else
+				if(obj_target.buckled_mob)
+					obj_target.unbuckle()
+				visible_message(SPAN_WARNING("[src] knocks [obj_target] aside!"), SPAN_XENOWARNING("We knock [obj_target] aside.")) //Canisters, crates etc. go flying.
+				playsound(loc, "punch", 25, 1)
+
+				var/impact_range = 2
+				var/turf/TA = get_diagonal_step(obj_target, dir)
+				TA = get_step_away(TA, src)
+				var/launch_speed = 2
+				throw_atom(TA, impact_range, launch_speed)
+
+				. = TRUE
+
+	if(!.)
+		update_icons()*/
+
+/datum/action/xeno_action/activable/brutality/use_ability(atom/target)
+	var/mob/living/carbon/xenomorph/queen/xeno = owner
+
+	if(!action_cooldown_check())
+		return //this gives a little feedback on why your lunge didn't hit other than the lunge button going grey. Plus, it might spook marines that almost got lunged if they know why the message appeared, and extra spookiness is always good.
+
+	if(!target)
+		return
+
+	if(!isturf(xeno.loc))
+		to_chat(xeno, SPAN_XENOWARNING("We can't lunge from here!"))
+		return
+
+	if(!xeno.check_state())
+		return
+
+	if(xeno.can_not_harm(target) || !ismob(target))
+		return
+
+
+	var/mob/living/carbon/carbon_target = target
+	if(carbon_target.stat == DEAD)
+		return
+
+	if(!isliving(target))
+		return
+
+	if(!check_and_use_plasma_owner())
+		return
+
+	apply_cooldown()
+
+	xeno.throw_atom(get_step_towards(target, xeno), max_range, SPEED_FAST, xeno)
+
+	if(xeno.Adjacent(carbon_target) && xeno.start_pulling(carbon_target, TRUE))
+		playsound(carbon_target.pulledby, 'sound/voice/predalien_growl.ogg', 75, 0, status = 0) // bang and roar for dramatic effect
+		playsound(carbon_target, 'sound/effects/bang.ogg', 25, 0)
+		animate(carbon_target, pixel_y = carbon_target.pixel_y + 32, time = 4, easing = SINE_EASING)
+		sleep(4)
+		playsound(carbon_target, 'sound/effects/bang.ogg', 25, 0)
+		playsound(carbon_target,"slam", 50, 1)
+		animate(carbon_target, pixel_y = 0, time = 4, easing = BOUNCE_EASING) //animates the smash
+		carbon_target.apply_armoured_damage(get_xeno_damage_slash(carbon_target, xeno.melee_damage_upper), ARMOR_MELEE, BRUTE, "chest", 20)
+	else
+		xeno.visible_message(SPAN_XENOWARNING("[xeno]'s claws twitch."), SPAN_XENOWARNING("We couldn't grab our target. Wait a moment to try again."))
+
+	return ..()
 /*
-	Insert New Abilities Here
-*/
+/mob/living/carbon/xenomorph/queen/stop_pulling()
+	if(isliving(pulling) && smashing)
+		smashing = FALSE // To avoid extreme cases of stopping a lunge then quickly pulling and stopping to pull someone else
+		var/mob/living/smashed = pulling
+		smashed.set_effect(0, STUN)
+		smashed.set_effect(0, WEAKEN)
+	return ..()
+
+/mob/living/carbon/xenomorph/queen/start_pulling(atom/movable/movable_atom, brutality)
+	if(!check_state())
+		return FALSE
+
+	if(!isliving(movable_atom))
+		return FALSE
+	var/mob/living/living_mob = movable_atom
+	var/should_neckgrab = !(src.can_not_harm(living_mob)) && brutality
+
+
+	. = ..(living_mob, brutality, should_neckgrab)
+
+	if(.) //successful pull
+		if(isxeno(living_mob))
+			var/mob/living/carbon/xenomorph/xeno = living_mob
+			if(xeno.tier >= 2) // Tier 2 castes or higher immune to warrior grab stuns
+				return
+
+		if(should_neckgrab && living_mob.mob_size < MOB_SIZE_BIG)
+			visible_message(SPAN_XENOWARNING("[src] grabs [living_mob] by the back of their leg and slams them onto the ground!"),
+			SPAN_XENOWARNING("We grab [living_mob] by the back of their leg and slam them onto the ground!")) // more flair
+			smashing = TRUE
+			living_mob.drop_held_items()
+			var/duration = get_xeno_stun_duration(living_mob, 1)
+			living_mob.KnockDown(duration)
+			living_mob.Stun(duration)
+			addtimer(VARSET_CALLBACK(src, smashing, FALSE), duration)
+
 
 /datum/action/xeno_action/activable/gut/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
@@ -734,7 +1194,7 @@
 	if(xeno.queen_gut(target))
 		apply_cooldown()
 	return ..()
-
+*/
 // Restricted to on Ovi
 
 /datum/action/xeno_action/onclick/remove_eggsac/use_ability(atom/A)

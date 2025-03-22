@@ -305,11 +305,11 @@
 	viewsize = 12
 
 	base_actions = list(
-		/datum/action/xeno_action/onclick/xeno_resting, // Not usable on ovi
+		/datum/action/xeno_action/onclick/xeno_resting/queen, // Not usable on ovi
 		/datum/action/xeno_action/onclick/regurgitate,
 		/datum/action/xeno_action/watch_xeno,
-		/datum/action/xeno_action/activable/tail_stab, // Not usable on ovi
-		/datum/action/xeno_action/activable/corrosive_acid, // Not usable on ovi
+		/datum/action/xeno_action/activable/tail_stab/queen, // Not usable on ovi
+		/datum/action/xeno_action/activable/corrosive_acid/queen, // Not usable on ovi
 		/datum/action/xeno_action/onclick/emit_pheromones,
 		/datum/action/xeno_action/onclick/queen_word,
 		/datum/action/xeno_action/onclick/send_thoughts,
@@ -318,16 +318,16 @@
 		/datum/action/xeno_action/onclick/screech, // Custom macro, needs to be mature to use
 		// Mobile Abilities
 		/datum/action/xeno_action/onclick/grow_ovipositor,
-		/datum/action/xeno_action/onclick/plant_weeds, // First macro
-		// Rework Ability 1 // Second macro
-		// Rework Ability 2 // Third macro
-		// Rework Ability 3 Ram // Fourth macro, needs to be mature to use
+		/datum/action/xeno_action/onclick/plant_weeds/queen, // First macro
+		/datum/action/xeno_action/activable/frontal_assault, // Second macro
+		/datum/action/xeno_action/onclick/disarming_sweep, // Third macro
+		/datum/action/xeno_action/activable/ram, // Fourth macro, needs to be mature to use
 		// Rework Ability 4 Brutality // Needs to be mature to use
 		// Rework Ability 5 Resin Spit // Fifth macro
 		/datum/action/xeno_action/activable/gut,
 		// Immobile Abilities
 		/datum/action/xeno_action/onclick/remove_eggsac,
-		/datum/action/xeno_action/activable/place_construction/not_primary,
+		/datum/action/xeno_action/activable/place_construction/queen,
 		/datum/action/xeno_action/activable/expand_weeds, // Third macro
 		/datum/action/xeno_action/onclick/choose_resin/queen_macro, // Fourth macro
 		/datum/action/xeno_action/activable/secrete_resin/remote/queen, // Fifth macro
@@ -351,8 +351,9 @@
 
 	claw_type = CLAW_TYPE_VERY_SHARP
 
-	var/queen_aged = FALSE
-	var/queen_age_timer_id = TIMER_ID_NULL
+	needs_maturity = TRUE
+	maturity_time_needed = XENO_QUEEN_AGE_TIME
+	utilizes_special_states = TRUE
 
 	bubble_icon = "alienroyal"
 
@@ -381,27 +382,31 @@
 	AUTOWIKI_SKIP(TRUE)
 
 	hivenumber = XENO_HIVE_FORSAKEN
-	queen_aged = TRUE
+	starts_mature = TRUE
 
 /mob/living/carbon/xenomorph/queen/alpha
 	AUTOWIKI_SKIP(TRUE)
 
 	hivenumber = XENO_HIVE_ALPHA
+	is_mature = TRUE
 
 /mob/living/carbon/xenomorph/queen/bravo
 	AUTOWIKI_SKIP(TRUE)
 
 	hivenumber = XENO_HIVE_BRAVO
+	is_mature = TRUE
 
 /mob/living/carbon/xenomorph/queen/charlie
 	AUTOWIKI_SKIP(TRUE)
 
 	hivenumber = XENO_HIVE_CHARLIE
+	is_mature = TRUE
 
 /mob/living/carbon/xenomorph/queen/delta
 	AUTOWIKI_SKIP(TRUE)
 
 	hivenumber = XENO_HIVE_DELTA
+	is_mature = TRUE
 
 /mob/living/carbon/xenomorph/queen/mutated
 	AUTOWIKI_SKIP(TRUE)
@@ -410,7 +415,7 @@
 
 /mob/living/carbon/xenomorph/queen/combat_ready
 	AUTOWIKI_SKIP(FALSE)
-	queen_aged = TRUE
+	is_mature = TRUE
 
 /mob/living/carbon/xenomorph/queen/Initialize()
 	. = ..()
@@ -428,9 +433,6 @@
 				choose_resin_ability.update_button_icon(selected_resin)
 				break // Don't need to keep looking
 
-	if(hive.dynamic_evolution && !queen_aged)
-		queen_age_timer_id = addtimer(CALLBACK(src, PROC_REF(make_combat_effective)), XENO_QUEEN_AGE_TIME, TIMER_UNIQUE|TIMER_STOPPABLE)
-
 	AddComponent(/datum/component/footstep, 2 , 35, 11, 4, "alien_footstep_large")
 	RegisterSignal(src, COMSIG_MOVABLE_PRE_MOVE, PROC_REF(check_block))
 
@@ -447,7 +449,7 @@
 	if(!nicknumber)
 		generate_and_set_nicknumber()
 	var/name_prefix = hive.prefix
-	if(queen_aged)
+	if(is_mature)
 		age_xeno()
 		switch(age)
 			if(XENO_YOUNG)
@@ -489,19 +491,15 @@
 		return FALSE
 	update_living_queens()
 
-/mob/living/carbon/xenomorph/queen/proc/make_combat_effective()
-	queen_aged = TRUE
-	if(queen_age_timer_id != TIMER_ID_NULL)
-		deltimer(queen_age_timer_id)
-		queen_age_timer_id = TIMER_ID_NULL
-
+/mob/living/carbon/xenomorph/queen/reach_maturity()
+	. = ..()
 	recalculate_actions()
 	recalculate_health()
 	generate_name()
 
 /mob/living/carbon/xenomorph/queen/recalculate_health()
 	. = ..()
-	if(!queen_aged)
+	if(!is_mature)
 		maxHealth *= YOUNG_QUEEN_HEALTH_MULTIPLIER
 
 	if(health > maxHealth)
@@ -564,6 +562,7 @@
 
 		if(!ovipositor)
 			if(stamina_drain_delay_active == TRUE)
+				/* [Insert code for cancelling the delay early if multiple living humans are on screen] */
 				stamina_drain_delay_countdown(stamina_drain)
 
 			if(queen_stamina > 0)
@@ -615,8 +614,10 @@
 	. += "Pooled Larvae: [stored_larvae]"
 	. += "Leaders: [xeno_leader_num] / [hive?.queen_leader_limit]"
 	. += "Royal Resin: [hive?.buff_points]"
-	if(!queen_aged && queen_age_timer_id != TIMER_ID_NULL)
-		. += "Maturity: [time2text(timeleft(queen_age_timer_id), "mm:ss")] remaining"
+	if(queen_stamina != 0)
+		. += "Impatience: [queen_stamina], Tier [stamina_tier]"
+	if(!is_mature && maturity_timer_id != TIMER_ID_NULL)
+		. += "Maturity: [time2text(timeleft(maturity_timer_id), "mm:ss")] remaining"
 
 /mob/living/carbon/xenomorph/queen/proc/set_orders()
 	set category = "Alien"
@@ -880,6 +881,7 @@
 	set_body_position(STANDING_UP)
 	set_resting(FALSE)
 	ovipositor = TRUE
+	special_state = TRUE
 
 	set_resin_build_order(GLOB.resin_build_order_ovipositor) // This needs to occur before we update the abilities so we can update the choose resin icon
 	for(var/datum/action/xeno_action/action in actions)
@@ -926,6 +928,7 @@
 	if(!ovipositor)
 		return
 	ovipositor = FALSE
+	special_state = FALSE
 	REMOVE_TRAIT(src, TRAIT_IMMOBILIZED, OVIPOSITOR_TRAIT)
 	update_icons()
 	bubble_icon_x_offset = initial(bubble_icon_x_offset)
@@ -965,17 +968,17 @@
 	if(stamina_tier != 0)
 		switch(stamina_tier)
 			if(1)
-				to_chat(src, SPAN_XENONOTICE("We feel somewhat fit to fight!"))
+				to_chat(src, SPAN_XENONOTICE("We feel mildy irritated!"))
 			if(2)
-				to_chat(src, SPAN_XENONOTICE("We feel slightly fit to fight!"))
+				to_chat(src, SPAN_XENONOTICE("We feel decently irritated!"))
 			if(3)
-				to_chat(src, SPAN_XENONOTICE("We feel decently fit to fight!"))
+				to_chat(src, SPAN_XENONOTICE("We feel fairly annoyed!"))
 			if(4)
-				to_chat(src, SPAN_XENOBOLDNOTICE("We feel fairly fit to fight!"))
+				to_chat(src, SPAN_XENOBOLDNOTICE("We feel very annoyed!"))
 			if(5)
-				to_chat(src, SPAN_XENOBOLDNOTICE("We feel quite fit to fight!"))
+				to_chat(src, SPAN_XENOBOLDNOTICE("We feel quite angry!"))
 			if(6)
-				to_chat(src, SPAN_XENOHIGHDANGER("We feel as fit to fight as we possibly can be!"))
+				to_chat(src, SPAN_XENOHIGHDANGER("We feel incredibly angry!"))
 				src.emote("roar")
 
 	if(!instant_dismount)
