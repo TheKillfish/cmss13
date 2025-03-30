@@ -226,8 +226,8 @@
 
 	// Animation code taken from tail stab pretty much verbatim
 	swing_direction = turn(demolisher.dir, pick(90, -90))
-	demolisher.animation_attack_on(target)
-	demolisher.flick_attack_overlay(target, "slam")
+	demolisher.animation_attack_on(targetted_atom)
+	demolisher.flick_attack_overlay(targetted_atom, "slam")
 
 	if(last_dir != swing_direction)
 		demolisher.setDir(swing_direction)
@@ -239,3 +239,33 @@
 /datum/action/xeno_action/activable/wrecking_tail/proc/reset_direction(mob/living/carbon/xenomorph/demolisher, last_dir, new_dir)
 	if(new_dir == demolisher.dir)
 		demolisher.setDir(last_dir)
+
+/datum/action/xeno_action/activable/corrosive_slime/use_ability(atom/targetted_atom)
+	var/mob/living/carbon/xenomorph/demolisher = owner
+	if(!demolisher.check_state())
+		return
+
+	if(!action_cooldown_check())
+		return
+
+	if(!demolisher.Adjacent(targetted_atom))
+		return
+
+	var/datum/behavior_delegate/warrior_demolisher/behavior_delegate = demolisher.behavior_delegate
+	if(!istype(behavior_delegate))
+		return
+
+	if(behavior_delegate.acid_charges < 1)
+		to_chat(demolisher, SPAN_XENOHIGHDANGER("We do not have any acid charges!"))
+
+	if(targetted_atom == demolisher)
+		if(!do_after(demolisher, 2 SECONDS, INTERRUPT_NO_NEEDHAND, BUSY_ICON_HOSTILE))
+			return
+		playsound(demolisher, "alien_drool", 25)
+		behavior_delegate.fists_drenched()
+	else
+		demolisher.corrosive_acid(targetted_atom, acid_type, 0)
+		for(var/obj/item/explosive/plastic/explosive in targetted_atom.contents)
+			demolisher.corrosive_acid(explosive, acid_type, 0)
+
+	return ..()
