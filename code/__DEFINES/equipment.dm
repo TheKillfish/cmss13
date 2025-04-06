@@ -475,16 +475,59 @@ GLOBAL_LIST_INIT(slot_to_contained_sprite_shorthand, list(
 //=================================================
 
 //=================================================
+#define ACCESSORY_SLOT_FALLBACK "Fallback" // A fallback
+// Hat Accessory Slots
+#define ACCESSORY_SLOT_FLAIR "Flair" // For putting flairs and patches on hats
+#define ACCESSORY_SLOT_GLASSES "Glasses" // For putting glasses on hats, also includes NVGs because they'd conflict visually/logically
+#define ACCESSORY_SLOT_HELMETLIGHT "Helmet Light" // For putting rail lights on helmets, maybe other tacticool crap can use this slot in the future
+#define ACCESSORY_SLOT_MOUNTEDMASK "Mounted Mask" // For putting gas masks and riot visors on
+#define ACCESSORY_SLOT_MISCPRIMARY "Miscellaneous Primary" // For stylish/flavour/fluff items that you might not be removing regularly and so can tolerate removal via context menu
+#define ACCESSORY_SLOT_MISCSECONDARY "Miscellaneous Secondary" // Ditto of above
+
+// Uniform & Suit Shared Accessory Slots
+#define ACCESSORY_SLOT_RANK "Rank" // For rank boards
+#define ACCESSORY_SLOT_MEDAL "Medal" // For big, shiny medals
+#define ACCESSORY_SLOT_DOGTAGS "Dogtags" // For decorative dogtags
+
+// Uniform & Jacket Accessory Slots
+#define ACCESSORY_SLOT_PATCH "Patch" // For putting shoulder patches on your uniform
+#define ACCESSORY_SLOT_FUNCTIONAL "Functional" // For storage webbings and the like, basically everything that used ACCESSORY_SLOT_UTILITY
+#define ACCESSORY_SLOT_NECK "Neck" // For stuff that you wear around your neck, like ties, scarves, tactical wraps, goggle-type glasses because why not, and stethoscopes
+#define ACCESSORY_SLOT_BACK "Back" // For ponchos and the like
+#define ACCESSORY_SLOT_UPPERARM_L "Left Upper Arm" // For stuff that you'd wear on your bicep, like armbands
+#define ACCESSORY_SLOT_UPPERARM_R "Right Upper Arm" // Ditto of above
+#define ACCESSORY_SLOT_FOREARM_L "Left Forearm" // For stuff that you'd wear on your forearm
+#define ACCESSORY_SLOT_FOREARM_R "Right Forearm" // Ditto of above
+#define ACCESSORY_SLOT_UPPERLEG_L "Left upper leg" // For stuff that you'd wear on your upper leg, such as your thighs
+#define ACCESSORY_SLOT_UPPERLEG_R "Right upper leg" // Ditto of above
+#define ACCESSORY_SLOT_KNEE_L "Left knee" // For stuff that you'd wear on your knee, like kneepads or a kneebrace
+#define ACCESSORY_SLOT_KNEE_R "Right knee" // Ditto of above
+#define ACCESSORY_SLOT_LOWERLEG_L "Left lower leg" // For stuff that you'd wear on your lower leg, like shinguards
+#define ACCESSORY_SLOT_LOWERLEG_R "Right lower leg" // Ditto of above
+
+// Uniform & Glove Shared Accessory Slots
+#define ACCESSORY_SLOT_WRIST_L "Left wrist" // For stuff that you'd have on your wrists, like watches or bracelets
+#define ACCESSORY_SLOT_WRIST_R "Right wrist" // Ditto of above
+
+// Uniform & Boots Shared Accessory Slots
+#define ACCESSORY_SLOT_ANKLE_L "Left ankle" // For stuff that you'd wear around your ankles
+#define ACCESSORY_SLOT_ANKLE_R "Right ankle" // Ditto of above
+
+// Armor Accessory Slots, although these aren't really accessories
+#define ACCESSORY_SLOT_MOUNTEDLIGHT "Mounted light" // For making armor lights removable and modular
+#define ACCESSORY_SLOT_STORAGE_T1 "Low Tier Storage" // For mounting 2 slot storage items to armor, and switching them out for similarly sized alternatives
+#define ACCESSORY_SLOT_STORAGE_T2 "High Tier Storage" // For mounting 3 slot storage items to armor, and switching them out for similarly sized alternatives
+#define ACCESSORY_SLOT_STORAGE_T3 "Low Special Storage" // For mounting 4 slot storage items to armor, and switching them out for similarly sized alternatives
+#define ACCESSORY_SLOT_STORAGE_T4 "High Special Storage" // For mounting 5 slot storage items to armor, and switching them out for similarly sized alternatives
+
+// Old Defines
 #define ACCESSORY_SLOT_UTILITY "Utility"
 #define ACCESSORY_SLOT_ARMBAND "Armband"
-#define ACCESSORY_SLOT_RANK "Rank"
 #define ACCESSORY_SLOT_DECOR "Decor"
-#define ACCESSORY_SLOT_MEDAL "Medal"
 #define ACCESSORY_SLOT_PONCHO "Ponchos"
+
 #define ACCESSORY_SLOT_TROPHY "Trophy"
 #define ACCESSORY_SLOT_MASK "Mask"
-#define ACCESSORY_SLOT_WRIST_L "Left wrist"
-#define ACCESSORY_SLOT_WRIST_R "Right wrist"
 
 /// Used for uniform armor inserts.
 #define ACCESSORY_SLOT_ARMOR_C "Chest armor"

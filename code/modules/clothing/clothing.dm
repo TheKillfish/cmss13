@@ -12,13 +12,29 @@
 	var/armor_rad = 0
 	var/armor_internaldamage = 0
 	var/movement_compensation = 0
-	var/list/accessories
-	var/list/valid_accessory_slots = list()
-	var/list/restricted_accessory_slots = list()
 	var/drag_unequip = FALSE
 	var/blood_overlay_type = "" //which type of blood overlay to use on the mob when bloodied
 	var/list/clothing_traits // Trait modification, lazylist of traits to add/take away, on equipment/drop in the correct slot
 	var/clothing_traits_active = TRUE //are the clothing traits that are applied to the item active (acting on the mob) or not?
+	// Accessory Vars
+	var/list/accessories
+	var/list/valid_accessory_slots = list()
+	var/list/restricted_accessory_slots = list()
+	var/can_be_accessory = FALSE // Can this be attatched to something as an accessory?
+	var/slot = ACCESSORY_SLOT_FALLBACK
+	var/image/inv_overlay = null //overlay used when attached to clothing.
+	var/obj/item/clothing/has_suit = null //the suit the tie may be attached to
+	var/list/mob_overlay = list()
+	var/overlay_state = null
+	var/inv_overlay_icon = 'icons/obj/items/clothing/accessory/inventory_overlays/ties.dmi'
+	var/list/accessory_icons = list(
+		WEAR_BODY = 'icons/mob/humans/onmob/clothing/accessory/ties.dmi',
+		WEAR_JACKET = 'icons/mob/humans/onmob/clothing/accessory/ties.dmi'
+	)
+	///Jumpsuit flags that cause the accessory to be hidden. format: "x" OR "(x|y|z)" (w/o quote marks).
+	var/jumpsuit_hide_states
+	var/high_visibility //if it should appear on examine without detailed view
+	var/removable = TRUE
 
 /obj/item/clothing/get_examine_line(mob/user)
 	. = ..()
@@ -30,6 +46,9 @@
 		.+= " with [english_list(ties)] attached"
 	if(LAZYLEN(accessories) > length(ties))
 		.+= ". <a href='byond://?src=\ref[src];list_acc=1'>\[See accessories\]</a>"
+	for(var/obj/item/clothing/accessory/thing in accessories)
+		. += "[icon2html(thing, user)] \A [thing] is [thing.additional_examine_text()]" //The spacing of the examine text proc is deliberate. By default it returns ".".
+
 
 /obj/item/clothing/Topic(href, href_list)
 	. = ..()

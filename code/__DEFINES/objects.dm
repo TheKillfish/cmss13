@@ -209,6 +209,8 @@ GLOBAL_LIST_INIT(RESTRICTED_CAMERA_NETWORKS, list( //Those networks can only be 
 #define OBJ_IS_HELMET_GARB (1<<2)
 /// can you customize the description/name of the thing?
 #define OBJ_UNIQUE_RENAME (1<<3)
+/// Is the thing able to be attached as an accessory?
+#define OBJ_CAN_BE_ACCESSORY (1<<4)
 
 // For reinforced table status
 #define RTABLE_WEAKENED 1
