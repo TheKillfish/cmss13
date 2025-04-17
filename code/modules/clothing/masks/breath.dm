@@ -97,6 +97,8 @@
 	var/pulled = FALSE
 	var/original_state = "coif"
 	actions_types = list(/datum/action/item_action/toggle)
+	can_be_accessory = TRUE
+	slot = ACCESSORY_SLOT_NECK
 
 /obj/item/clothing/mask/rebreather/scarf/ui_action_click()
 	pull_down()

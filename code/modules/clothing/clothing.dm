@@ -21,7 +21,7 @@
 	var/list/valid_accessory_slots = list()
 	var/list/restricted_accessory_slots = list()
 	var/can_be_accessory = FALSE // Can this be attatched to something as an accessory?
-	var/slot = ACCESSORY_SLOT_FALLBACK
+	var/slot = null
 	var/image/inv_overlay = null //overlay used when attached to clothing.
 	var/obj/item/clothing/has_suit = null //the suit the tie may be attached to
 	var/list/mob_overlay = list()
@@ -43,9 +43,9 @@
 		if(accessory.high_visibility)
 			ties += "\a [accessory.get_examine_line(user)]"
 	if(length(ties))
-		.+= " with [english_list(ties)] attached"
+		. += " with [english_list(ties)] attached"
 	if(LAZYLEN(accessories) > length(ties))
-		.+= ". <a href='byond://?src=\ref[src];list_acc=1'>\[See accessories\]</a>"
+		. += ". <a href='byond://?src=\ref[src];list_acc=1'>\[See accessories\]</a>"
 	for(var/obj/item/clothing/accessory/thing in accessories)
 		. += "[icon2html(thing, user)] \A [thing] is [thing.additional_examine_text()]" //The spacing of the examine text proc is deliberate. By default it returns ".".
 
@@ -66,7 +66,7 @@
 	//only forward to the attached accessory if the clothing is equipped (not in a storage)
 	if(LAZYLEN(accessories) && loc == user)
 		var/delegated //So that accessories don't block attack_hands unless they actually did something. Specifically meant for armor vests with medals, but can't hurt in general.
-		for(var/obj/item/clothing/accessory/A in accessories)
+		for(var/obj/item/clothing/A in accessories)
 			if(A.attack_hand(user))
 				delegated = TRUE
 		if(delegated)
@@ -135,8 +135,8 @@
 		ret.overlays += bloodsies
 
 	if(LAZYLEN(accessories))
-		for(var/obj/item/clothing/accessory/A in accessories)
-			ret.overlays |= A.get_mob_overlay(user_mob, slot)
+		for(var/obj/item/clothing/accessory_thing in accessories)
+			ret.overlays |= accessory_thing.get_mob_overlay_accessory(user_mob, slot)
 	return ret
 
 ///////////////////////////////////////////////////////////////////////

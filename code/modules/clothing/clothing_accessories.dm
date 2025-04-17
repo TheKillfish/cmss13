@@ -9,8 +9,6 @@
 				return 0
 
 /obj/item/clothing/proc/get_inv_overlay()
-	if(!can_be_accessory)
-		return
 	if(!inv_overlay)
 		var/tmp_icon_state = overlay_state? overlay_state : icon_state
 		if(icon_override && ("[tmp_icon_state]_tie" in icon_states(icon_override)))
@@ -22,11 +20,9 @@
 	inv_overlay.color = color
 	return inv_overlay
 
-/obj/item/clothing/get_mob_overlay(mob/user_mob, slot, default_bodytype = "Default")
-	if(!can_be_accessory)
-		return ..()
-	if(!istype(loc,/obj/item/clothing)) //don't need special handling if it's worn as normal item.
-		return ..()
+/obj/item/clothing/proc/get_mob_overlay_accessory(mob/user_mob, slot, default_bodytype = "Default")
+	if(!istype(loc, /obj/item/clothing)) //don't need special handling if it's worn as normal item.
+		return
 	var/bodytype = default_bodytype
 	if(ishuman(user_mob))
 		var/mob/living/carbon/human/user_human = user_mob
@@ -52,7 +48,7 @@
 			return overlay_image(use_sprite_sheet, tmp_icon_state, color, RESET_COLOR)
 
 /obj/item/clothing/attackby(obj/item/item, mob/user)
-	if(istype(item, /obj/item/clothing/accessory) && HAS_FLAG(item.flags_obj, OBJ_CAN_BE_ACCESSORY))
+	if(istype(item, /obj/item/clothing/accessory) && can_be_accessory)
 		if(!LAZYLEN(valid_accessory_slots))
 			to_chat(usr, SPAN_WARNING("You cannot attach accessories of any kind to \the [src]."))
 			return

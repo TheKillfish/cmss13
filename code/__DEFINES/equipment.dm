@@ -475,7 +475,6 @@ GLOBAL_LIST_INIT(slot_to_contained_sprite_shorthand, list(
 //=================================================
 
 //=================================================
-#define ACCESSORY_SLOT_FALLBACK "Fallback" // A fallback
 // Hat Accessory Slots
 #define ACCESSORY_SLOT_FLAIR "Flair" // For putting flairs and patches on hats
 #define ACCESSORY_SLOT_GLASSES "Glasses" // For putting glasses on hats, also includes NVGs because they'd conflict visually/logically
@@ -521,7 +520,6 @@ GLOBAL_LIST_INIT(slot_to_contained_sprite_shorthand, list(
 #define ACCESSORY_SLOT_STORAGE_T4 "High Special Storage" // For mounting 5 slot storage items to armor, and switching them out for similarly sized alternatives
 
 // Old Defines
-#define ACCESSORY_SLOT_UTILITY "Utility"
 #define ACCESSORY_SLOT_ARMBAND "Armband"
 #define ACCESSORY_SLOT_DECOR "Decor"
 #define ACCESSORY_SLOT_PONCHO "Ponchos"
