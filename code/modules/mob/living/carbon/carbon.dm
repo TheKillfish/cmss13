@@ -217,7 +217,8 @@
 	if(shock_damage<1)
 		return FALSE
 
-	src.apply_damage(shock_damage, BURN, def_zone, used_weapon="Electrocution")
+	if(!HAS_TRAIT(src, TRAIT_SHOCKPROOF))
+		src.apply_damage(shock_damage, BURN, def_zone, used_weapon="Electrocution")
 
 	playsound(loc, "sparks", 25, 1)
 	if(shock_damage > 10)

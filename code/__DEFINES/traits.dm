@@ -167,6 +167,8 @@
 #define TRAIT_HAULED "hauled"
 // only used by valkyrie
 #define TRAIT_VALKYRIE_ARMORED "trait_valkyrie_armored"
+/// Makes mob immune to shocks or shock-related stuff like EMPs
+#define TRAIT_SHOCKPROOF "trait_shockproof"
 
 // SPECIES TRAITS
 /// Knowledge of Yautja technology

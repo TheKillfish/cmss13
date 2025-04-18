@@ -586,6 +586,8 @@
 			new /obj/effect/overlay/temp/emp_sparks(turf)
 
 	for(var/mob/living/carbon/mob in full_range) // no legacy mob support
+		if(HAS_TRAIT(mob, TRAIT_SHOCKPROOF))
+			return
 
 		var/mob_dist = get_dist(src, mob) // Distance from mob
 

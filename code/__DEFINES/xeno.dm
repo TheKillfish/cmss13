@@ -383,6 +383,7 @@
 
 // Boiler strain flags
 #define BOILER_TRAPPER "Trapper"
+#define BOILER_STORM "Storm"
 
 // Runner strain flags
 #define RUNNER_ACIDER "Acider"

@@ -290,6 +290,8 @@
 //source is an object caused electrocuting (airlock, grille, etc)
 //No animations will be performed by this proc.
 /proc/electrocute_mob(mob/living/carbon/M as mob, power_source, obj/source, siemens_coeff = 1.0)
+	if(HAS_TRAIT(M, TRAIT_SHOCKPROOF))
+		return 0
 	//This is for performance optimization only.
 	//DO NOT modify siemens_coeff here. That is checked in human/electrocute_act()
 	if(istype(M,/mob/living/carbon/human))

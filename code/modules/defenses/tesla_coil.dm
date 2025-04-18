@@ -107,7 +107,9 @@
 			if(!check_path(M))
 				continue
 
-			apply_debuff(M)
+				if(!HAS_TRAIT(M, TRAIT_SHOCKPROOF))
+					apply_debuff(M)
+
 		else if(istype(A, /obj/structure/machinery/defenses))
 			var/obj/structure/machinery/defenses/D = A
 			D.power_off()
