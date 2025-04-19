@@ -209,6 +209,15 @@ Defined in conflicts.dm of the #defines folder.
 		// Remove bullet traits of attachment from gun's current projectile
 		detaching_gun.in_chamber._RemoveElement(L)
 
+	// Remove any leftover reference to the bullet trait
+	for(var/list/trait_list in detaching_gun.in_chamber.bullet_traits)
+		trait_list.Remove(traits_to_give)
+		if(!length(trait_list))
+			detaching_gun.in_chamber.bullet_traits.Remove(list(trait_list))
+
+	if(!length(detaching_gun.in_chamber.bullet_traits))
+		detaching_gun.in_chamber.bullet_traits = null
+
 /obj/item/attachable/ui_action_click(mob/living/user, obj/item/weapon/gun/G)
 	activate_attachment(G, user)
 	return //success
@@ -269,7 +278,12 @@ Defined in conflicts.dm of the #defines folder.
 /obj/item/attachable/suppressor/New()
 	..()
 	damage_falloff_mod = 0.1
-	attach_icon = pick("suppressor_a","suppressor2_a")
+
+/obj/item/attachable/suppressor/nsg
+	name = "\improper BL11 firearm muffler"
+	desc = "Threaded steel barrel attachment; slows the escape of propellant gasses, resulting in muffled weapon fire."
+	icon_state = "bl11"
+	attach_icon = "bl11_a"
 
 /obj/item/attachable/suppressor/xm40_integral
 	name = "\improper XM40 integral suppressor"
@@ -303,6 +317,7 @@ Defined in conflicts.dm of the #defines folder.
 	flags_armor_protection = SLOT_FACE
 	flags_item = CAN_DIG_SHRAPNEL
 
+
 	attach_icon = "bayonet_a"
 	melee_mod = 20
 	slot = "muzzle"
@@ -321,13 +336,26 @@ Defined in conflicts.dm of the #defines folder.
 	accuracy_unwielded_mod = -HIT_ACCURACY_MULT_TIER_1
 
 /obj/item/attachable/bayonet/upp_replica
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "\improper Type 80 bayonet"
+	desc = "The standard-issue bayonet of the UPP, it's dulled from heavy use."
 	icon_state = "upp_bayonet"
 	item_state = "combat_knife"
 	attach_icon = "upp_bayonet_a"
-	desc = "The standard-issue bayonet of the UPP, it's dulled from heavy use."
+
+/obj/item/attachable/bayonet/wy
+	AUTOWIKI_SKIP(TRUE)
+
+	name = "\improper SA120 L7 bayonet"
+	desc = "The standard-issue bayonet of the W-Y Commandos and PMCs, has a better ergonomic carbon finish grip and corrosion proof blade."
+	icon_state = "wy_bayonet"
+	attach_icon = "wy_bayonet_a"
+	unacidable = TRUE
 
 /obj/item/attachable/bayonet/upp
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "\improper Type 80 bayonet"
 	desc = "The standard-issue bayonet of the UPP, the Type 80 is balanced to also function as an effective throwing knife."
 	icon_state = "upp_bayonet"
@@ -339,6 +367,8 @@ Defined in conflicts.dm of the #defines folder.
 	pry_delay = 1 SECONDS
 
 /obj/item/attachable/bayonet/co2
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "\improper M8 cartridge bayonet"
 	desc = "A back issue USCM approved exclusive for Boots subscribers found in issue #255 'Inside the Night Raider - morale breaking alternatives with 2nd LT. Juliane Gerd'. A pressurized tube runs along the inside of the blade, and a button allows one to inject compressed CO2 into the stab wound. It feels cheap to the touch. Faulty even."
 	icon_state = "co2_knife"
@@ -346,6 +376,8 @@ Defined in conflicts.dm of the #defines folder.
 	var/filled = FALSE
 
 /obj/item/attachable/bayonet/rmc
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "\improper L5 bayonet"
 	desc = "The standard-issue bayonet of the RMC, the L5 is balanced to also function as an effective throwing knife."
 	icon_state = "twe_bayonet"
@@ -356,7 +388,76 @@ Defined in conflicts.dm of the #defines folder.
 	throw_range = 7
 	pry_delay = 1 SECONDS
 
+/obj/item/attachable/bayonet/antique
+	AUTOWIKI_SKIP(TRUE)
+
+	name = "\improper antique bayonet"
+	desc = "An antique-style bayonet, has a long blade, wooden handle with brass fittings, reflecting historical craftsmanship."
+	icon_state = "antique_bayonet"
+	item_state = "combat_knife"
+	attach_icon = "antique_bayonet_a"
+
+/obj/item/attachable/bayonet/rmc_replica
+	AUTOWIKI_SKIP(TRUE)
+
+	name = "\improper L5 bayonet"
+	desc = "The standard-issue bayonet of the RMC, it's dulled from heavy use."
+	icon_state = "twe_bayonet"
+	item_state = "combat_knife"
+	attach_icon = "twe_bayonet_a"
+
+/obj/item/attachable/bayonet/custom
+	AUTOWIKI_SKIP(TRUE)
+
+	name = "\improper M5 'Raven's Claw' tactical bayonet"
+	desc = "A prototype bayonet-combat knife hybrid, engineered for close-quarters engagements and urban operations. Its rugged construction, quick-detach mechanism and deadly versatility make it a formidable tool."
+	icon_state = "bayonet_custom"
+	item_state = "combat_knife"
+	attach_icon = "bayonet_custom_a"
+
+/obj/item/attachable/bayonet/custom/red
+	AUTOWIKI_SKIP(TRUE)
+
+	desc = "A prototype bayonet-combat knife hybrid, engineered for close-quarters engagements and urban operations. Its rugged construction, quick-detach mechanism and deadly versatility make it a formidable tool. This version has been customized with a red grip and gold detailing, giving it a unique and distinctive appearance."
+	icon_state = "bayonet_custom_red"
+	item_state = "combat_knife"
+	attach_icon = "bayonet_custom_red_a"
+
+/obj/item/attachable/bayonet/custom/blue
+	AUTOWIKI_SKIP(TRUE)
+
+	desc = "A prototype bayonet-combat knife hybrid, engineered for close-quarters engagements and urban operations. Its rugged construction, quick-detach mechanism and deadly versatility make it a formidable tool. This version has been customized with a blue grip and gold detailing, giving it a unique and distinctive appearance."
+	icon_state = "bayonet_custom_blue"
+	item_state = "combat_knife"
+	attach_icon = "bayonet_custom_blue_a"
+
+/obj/item/attachable/bayonet/custom/black
+	AUTOWIKI_SKIP(TRUE)
+
+	desc = "A prototype bayonet-combat knife hybrid, engineered for close-quarters engagements and urban operations. Its rugged construction, quick-detach mechanism and deadly versatility make it a formidable tool. This version has been customized with a black grip and gold detailing, giving it a unique and distinctive appearance."
+	icon_state = "bayonet_custom_black"
+	item_state = "combat_knife"
+	attach_icon = "bayonet_custom_black_a"
+
+/obj/item/attachable/bayonet/tanto
+	AUTOWIKI_SKIP(TRUE)
+
+	name = "\improper T9 tactical bayonet"
+	desc = "Preferred by TWE colonial military forces in the Neroid Sector, the T9 is designed for urban combat with a durable tanto blade and quick-attach system, reflecting traditional Japanese blade influences. Occasionally seen in the hands of Colonial Liberation Front (CLF) forces, often stolen from TWE detatchments and outposts across the sector."
+	icon_state = "bayonet_tanto"
+	item_state = "combat_knife"
+	attach_icon = "bayonet_tanto_a"
+
+/obj/item/attachable/bayonet/tanto/blue
+	AUTOWIKI_SKIP(TRUE)
+
+	icon_state = "bayonet_tanto_alt"
+	item_state = "combat_knife"
+	attach_icon = "bayonet_tanto_alt_a"
+
 /obj/item/attachable/bayonet/van_bandolier
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "\improper Fairbairn-Sykes fighting knife"
 	desc = "This isn't for dressing game or performing camp chores. It's almost certainly not an original. Almost."
 
@@ -459,6 +560,11 @@ Defined in conflicts.dm of the #defines folder.
 	pixel_shift_y = 17
 	hud_offset_mod = -2
 
+/obj/item/attachable/shotgun_choke/set_bullet_traits()
+	LAZYADD(traits_to_give, list(
+		BULLET_TRAIT_ENTRY(/datum/element/bullet_trait_knockback_disabled)
+	))
+
 /obj/item/attachable/shotgun_choke/New()
 	..()
 	recoil_mod = RECOIL_AMOUNT_TIER_4
@@ -474,21 +580,19 @@ Defined in conflicts.dm of the #defines folder.
 	if(!istype(attaching_gun, /obj/item/weapon/gun/shotgun/pump))
 		return ..()
 	attaching_gun.pump_delay -= FIRE_DELAY_TIER_5
-	attaching_gun.add_bullet_trait(BULLET_TRAIT_ENTRY_ID("knockback_disabled", /datum/element/bullet_trait_knockback_disabled))
 	attaching_gun.fire_sound = 'sound/weapons/gun_shotgun_choke.ogg'
-
 	return ..()
 
 /obj/item/attachable/shotgun_choke/Detach(mob/user, obj/item/weapon/gun/shotgun/pump/detaching_gun)
 	if(!istype(detaching_gun, /obj/item/weapon/gun/shotgun/pump))
 		return ..()
 	detaching_gun.pump_delay += FIRE_DELAY_TIER_5
-	detaching_gun.remove_bullet_trait("knockback_disabled")
 	detaching_gun.fire_sound = initial(detaching_gun.fire_sound)
-
 	return ..()
 
 /obj/item/attachable/slavicbarrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "sniper barrel"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
 	icon_state = "slavicbarrel"
@@ -528,6 +632,8 @@ Defined in conflicts.dm of the #defines folder.
 	size_mod = 0
 
 /obj/item/attachable/l56a2_smartgun
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "l56a2 barrel"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon_state = "magsg_barrel_a"
@@ -539,6 +645,8 @@ Defined in conflicts.dm of the #defines folder.
 	size_mod = 0
 
 /obj/item/attachable/sniperbarrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "sniper barrel"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
 	icon_state = "sniperbarrel"
@@ -553,6 +661,8 @@ Defined in conflicts.dm of the #defines folder.
 	scatter_mod = -SCATTER_AMOUNT_TIER_8
 
 /obj/item/attachable/pmc_sniperbarrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "sniper barrel"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
 	icon_state = "pmc_sniperbarrel"
@@ -572,6 +682,8 @@ Defined in conflicts.dm of the #defines folder.
 	hud_offset_mod = -1
 
 /obj/item/attachable/m60barrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "M60 barrel"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
 	icon_state = "m60barrel"
@@ -586,6 +698,8 @@ Defined in conflicts.dm of the #defines folder.
 	scatter_mod = -SCATTER_AMOUNT_TIER_8
 
 /obj/item/attachable/mar50barrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "MAR-50 barrel"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
 	icon_state = "mar50barrel"
@@ -600,6 +714,8 @@ Defined in conflicts.dm of the #defines folder.
 	scatter_mod = -SCATTER_AMOUNT_TIER_8
 
 /obj/item/attachable/smartbarrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "smartgun barrel"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
 	icon_state = "m56_barrel"
@@ -969,6 +1085,37 @@ Defined in conflicts.dm of the #defines folder.
 			. = TRUE
 	return .
 
+/obj/item/attachable/alt_iff_scope
+	name = "B8 Smart-Scope"
+	icon = 'icons/obj/items/weapons/guns/attachments/rail.dmi'
+	icon_state = "iffbarrel"
+	attach_icon = "iffbarrel_a"
+	desc = "An experimental B8 Smart-Scope. Based on the technologies used in the Smart Gun by ARMAT, this sight has integrated IFF systems. It can only attach to the M4RA Battle Rifle, the M44 Combat Revolver, and the M41A MK2 Pulse Rifle."
+	desc_lore = "An experimental fire-control optic capable of linking into compatible IFF systems on certain weapons, designated the XAN/PVG-110 Smart Scope. Experimental technology developed by Armat, who have assured that all previously reported issues with false-negative IFF recognitions have been solved. Make sure to check the sight after every deployment, just in case."
+	slot = "rail"
+	pixel_shift_y = 15
+
+/obj/item/attachable/alt_iff_scope/New()
+	..()
+	damage_mod = -BULLET_DAMAGE_MULT_TIER_2
+	damage_falloff_mod = 0.2
+
+/obj/item/attachable/alt_iff_scope/set_bullet_traits()
+	LAZYADD(traits_to_give, list(
+		BULLET_TRAIT_ENTRY(/datum/element/bullet_trait_iff)
+	))
+
+/obj/item/attachable/alt_iff_scope/Attach(obj/item/weapon/gun/attaching_gun)
+	. = ..()
+	if(!GetComponent(attaching_gun, /datum/component/iff_fire_prevention))
+		attaching_gun.AddComponent(/datum/component/iff_fire_prevention, 5)
+	SEND_SIGNAL(attaching_gun, COMSIG_GUN_ALT_IFF_TOGGLED, TRUE)
+
+/obj/item/attachable/alt_iff_scope/Detach(mob/user, obj/item/weapon/gun/detaching_gun)
+	. = ..()
+	SEND_SIGNAL(detaching_gun, COMSIG_GUN_ALT_IFF_TOGGLED, FALSE)
+	detaching_gun.GetExactComponent(/datum/component/iff_fire_prevention).RemoveComponent()
+
 /obj/item/attachable/scope
 	name = "S8 4x telescopic scope"
 	icon = 'icons/obj/items/weapons/guns/attachments/rail.dmi'
@@ -1219,46 +1366,6 @@ Defined in conflicts.dm of the #defines folder.
 	..()
 	select_gamemode_skin(type)
 	attach_icon = icon_state
-
-/obj/item/attachable/scope/mini_iff
-	name = "B8 Smart-Scope"
-	icon_state = "iffbarrel"
-	attach_icon = "iffbarrel_a"
-	desc = "An experimental B8 Smart-Scope. Based on the technologies used in the Smart Gun by ARMAT, this sight has integrated IFF systems. It can only attach to the M4RA Battle Rifle and M44 Combat Revolver."
-	desc_lore = "An experimental fire-control optic capable of linking into compatible IFF systems on certain weapons, designated the XAN/PVG-110 Smart Scope. Currently programmed for usage with the M4RA battle rifle and M44 Combat Revolver, due to their relatively lower rates of fire. Experimental technology developed by Armat, who have assured that all previously reported issues with false-negative IFF recognitions have been solved. Make sure to check the sight after every op, just in case."
-	slot = "rail"
-	zoom_offset = 6
-	zoom_viewsize = 7
-	pixel_shift_y = 15
-	var/dynamic_aim_slowdown = SLOWDOWN_ADS_MINISCOPE_DYNAMIC
-
-/obj/item/attachable/scope/mini_iff/New()
-	..()
-	movement_onehanded_acc_penalty_mod = MOVEMENT_ACCURACY_PENALTY_MULT_TIER_6
-	accuracy_unwielded_mod = 0
-
-	accuracy_scoped_buff = HIT_ACCURACY_MULT_TIER_1
-	delay_scoped_nerf = 0
-	damage_falloff_scoped_buff = 0
-
-/obj/item/attachable/scope/mini_iff/set_bullet_traits()
-	LAZYADD(traits_to_give, list(
-		BULLET_TRAIT_ENTRY(/datum/element/bullet_trait_iff)
-	))
-
-/obj/item/attachable/scope/mini_iff/activate_attachment(obj/item/weapon/gun/G, mob/living/carbon/user, turn_off)
-	if(do_after(user, 4, INTERRUPT_ALL, BUSY_ICON_HOSTILE))
-		allows_movement = 1
-		. = ..()
-
-/obj/item/attachable/scope/mini_iff/apply_scoped_buff(obj/item/weapon/gun/G, mob/living/carbon/user)
-	. = ..()
-	if(G.zoom)
-		G.slowdown += dynamic_aim_slowdown
-
-/obj/item/attachable/scope/mini_iff/remove_scoped_buff(mob/living/carbon/user, obj/item/weapon/gun/G)
-	G.slowdown -= dynamic_aim_slowdown
-	..()
 
 /obj/item/attachable/scope/slavic
 	icon_state = "slavicscope"
@@ -1983,6 +2090,8 @@ Defined in conflicts.dm of the #defines folder.
 	scatter_unwielded_mod = -SCATTER_AMOUNT_TIER_10
 
 /obj/item/attachable/stock/hunting
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "wooden stock"
 	desc = "The non-detachable stock of a Basira-Armstrong rifle."
 	icon_state = "huntingstock"
@@ -2004,6 +2113,8 @@ Defined in conflicts.dm of the #defines folder.
 	scatter_unwielded_mod = SCATTER_AMOUNT_TIER_8
 
 /obj/item/attachable/stock/hg3712
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "hg3712 stock"
 	desc = "The non-detachable stock of a HG 37-12 pump shotgun."
 	icon_state = "hg3712_stock"
@@ -2027,6 +2138,7 @@ Defined in conflicts.dm of the #defines folder.
 	wield_delay_mod = WIELD_DELAY_NONE
 
 /obj/item/attachable/stock/hg3712/m3717
+	AUTOWIKI_SKIP(TRUE)
 	name = "hg3717 stock"
 	desc = "The non-detachable stock of a M37-17 pump shotgun."
 	icon_state = "hg3717_stock"
@@ -2266,6 +2378,8 @@ Defined in conflicts.dm of the #defines folder.
 	return .
 
 /obj/item/attachable/stock/mod88
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "\improper Mod 88 burst stock"
 	desc = "Increases the fire rate and burst amount on the Mod 88. Some versions act as a holster for the weapon when un-attached. This is a test item and should not be used in normal gameplay (yet)."
 	icon_state = "mod88_stock"
@@ -2368,6 +2482,8 @@ Defined in conflicts.dm of the #defines folder.
 	hud_offset_mod = 10 //A sprite long enough to touch the Moon.
 
 /obj/item/attachable/m4ra_barrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "M4RA barrel"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon_state = "m4ra_barrel"
@@ -2401,6 +2517,8 @@ Defined in conflicts.dm of the #defines folder.
 	return .
 
 /obj/item/attachable/m4ra_barrel_custom
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "custom M4RA barrel"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon_state = "m4ra_custom_barrel"
@@ -2434,6 +2552,8 @@ Defined in conflicts.dm of the #defines folder.
 	return .
 
 /obj/item/attachable/upp_rpg_breech
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "HJRA-12 Breech"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/stock.dmi'
@@ -2446,6 +2566,8 @@ Defined in conflicts.dm of the #defines folder.
 	size_mod = 0
 
 /obj/item/attachable/pkpbarrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "QYJ-72 Barrel"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
@@ -2458,6 +2580,8 @@ Defined in conflicts.dm of the #defines folder.
 	size_mod = 0
 
 /obj/item/attachable/stock/pkpstock
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "QYJ-72 Stock"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/stock.dmi'
@@ -2470,6 +2594,8 @@ Defined in conflicts.dm of the #defines folder.
 	size_mod = 0
 
 /obj/item/attachable/type88_barrel
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "Type-88 Barrel"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
@@ -2482,6 +2608,8 @@ Defined in conflicts.dm of the #defines folder.
 	size_mod = 0
 
 /obj/item/attachable/type73suppressor
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "Type 73 Integrated Suppressor"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/barrel.dmi'
@@ -2494,6 +2622,8 @@ Defined in conflicts.dm of the #defines folder.
 	size_mod = 0
 
 /obj/item/attachable/stock/type71
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "Type 71 Stock"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/stock.dmi'
@@ -2509,6 +2639,8 @@ Defined in conflicts.dm of the #defines folder.
 	..()
 
 /obj/item/attachable/stock/m60
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "M60 stock"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/stock.dmi'
@@ -2522,6 +2654,8 @@ Defined in conflicts.dm of the #defines folder.
 
 
 /obj/item/attachable/stock/ppsh
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "PPSh-17b stock"
 	desc = "This isn't supposed to be separated from the gun, how'd this happen?"
 	icon = 'icons/obj/items/weapons/guns/attachments/stock.dmi'
@@ -2787,6 +2921,8 @@ Defined in conflicts.dm of the #defines folder.
 		R.flags_equip_slot |= SLOT_WAIST
 
 /obj/item/attachable/stock/nsg23
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "NSG 23 stock"
 	desc = "If you can read this, someone screwed up. Go Github this and bug a coder."
 	icon_state = "nsg23_stock"
@@ -2799,6 +2935,8 @@ Defined in conflicts.dm of the #defines folder.
 	hud_offset_mod = 2
 
 /obj/item/attachable/stock/l23
+	AUTOWIKI_SKIP(TRUE)
+
 	name = "L23 stock"
 	desc = "If you can read this, someone screwed up. Go Github this and bug a coder."
 	icon_state = "l23_stock"
@@ -3181,10 +3319,6 @@ Defined in conflicts.dm of the #defines folder.
 		to_chat(user, SPAN_WARNING("[src] can only be refilled with an incinerator tank."))
 
 /obj/item/attachable/attached_gun/flamer/fire_attachment(atom/target, obj/item/weapon/gun/gun, mob/living/user)
-	if(get_dist(user,target) > max_range+4)
-		to_chat(user, SPAN_WARNING("Too far to fire the attachment!"))
-		return
-
 	if(!istype(loc, /obj/item/weapon/gun))
 		to_chat(user, SPAN_WARNING("\The [src] must be attached to a gun!"))
 		return
@@ -3204,38 +3338,53 @@ Defined in conflicts.dm of the #defines folder.
 	set waitfor = 0
 	var/list/turf/turfs = get_line(user,target)
 	var/distance = 0
-	var/turf/prev_T
+	var/turf/prev_turf
 	var/stop_at_turf = FALSE
 	playsound(user, 'sound/weapons/gun_flamethrower2.ogg', 50, 1)
-	for(var/turf/T in turfs)
-		if(T == user.loc)
-			prev_T = T
-			continue
-		if(!current_rounds || current_rounds < round_usage_per_tile)
-			break
-		if(distance >= max_range)
-			break
+	process_flame_turf(turfs, target, user, distance, prev_turf, stop_at_turf)
 
-		current_rounds -= round_usage_per_tile
-		var/datum/cause_data/cause_data = create_cause_data(initial(name), user)
-		if(T.density)
-			T.flamer_fire_act(0, cause_data)
+/obj/item/attachable/attached_gun/flamer/proc/process_flame_turf(list/turfs, atom/target, mob/living/user, distance, turf/prev_turf, stop_at_turf)
+	if(!length(turfs))
+		return
+	var/turf/current_turf = turfs[1]
+	turfs.Cut(1,2)
+	if(current_turf == user.loc)
+		prev_turf = current_turf
+		addtimer(CALLBACK(src, PROC_REF(process_flame_turf), turfs, target, user, distance, prev_turf, stop_at_turf), 1, TIMER_UNIQUE)
+		return
+	if(!current_rounds)
+		return
+	if(distance >= max_range)
+		to_chat(user, SPAN_WARNING("The meter reads: <b>[floor(current_rounds)]</b> fuel blocks remaining!"))
+		return
+
+	current_rounds -= min(round_usage_per_tile, current_rounds)
+	var/datum/cause_data/cause_data = create_cause_data(initial(name), user)
+	if(current_turf.density)
+		current_turf.flamer_fire_act(0, cause_data)
+		stop_at_turf = TRUE
+	else if(prev_turf)
+		var/atom/movable/temp = new/obj/flamer_fire()
+		var/atom/movable/blocked = LinkBlocked(temp, prev_turf, current_turf)
+		qdel(temp)
+
+		if(blocked)
+			blocked.flamer_fire_act(0, cause_data)
+			if(blocked.flags_atom & ON_BORDER)
+				return
 			stop_at_turf = TRUE
-		else if(prev_T)
-			var/atom/movable/temp = new/obj/flamer_fire()
-			var/atom/movable/AM = LinkBlocked(temp, prev_T, T)
-			qdel(temp)
-			if(AM)
-				AM.flamer_fire_act(0, cause_data)
-				if (AM.flags_atom & ON_BORDER)
-					break
-				stop_at_turf = TRUE
-		flame_turf(T, user)
-		if (stop_at_turf)
-			break
-		distance++
-		prev_T = T
-		sleep(1)
+
+	flame_turf(current_turf, user)
+	if(stop_at_turf)
+		to_chat(user, SPAN_WARNING("The meter reads: <b>[floor(current_rounds)]</b> fuel blocks remaining!"))
+		return
+
+	distance++
+	prev_turf = current_turf
+
+	if(!length(turfs))
+		to_chat(user, SPAN_WARNING("The meter reads: <b>[floor(current_rounds)]</b> fuel blocks remaining!"))
+	addtimer(CALLBACK(src, PROC_REF(process_flame_turf), turfs, target, user, distance, prev_turf, stop_at_turf), 1, TIMER_UNIQUE)
 
 
 /obj/item/attachable/attached_gun/flamer/proc/flame_turf(turf/T, mob/living/user)
@@ -3420,12 +3569,12 @@ Defined in conflicts.dm of the #defines folder.
 /obj/item/attachable/attached_gun/extinguisher/get_examine_text(mob/user)
 	. = ..()
 	if(internal_extinguisher)
-		. += SPAN_NOTICE("It has [internal_extinguisher.reagents.total_volume] unit\s of water left!")
+		. += SPAN_NOTICE("It has [floor(internal_extinguisher.reagents.total_volume)] unit\s of water left!")
 		return
 	. += SPAN_WARNING("It's empty.")
 
 /obj/item/attachable/attached_gun/extinguisher/handle_attachment_description(slot)
-	return "It has a [icon2html(src)] [name] ([internal_extinguisher.reagents.total_volume]/[internal_extinguisher.max_water]) mounted underneath.<br>"
+	return "It has a [icon2html(src)] [name] ([floor(internal_extinguisher.reagents.total_volume)]/[internal_extinguisher.max_water]) mounted underneath.<br>"
 
 /obj/item/attachable/attached_gun/extinguisher/New()
 	..()
