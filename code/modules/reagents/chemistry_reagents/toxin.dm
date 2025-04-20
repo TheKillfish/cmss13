@@ -330,7 +330,7 @@
 	id = "xenoalch_pain"
 	description = "A dark chemical compound of Xenomorph origin. Has neuropathic properties resulting in high pain induction, and appears to purge certain chemicals with painkilling properties."
 	color = "#280138"
-	properties = list(PROPERTY_CROSSMETABOLIZING = 3, PROPERTY_PAINING = 2)
+	properties = list(PROPERTY_CROSSMETABOLIZING = 3, PROPERTY_PAINING = 6)
 	purges_specific_chems = TRUE
 	specific_chem_purge = list(/datum/reagent/medical/paracetamol, /datum/reagent/medical/tramadol, /datum/reagent/medical/oxycodone)
 

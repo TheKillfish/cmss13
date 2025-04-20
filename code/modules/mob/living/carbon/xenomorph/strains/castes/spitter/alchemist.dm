@@ -82,7 +82,7 @@
 	if(bound_xeno.client.prefs && bound_xeno.client.prefs.no_radials_preference)
 		alchem = tgui_input_list(bound_xeno, "Choose a pheromone", "Pheromone Menu", "sagunine" + "cholinine" + "noctine" + "nothing" + "help" + "cancel", theme="hive_status")
 		if(alchem == "help")
-			to_chat(bound_xeno, SPAN_NOTICE("<br>You can choose between three unique toxic chemicals to produce with Stockpile and inject into humanoid targets with Injection, with varying effects:<br><B>Sagunine</B> - Deals brute damage and purges Bicardine and Meralyne.<br><B>Cholinine</B> - Deals burn damage and purges Kelotane and Dermaline.<br><B>Noctine</B> - Induces a fair bit of pain and purges Paracetamol, Tramadol and Oxycodone.<br>Stockpiling different chemicals causes them blend together upon Injecting someone to produce a different effect. This happens automatically and regardless of amount stored.<br><B>Experiment!</B><br>"))
+			to_chat(bound_xeno, SPAN_NOTICE("<br>You can choose between three unique toxic chemicals to produce with Stockpile and inject into humanoid targets with Injection, with varying effects:<br><B>Sagunine</B> - Deals brute damage and purges Bicardine and Meralyne.<br><B>Cholinine</B> - Deals burn damage and purges Kelotane and Dermaline.<br><B>Noctine</B> - Induces a lot of pain and purges Paracetamol, Tramadol and Oxycodone.<br>Stockpiling different chemicals causes them blend together upon Injecting someone to produce a different effect. This happens automatically and regardless of amount stored.<br><B>Experiment!</B><br>"))
 			return
 		if(alchem == "nothing")
 			if(current_alchem != null)
@@ -213,19 +213,19 @@
 		if(bound_xeno.can_not_harm(target))
 			switch(final_alchem_name)
 				if("Saguinine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Saguinine! It restore some of our target's health!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Saguinine! It will restore some of our targets health!"))
 				if("Cholinine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Cholinine! It restore some of our target's health!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Cholinine! It will restore some of our targets health!"))
 				if("Noctine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Noctine! It will temporarily harden our target's' carapace!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Noctine! It will temporarily harden our targets carapace!"))
 				if("Pyrinine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Pyrinine! It will temporarily strengthen our target's' claws!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Pyrinine! It will temporarily strengthen our targets claws!"))
 				if("Vapinine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Vapinine! It will restore some of our target's blood!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Vapinine! It will restore some of our targets plasma!"))
 				if("Crynine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Crynine! It will temporarily increase our target's speed!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Crynine! It will temporarily increase our targets speed!"))
 				if("Xenosterine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Xenosterine! It will render our target fireproof!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Xenosterine! It will extinguish our target and recover a decent amount of health!"))
 		else
 			switch(final_alchem_name)
 				if("Saguinine")
@@ -233,13 +233,13 @@
 				if("Cholinine")
 					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Cholinine! It harm our target slightly!"))
 				if("Noctine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Noctine! It will temporarily weaken our target's' carapace!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Noctine! It will temporarily weaken our targets carapace!"))
 				if("Pyrinine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Pyrinine! It will temporarily weaken our target's' claws!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Pyrinine! It will temporarily weaken our targets claws!"))
 				if("Vapinine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Vapinine! It will drain some of our target's blood!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Vapinine! It will drain some of our targets blood!"))
 				if("Crynine")
-					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Crynine! It will temporarily decrease our target's speed!"))
+					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Crynine! It will temporarily decrease our targets speed!"))
 				if("Xenosterine")
 					to_chat(bound_xeno, SPAN_XENOWARNING("We catalyzed Xenosterine! It will temporarily block our target from their hivemind!"))
 	else
@@ -280,7 +280,7 @@
 			if("Crynine") // Slows down
 				target.AddComponent(/datum/component/status_effect/xeno_stat_debuff/speed_debuff, total_pool)
 			if("Xenosterine") // Blocks hivemind
-				target.AddComponent(/datum/component/status_effect/interference, total_pool)
+				target.AddComponent(/datum/component/status_effect/interference, total_pool, total_pool)
 	else
 		switch(final_alchem_name)
 			if("Saguinine") // Heals a small bit
@@ -296,8 +296,9 @@
 				to_chat(target, SPAN_WARNING("We feel a surge of plasma!"))
 			if("Crynine") // Temporarily boosts speed
 				target.AddComponent(/datum/component/status_effect/xeno_stat_buff/speed_buff, total_pool)
-			if("Xenosterine") // Makes fireproof
-				target.AddComponent(/datum/component/status_effect/xeno_stat_buff/fireproof_buff, total_pool)
+			if("Xenosterine") // Extinguish and heal a bit more than Saguinine/Cholinine
+				target.extinguish_mob()
+				new /datum/effects/heal_over_time(target, heal_amount = 7.5 * total_pool)
 
 // Powers
 
@@ -339,54 +340,58 @@
 				to_chat(xeno, SPAN_WARNING("There's something blocking us from striking!"))
 				return
 
-	if((!iscarbon(target) && carbon.stat == DEAD) || (xeno.can_not_harm(carbon) && (ishuman(carbon)|| islarva(carbon)))) // Don't want to try using on friendly humans or larva
+	var/target_found = FALSE
+	if((!iscarbon(target) || iscarbon(target) && carbon.stat == DEAD) || (xeno.can_not_harm(carbon) && (ishuman(carbon)) || islarva(carbon))) // Don't want to try using on friendly humans or larva
+		target_found = FALSE
 		xeno.visible_message(SPAN_XENOWARNING("\The [xeno] swipes their tail through the air!"), SPAN_XENOWARNING("We swipe our tail through the air!"))
 		apply_cooldown(0.2)
 		playsound(xeno, 'sound/effects/alien_tail_swipe1.ogg', 50, TRUE)
-		return
 
-	var/obj/limb/target_limb = carbon.get_limb(check_zone(xeno.zone_selected))
-	if(ishuman(target) && (!target_limb || (target_limb.status & LIMB_DESTROYED)))
-		target_limb = carbon.get_limb("chest")
-
-	alchemist.parse_final_alchem()
-	if(alchemist.final_alchem_reagent != null && alchemist.final_alchem_source != null)
-		if(isxeno(target))
-			var/mob/living/carbon/xenomorph/xenoid = target
-			alchemist.alchem_xeno_reaction(xenoid)
-
-		if(!xeno.can_not_harm(carbon) && ishuman(target) && !issynth(target) && !HAS_TRAIT(target, TRAIT_NESTED) && carbon.status_flags & XENO_HOST)
-			var/mob/living/carbon/human/humanoid = target
-			if(isyautja(humanoid))
-				humanoid.reagents.add_reagent(alchemist.final_alchem_reagent, alchemist.total_pool / 2)
-				humanoid.reagents.set_source_mob(xeno, alchemist.final_alchem_source)
-			else
-				humanoid.reagents.add_reagent(alchemist.final_alchem_reagent, alchemist.total_pool)
-				humanoid.reagents.set_source_mob(xeno, alchemist.final_alchem_source)
-		alchemist.final_alchem_info(carbon)
-		if(alchemist.total_pool > 14)
-			alchem_cooldown_modifier = alchemist.total_pool * 0.07
-		else
-			alchem_cooldown_modifier = 1
-		alchemist.empty_entire_stockpile()
-		check_and_use_plasma_owner()
-
-	if(!xeno.can_not_harm(carbon))
-		xeno.visible_message(SPAN_XENOWARNING("[xeno] stabs [carbon] in the [target_limb ? target_limb.display_name : "chest"] with their tail!"), \
-		SPAN_XENOWARNING("We stab [carbon] in the [target_limb ? target_limb.display_name : "chest"] with our tail!"))
-		playsound(carbon,'sound/weapons/alien_tail_attack.ogg', 50, TRUE)
-
-		carbon.apply_armoured_damage(get_xeno_damage_slash(target, xeno.caste.melee_damage_lower), ARMOR_MELEE, BRUTE, target_limb ? target_limb.name : "chest")
-		carbon.last_damage_data = create_cause_data(xeno.caste_type, xeno)
-		log_attack("[key_name(xeno)] attacked [key_name(carbon)] with Tail Injection")
 	else
-		xeno.visible_message(SPAN_XENOWARNING("[xeno] gently jabs [carbon] with their tail!"), \
-		SPAN_XENOWARNING("We gently jab our tail into [carbon], making sure not to harm them!"))
-		playsound(xeno, 'sound/effects/alien_tail_swipe1.ogg', 50, TRUE)
-		sleep(1)
-		playsound(carbon,'sound/weapons/alien_tail_attack.ogg', 5, TRUE)
-		if(alchemist.final_alchem_name == null)
-			alchem_cooldown_modifier = 0.2
+		target_found = TRUE
+		var/obj/limb/target_limb = carbon.get_limb(check_zone(xeno.zone_selected))
+		if(ishuman(target) && (!target_limb || (target_limb.status & LIMB_DESTROYED)))
+			target_limb = carbon.get_limb("chest")
+
+		alchemist.parse_final_alchem()
+		if(alchemist.final_alchem_reagent != null && alchemist.final_alchem_source != null)
+			if(isxeno(target))
+				var/mob/living/carbon/xenomorph/xenoid = target
+				alchemist.alchem_xeno_reaction(xenoid)
+
+			if(!xeno.can_not_harm(carbon) && ishuman(target) && !issynth(target) && !HAS_TRAIT(target, TRAIT_NESTED) && carbon.status_flags & XENO_HOST)
+				var/mob/living/carbon/human/humanoid = target
+				if(isyautja(humanoid))
+					humanoid.reagents.add_reagent(alchemist.final_alchem_reagent, alchemist.total_pool / 2)
+					humanoid.reagents.set_source_mob(xeno, alchemist.final_alchem_source)
+				else
+					humanoid.reagents.add_reagent(alchemist.final_alchem_reagent, alchemist.total_pool)
+					humanoid.reagents.set_source_mob(xeno, alchemist.final_alchem_source)
+			alchemist.final_alchem_info(carbon)
+			if(alchemist.total_pool > 14)
+				alchem_cooldown_modifier = alchemist.total_pool * 0.07
+			else
+				alchem_cooldown_modifier = 1
+			alchemist.empty_entire_stockpile()
+			check_and_use_plasma_owner()
+
+		if(!xeno.can_not_harm(carbon))
+			xeno.visible_message(SPAN_XENOWARNING("[xeno] stabs [carbon] in the [target_limb ? target_limb.display_name : "chest"] with their tail!"), \
+			SPAN_XENOWARNING("We stab [carbon] in the [target_limb ? target_limb.display_name : "chest"] with our tail!"))
+			playsound(carbon,'sound/weapons/alien_tail_attack.ogg', 50, TRUE)
+
+			carbon.apply_armoured_damage(get_xeno_damage_slash(target, xeno.caste.melee_damage_lower), ARMOR_MELEE, BRUTE, target_limb ? target_limb.name : "chest")
+			carbon.last_damage_data = create_cause_data(xeno.caste_type, xeno)
+			log_attack("[key_name(xeno)] attacked [key_name(carbon)] with Tail Injection")
+		else
+			xeno.visible_message(SPAN_XENOWARNING("[xeno] gently jabs [carbon] with their tail!"), \
+			SPAN_XENOWARNING("We gently jab our tail into [carbon], making sure not to harm them!"))
+			playsound(xeno, 'sound/effects/alien_tail_swipe1.ogg', 50, TRUE)
+			sleep(1)
+			playsound(carbon,'sound/weapons/alien_tail_attack.ogg', 5, TRUE)
+			if(alchemist.final_alchem_name == null)
+				alchem_cooldown_modifier = 0.2
+
 	var/stab_direction
 	stab_direction = turn(get_dir(xeno, target), 180)
 
@@ -394,8 +399,9 @@
 	var/last_dir = xeno.dir
 
 	xeno.setDir(stab_direction)
-	xeno.flick_attack_overlay(target, "tail")
 	xeno.animation_attack_on(target)
+	if(target_found)
+		xeno.flick_attack_overlay(target, "tail")
 
 	var/new_dir = xeno.dir
 	addtimer(CALLBACK(src, PROC_REF(reset_direction), xeno, last_dir, new_dir), 0.5 SECONDS)
