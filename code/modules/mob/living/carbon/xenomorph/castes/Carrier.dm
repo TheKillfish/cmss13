@@ -14,7 +14,7 @@
 	evasion = XENO_EVASION_NONE
 	speed = XENO_SPEED_TIER_4
 
-	available_strains = list(/datum/xeno_strain/eggsac)
+	available_strains = list(/datum/xeno_strain/eggsac, /datum/xeno_strain/occult)
 	behavior_delegate_type = /datum/behavior_delegate/carrier_base
 
 	evolution_allowed = FALSE

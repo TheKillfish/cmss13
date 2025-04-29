@@ -640,6 +640,8 @@
 		if(shooter_human.marksman_aura)
 			effective_accuracy += shooter_human.marksman_aura * 1.5 //Flat buff of 3 % accuracy per aura level
 			effective_accuracy += distance_travelled * 0.35 * shooter_human.marksman_aura //Flat buff to accuracy per tile travelled
+		if(HAS_TRAIT(shooter_human, TRAIT_INACCURATE))
+			effective_accuracy -= (effective_accuracy / 4) * 3 // 1/4 as accurate as currently supposed to be
 
 	#if DEBUG_HIT_CHANCE
 	to_world(SPAN_DEBUG("Final accuracy is <b>[effective_accuracy]</b>"))

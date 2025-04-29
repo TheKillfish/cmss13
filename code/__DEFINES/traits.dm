@@ -167,6 +167,8 @@
 #define TRAIT_HAULED "hauled"
 // only used by valkyrie
 #define TRAIT_VALKYRIE_ARMORED "trait_valkyrie_armored"
+// Causes shooting to inaccurate
+#define TRAIT_INACCURATE "trait_inaccurate"
 
 // SPECIES TRAITS
 /// Knowledge of Yautja technology

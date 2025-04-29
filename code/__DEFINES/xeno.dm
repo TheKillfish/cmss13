@@ -380,6 +380,7 @@
 
 // Carrier strain flags
 #define CARRIER_EGGSAC "Eggsac"
+#define CARRIER_OCCULT "Occult"
 
 // Boiler strain flags
 #define BOILER_TRAPPER "Trapper"
