@@ -72,6 +72,7 @@
 	var/max_distance = 5
 	var/windup_duration = 3 SECONDS
 	var/list/ram_callbacks = null
+	var/impassable_collide = FALSE
 
 /datum/action/xeno_action/activable/ram/New()
 	. = ..()

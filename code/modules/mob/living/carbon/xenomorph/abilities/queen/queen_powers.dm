@@ -646,22 +646,20 @@
 	xeno.visible_message(SPAN_XENOHIGHDANGER("[xeno] emits an ear-splitting guttural roar!"))
 	xeno.create_shriekwave(14) //Adds the visual effect. Wom wom wom, 14 shriekwaves
 
-	FOR_DVIEW(var/mob/mob, world.view, owner, HIDE_INVISIBLE_OBSERVER)
+	var/list/mobs_in_view = list()
+	FOR_DOVIEW(var/mob/living/carbon/mob, 11, xeno, HIDE_INVISIBLE_OBSERVER)
+		mobs_in_view += mob
 		if(mob && mob.client)
 			if(isxeno(mob))
 				shake_camera(mob, 10, 1)
 			else
 				shake_camera(mob, 30, 1) //50 deciseconds, SORRY 5 seconds was way too long. 3 seconds now
-	FOR_DVIEW_END
-
-	var/list/mobs_in_view = list()
-	FOR_DOVIEW(var/mob/living/carbon/M, 7, xeno, HIDE_INVISIBLE_OBSERVER)
-		mobs_in_view += M
 	FOR_DOVIEW_END
-	for(var/mob/living/carbon/M in orange(10, xeno))
-		if(SEND_SIGNAL(M, COMSIG_MOB_SCREECH_ACT, xeno) & COMPONENT_SCREECH_ACT_CANCEL)
+
+	for(var/mob/living/carbon/mob in orange(11, xeno))
+		if(SEND_SIGNAL(mob, COMSIG_MOB_SCREECH_ACT, xeno) & COMPONENT_SCREECH_ACT_CANCEL)
 			continue
-		M.handle_queen_screech(xeno, mobs_in_view)
+		mob.handle_queen_screech(xeno, mobs_in_view)
 
 	apply_cooldown()
 
@@ -856,17 +854,28 @@
 /datum/action/xeno_action/activable/ram/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
 
-	if(!istype(xeno) || !xeno.check_state() || !action_cooldown_check())
+	if(!xeno.check_state() || !action_cooldown_check())
 		return
 
 	if(!target || target.layer >= FLY_LAYER || !isturf(xeno.loc))
 		return
 
+	var/distance = get_dist(xeno, target)
+
+	if(distance > max_distance)
+		return
+
+	var/turf/target_turf = get_turf(target)
+
+	if(istype(target_turf, /turf/open/space))
+		return
+
+
+
 	if(!check_and_use_plasma_owner())
 		return
 
-	if(get_dist(xeno, target) > max_distance)
-		return
+	xeno.face_atom(target)
 
 	switch(xeno.stamina_tier)
 		if(0)
@@ -881,8 +890,6 @@
 			windup_duration = 1 SECONDS
 		if(5, 6)
 			windup_duration = 0.5 SECONDS
-
-	xeno.face_atom(target)
 
 	ADD_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
 	xeno.anchored = TRUE
@@ -900,13 +907,19 @@
 	xeno.visible_message(SPAN_XENOWARNING("[xeno] charges at [target]!"), \
 	SPAN_XENOWARNING("We charge at [target]!"))
 
-	while(xeno.loc != target) // Due to how throw_atom works, check to see if we're at our desired target and repeat...
-		xeno.throw_atom(target, max_distance, SPEED_FAST, xeno, launch_type = LOW_LAUNCH, pass_flags = PASS_OVER_THROW_MOB, collision_callbacks = ram_callbacks)
-		if(xeno.loc == target || !ram_callbacks) // ...Until we are at our target location or we hit a thing we're not supposed to charge through
+	while((xeno.loc != target || xeno.loc != target_turf) && !impassable_collide) // Due to how throw_atom works, check to see if we're at our desired target and repeat...
+		xeno.throw_atom(target, max_distance, SPEED_FAST, xeno, launch_type = LOW_LAUNCH, pass_flags = PASS_CRUSHER_CHARGE, collision_callbacks = ram_callbacks)
+		if((xeno.loc == target || xeno.loc == target_turf) || impassable_collide) // ...Until we are at our target location or we hit a thing we're not supposed to charge through
 			break
 
 	xeno.update_icons()
 
+	var/datum/action/xeno_action/onclick/screech/scree = get_action(xeno, /datum/action/xeno_action/onclick/screech)
+	if(scree && (scree.current_cooldown_duration <= 50))
+		scree.apply_cooldown_override(5 SECONDS)
+		to_chat(xeno, SPAN_XENODANGER("We feel our throat muscles weaken!"))
+
+	impassable_collide = FALSE
 	apply_cooldown()
 	return ..()
 
@@ -936,41 +949,77 @@
 
 	if(!check_state() || (!throwing && !ramAction.action_cooldown_check()))
 		obj_launch_collision(target)
+		ramAction.impassable_collide = TRUE
 		return FALSE
 
 	if(!target)
 		return FALSE
 
+	else if(istype(target, /obj/structure/machinery/door/poddoor))
+		var/obj/structure/machinery/door/poddoor/poddoor_target = target
+		visible_message(SPAN_DANGER("[src] rams straight through [poddoor_target]!"), SPAN_XENODANGER("We ram straight through [poddoor_target]!"))
+		playsound(poddoor_target, 'sound/effects/metal_door_close.ogg', 25)
+		ramAction.impassable_collide = TRUE
+		return FALSE
+
 	else if(istype(target, /obj/structure/barricade))
 		var/obj/structure/barricade/cade_target = target
-		visible_message(SPAN_DANGER("[src] plows straight through [cade_target]!"), null, null, 5)
+		visible_message(SPAN_DANGER("[src] rams straight through [cade_target]!"), SPAN_XENODANGER("We ram straight through [cade_target]!"))
 		playsound(cade_target, cade_target.barricade_hitsound, 50)
 		cade_target.deconstruct(FALSE)
 		return TRUE
 
-	else if(istype(target, /obj/structure/surface/table) || istype(target, /obj/structure/surface/rack) || istype(target, /obj/structure/window_frame))
+	else if(istype(target, /obj/structure/surface/table) || istype(target, /obj/structure/surface/rack))
 		var/obj/structure/structure_target = target
-		visible_message(SPAN_DANGER("[src] plows straight through [structure_target]!"), null, null, 5)
+		visible_message(SPAN_DANGER("[src] rams straight through [structure_target]!"), SPAN_XENODANGER("We ram straight through [structure_target]!"))
 		playsound(structure_target, "metalbang", 20)
 		structure_target.deconstruct(FALSE)
 		return TRUE
 
-	else if (istype(target, /obj/structure/window))
+	else if(istype(target, /obj/structure/window))
 		var/obj/structure/window/window_target = target
 		if(window_target.unacidable)
 			playsound(window_target, 'sound/effects/glassbash.ogg', 30)
 			target.hitby(src)
+			ramAction.impassable_collide = TRUE
 			return FALSE
 		else
 			playsound(window_target, "windowshatter", 50)
 			window_target.shatter_window(TRUE)
-			visible_message(SPAN_DANGER("[src] plows straight through [window_target]!"), null, null, 5)
+			visible_message(SPAN_DANGER("[src] rams straight through [window_target]!"))
+			return TRUE
+
+	else if(istype(target, /obj/structure/window_frame))
+		var/obj/structure/window_frame/winframe_target = target
+		visible_message(SPAN_DANGER("[src] rams straight through [winframe_target]!"))
+		playsound(winframe_target, 'sound/effects/metal_shatter.ogg', 20)
+		winframe_target.deconstruct(FALSE)
+		return TRUE
+
+	else if(istype(target, /obj/structure/grille))
+		var/obj/structure/grille/grille_target = target
+		if(grille_target.unacidable)
+			ramAction.impassable_collide = TRUE
+			return FALSE
+		else
+			grille_target.health -=  80 //Usually knocks it down.
+			grille_target.healthcheck()
+			return TRUE
+
+	else if(istype(target, /obj/structure/fence/electrified))
+		var/obj/structure/fence/electrified/fence_target = target
+		if(fence_target.cut)
+			return FALSE
+		else
+			src.visible_message(SPAN_DANGER("[src] rams [fence_target]!"))
+			fence_target.cut_grille()
 			return TRUE
 
 	else if(istype(target, /obj/structure/machinery/door/airlock))
 		var/obj/structure/machinery/door/airlock/airlock_target = target
 		if(airlock_target.unacidable)
 			target.hitby(src)
+			ramAction.impassable_collide = TRUE
 			return FALSE
 		else
 			playsound(airlock_target, 'sound/effects/metal_crash.ogg', 20, 1)
@@ -982,7 +1031,7 @@
 		if(vendor_target.unslashable)
 			target.hitby(src)
 		else
-			visible_message(SPAN_DANGER("[src] smashes straight into [vendor_target]!"), SPAN_XENODANGER("We smash straight into [vendor_target]!"))
+			visible_message(SPAN_DANGER("[src] rams [vendor_target]!"), SPAN_XENODANGER("We ram straight into [vendor_target]!"))
 			playsound(loc, "punch", 25, 1)
 			vendor_target.tip_over()
 
@@ -993,6 +1042,7 @@
 			launch_towards(TA, impact_range, launch_speed)
 
 			vendor_target.hitby(src)
+			ramAction.impassable_collide = TRUE
 			return FALSE
 
 	else if(istype(target, /obj/structure/machinery/cm_vending))
@@ -1000,7 +1050,7 @@
 		if(cm_vendor_target.unslashable)
 			target.hitby(src)
 		else
-			visible_message(SPAN_DANGER("[src] smashes straight into [cm_vendor_target]!"), SPAN_XENODANGER("We smash straight into [cm_vendor_target]!"))
+			visible_message(SPAN_DANGER("[src] rams [cm_vendor_target]!"), SPAN_XENODANGER("We ram [cm_vendor_target]!"))
 			playsound(loc, "punch", 25, 1)
 			cm_vendor_target.tip_over()
 
@@ -1011,12 +1061,14 @@
 			throw_atom(TA, impact_range, launch_speed)
 
 			cm_vendor_target.hitby(src)
+			ramAction.impassable_collide = TRUE
 			return FALSE
 
 	else if(istype(target, /obj/vehicle/multitile))
 		var/obj/vehicle/multitile/multi_target = target
-		visible_message(SPAN_DANGER("[src] rams into [multi_target] and skids to a halt!"), SPAN_XENOWARNING("We ram into [multi_target] and skid to a halt!"))
+		visible_message(SPAN_DANGER("[src] rams [multi_target] and skids to a halt!"), SPAN_XENOWARNING("We ram [multi_target] and skid to a halt!"))
 		multi_target.Collided(src)
+		ramAction.impassable_collide = TRUE
 		return FALSE
 
 	else if(istype(target, /obj/structure/machinery/m56d_hmg))
@@ -1025,108 +1077,122 @@
 		playsound(HMG_target, "punch", 25, 1)
 		HMG_target.CrusherImpact()
 		HMG_target.hitby(src)
+		ramAction.impassable_collide = TRUE
 		return FALSE
 
 	else if(istype(target, /obj/structure/machinery/defenses))
 		var/obj/structure/machinery/defenses/DF_target = target
-		visible_message(SPAN_DANGER("[src] rams into [DF_target]!"), SPAN_XENODANGER("We ram straight into [DF_target]!"))
-
 		if(DF_target.unacidable)
+			visible_message(SPAN_DANGER("[src] rams [DF_target]!"), SPAN_XENODANGER("We ram [DF_target]!"))
+			playsound(DF_target, "punch", 25, 1)
 			target.hitby(src)
+			ramAction.impassable_collide = TRUE
 			return FALSE
 		else
+			visible_message(SPAN_DANGER("[src] rams straight through [DF_target]!"), SPAN_XENODANGER("We ram straight through [DF_target]!"))
 			playsound(DF_target, "punch", 25, 1)
 			DF_target.destroyed_action()
 			return TRUE
 
+	else if(istype(target, /obj/structure/cargo_container))
+		var/obj/structure/cargo_container/cargocontainer_target = target
+		visible_message(SPAN_DANGER("[src] rams into [cargocontainer_target]!"), SPAN_XENODANGER("We ram straight into [cargocontainer_target]!"))
+		playsound(cargocontainer_target, 'sound/effects/metalhit.ogg', 25, 1)
+		qdel(cargocontainer_target)
+		ramAction.impassable_collide = TRUE
+		return FALSE
+
+	else if(istype(target, /obj/structure/largecrate))
+		var/obj/structure/largecrate/largecrate_target = target
+		visible_message(SPAN_DANGER("[src] smashes straight through [largecrate_target]!"), SPAN_XENODANGER("We smash straight through [largecrate_target]!"))
+		largecrate_target.unpack()
+		return TRUE
+
+	else if(istype(target, /obj/structure/dropship_equipment))
+		var/obj/structure/dropship_equipment/dropshipequip_target = target
+		visible_message(SPAN_DANGER("[src] smashes straight through [dropshipequip_target]!"), SPAN_XENODANGER("We smash straight through [dropshipequip_target]!"))
+		playsound(dropshipequip_target, 'sound/effects/metalhit.ogg', 25, 1)
+		qdel(dropshipequip_target)
+		return TRUE
+
+	else if(istype(target, /obj/structure/girder))
+		var/obj/structure/girder/girder_target = target
+		visible_message(SPAN_DANGER("[src] smashes straight through [girder_target]!"), SPAN_XENODANGER("We smash straight through [girder_target]!"))
+		playsound(girder_target, 'sound/effects/metal_shatter.ogg', 20)
+		qdel(girder_target)
+		return TRUE
+
+	else if(isobj(target))
+		var/obj/obj_target = target
+		if(obj_target.unacidable)
+			ramAction.impassable_collide = TRUE
+			return FALSE
+
+		else if (obj_target.anchored)
+			visible_message(SPAN_DANGER("[src] crushes [obj_target]!"), SPAN_XENODANGER("We crush [obj_target]!"))
+			if(length(obj_target.contents)) //Hopefully won't auto-delete things inside crushed stuff.
+				var/turf/T = get_turf(src)
+				for(var/atom/movable/S in T.contents) S.forceMove(T)
+
+			qdel(obj_target)
+			return TRUE
+
+		else
+			if(obj_target.buckled_mob)
+				obj_target.unbuckle()
+			visible_message(SPAN_WARNING("[src] knocks [obj_target] aside!"), SPAN_XENOWARNING("We knock [obj_target] aside.")) //Canisters, crates etc. go flying.
+			playsound(loc, "punch", 25, 1)
+
+			var/impact_range = 2
+			var/turf/TA = get_diagonal_step(obj_target, dir)
+			TA = get_step_away(TA, src)
+			var/launch_speed = 2
+			throw_atom(TA, impact_range, launch_speed)
+			return TRUE
+
+	else
+		obj_launch_collision(target)
+		ramAction.impassable_collide = TRUE
+		return FALSE
+
 /mob/living/carbon/xenomorph/queen/proc/ram_turf(turf/target)
+	var/datum/action/xeno_action/activable/ram/ramAction = get_action(src, /datum/action/xeno_action/activable/ram)
+	var/mob/living/carbon/xenomorph/xeno = src
+
+	if(istype(target, /turf/closed/wall/resin))
+		var/turf/closed/wall/resin/resinwall_target = target
+		if(!HIVE_ALLIED_TO_HIVE(xeno, resinwall_target))
+			playsound(resinwall_target, "alien_resin_break", 25)
+			resinwall_target.dismantle_wall()
+			return TRUE
+
+	else if(istype(target, /turf/closed))
+		ramAction.impassable_collide = TRUE
+
 	if(!target.density)
 		for(var/mob/living/carbon/mob in target)
 			ram_mob(mob)
 			break
+
 	else
 		turf_launch_collision(target)
+		ramAction.impassable_collide = TRUE
 		return FALSE
-
-/*mob/living/carbon/xenomorph/queen/proc/handle_ram_obstacles(atom/target)
-	if(!target)
-		return FALSE
-
-	else if(istype(target, /obj/structure/grille))
-		var/obj/structure/grille/grille = target
-		if(grille.unacidable)
-			. =  FALSE
-		else
-			grille.health -=  80 //Usually knocks it down.
-			grille.healthcheck()
-			. = TRUE
-
-	else if(istype(target, /obj/structure/fence/electrified))
-		var/obj/structure/fence/electrified/fence = target
-		if (fence.cut)
-			. = FALSE
-		else
-			src.visible_message(SPAN_DANGER("[src] smashes into [fence]!"))
-			fence.cut_grille()
-			. = TRUE
-
-	// Anything else?
-	else
-		if(isobj(target))
-			var/obj/obj_target = target
-			if (obj_target.unacidable)
-				. = FALSE
-			else if (obj_target.anchored)
-				visible_message(SPAN_DANGER("[src] crushes [obj_target]!"), SPAN_XENODANGER("We crush [obj_target]!"))
-				if(length(obj_target.contents)) //Hopefully won't auto-delete things inside crushed stuff.
-					var/turf/T = get_turf(src)
-					for(var/atom/movable/S in T.contents) S.forceMove(T)
-
-				qdel(obj_target)
-				. = TRUE
-
-			else
-				if(obj_target.buckled_mob)
-					obj_target.unbuckle()
-				visible_message(SPAN_WARNING("[src] knocks [obj_target] aside!"), SPAN_XENOWARNING("We knock [obj_target] aside.")) //Canisters, crates etc. go flying.
-				playsound(loc, "punch", 25, 1)
-
-				var/impact_range = 2
-				var/turf/TA = get_diagonal_step(obj_target, dir)
-				TA = get_step_away(TA, src)
-				var/launch_speed = 2
-				throw_atom(TA, impact_range, launch_speed)
-
-				. = TRUE
-
-	if(!.)
-		update_icons()*/
 
 /datum/action/xeno_action/activable/brutality/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
 
-	if(!action_cooldown_check())
-		return //this gives a little feedback on why your lunge didn't hit other than the lunge button going grey. Plus, it might spook marines that almost got lunged if they know why the message appeared, and extra spookiness is always good.
-
-	if(!target)
+	if(!xeno.check_state() || !action_cooldown_check())
 		return
 
-	if(!isturf(xeno.loc))
-		to_chat(xeno, SPAN_XENOWARNING("We can't lunge from here!"))
-		return
-
-	if(!xeno.check_state())
+	if(!target || target.layer >= FLY_LAYER || !isturf(xeno.loc))
 		return
 
 	if(xeno.can_not_harm(target) || !ismob(target))
 		return
 
-
 	var/mob/living/carbon/carbon_target = target
 	if(carbon_target.stat == DEAD)
-		return
-
-	if(!isliving(target))
 		return
 
 	if(!check_and_use_plasma_owner())
@@ -1145,11 +1211,26 @@
 		playsound(carbon_target,"slam", 50, 1)
 		animate(carbon_target, pixel_y = 0, time = 4, easing = BOUNCE_EASING) //animates the smash
 		carbon_target.apply_armoured_damage(get_xeno_damage_slash(carbon_target, xeno.melee_damage_upper), ARMOR_MELEE, BRUTE, "chest", 20)
-	else
-		xeno.visible_message(SPAN_XENOWARNING("[xeno]'s claws twitch."), SPAN_XENOWARNING("We couldn't grab our target. Wait a moment to try again."))
+
 
 	return ..()
 /*
+/datum/action/xeno_action/activable/brutality/proc/animate_original2original(mob/living/carbon/xenomorph/xeno, mob/living/carbon/target)
+	// Dramatic heavy smash into dramatic throw
+	xeno.emote("roar")
+	sleep(6)
+	animate(target, pixel_y = 0, time = 4, easing = BOUNCE_EASING)
+
+/datum/action/xeno_action/activable/brutality/proc/animate_backwards2original(mob/living/carbon/xenomorph/xeno, mob/living/carbon/target)
+	// 180 smash into 180 throw
+
+/datum/action/xeno_action/activable/brutality/proc/animate_left2original(mob/living/carbon/xenomorph/xeno, mob/living/carbon/target)
+	// Dramatic smash to the left into throw
+
+/datum/action/xeno_action/activable/brutality/proc/animate_right2original(mob/living/carbon/xenomorph/xeno, mob/living/carbon/target)
+	// Quick smash to the right into dramatic throw
+
+
 /mob/living/carbon/xenomorph/queen/stop_pulling()
 	if(isliving(pulling) && smashing)
 		smashing = FALSE // To avoid extreme cases of stopping a lunge then quickly pulling and stopping to pull someone else
@@ -1185,8 +1266,7 @@
 			living_mob.KnockDown(duration)
 			living_mob.Stun(duration)
 			addtimer(VARSET_CALLBACK(src, smashing, FALSE), duration)
-
-
+*/
 /datum/action/xeno_action/activable/gut/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
 	if(!action_cooldown_check())
@@ -1194,7 +1274,7 @@
 	if(xeno.queen_gut(target))
 		apply_cooldown()
 	return ..()
-*/
+
 // Restricted to on Ovi
 
 /datum/action/xeno_action/onclick/remove_eggsac/use_ability(atom/A)

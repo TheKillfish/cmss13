@@ -300,6 +300,9 @@
 	var/stamina_drain_delay_duration = 60
 	var/stamina_drain_delay = 60 /// How long after getting off ovi will drain be delayed for?
 	var/stamina_drain_delay_active = FALSE /// Is the delay for stamina draining active?
+	// Screech Accuracy Degredation
+	var/screech_accdeg_str = 95
+	var/screech_accdeg_dur = 10 SECONDS
 
 	tileoffset = 0
 	viewsize = 12
