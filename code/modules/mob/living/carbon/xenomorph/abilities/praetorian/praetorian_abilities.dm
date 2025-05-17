@@ -368,3 +368,75 @@
 	var/max_distance = 7
 	var/windup = 6
 	var/retrieve_cost = 100
+
+///////////////////////// TORTURER PRAE
+/datum/action/xeno_action/activable/tail_stab/traumatic_stab
+	name = "Traumatic Stab"
+
+	var/pain_induced = 40 // How much /p a i n/ does the stab do?
+
+/datum/action/xeno_action/activable/diagnosis
+	name = "Diagnosis"
+	action_icon_state = "bombard"
+	//macro_path =
+	ability_primacy = XENO_PRIMARY_ACTION_1
+	action_type = XENO_ACTION_CLICK
+	xeno_cooldown = 3 SECONDS // To prevent spamming mainly
+
+/datum/action/xeno_action/onclick/toggle_vicious_stomp
+	name = "Toggle Vicious Stomp"
+	action_icon_state = "prae_cleave_root"
+	//macro_path = /datum/action/xeno_action/verb/verb_toggle_vicious_stomp
+	action_type = XENO_ACTION_CLICK
+	ability_primacy = XENO_PRIMARY_ACTION_2
+
+/datum/action/xeno_action/onclick/toggle_vicious_stomp/can_use_action()
+	var/mob/living/carbon/xenomorph/xeno = owner
+	if(xeno && !xeno.buckled && !xeno.is_mob_incapacitated())
+		return TRUE
+
+/datum/action/xeno_action/onclick/toggle_vicious_stomp/use_ability(atom/A)
+	var/mob/living/carbon/xenomorph/xeno = owner
+
+	if(!xeno.check_state())
+		return
+
+	var/datum/action/xeno_action/activable/vicious_stomp/cAction = get_action(xeno, /datum/action/xeno_action/activable/vicious_stomp)
+
+	if(!istype(cAction))
+		return
+
+	var/action_icon_result
+	if(cAction.bleed_toggle)
+		cAction.bleed_toggle = FALSE
+		action_icon_result = "prae_cleave_root"
+		to_chat(xeno, SPAN_WARNING("We will now aim to break bones when we stomp."))
+	else
+		cAction.bleed_toggle = TRUE
+		action_icon_result = "prae_cleave_fling"
+		to_chat(xeno, SPAN_WARNING("We will now aim to tear open wounds when we stomp."))
+
+	button.overlays.Cut()
+	button.overlays += image('icons/mob/hud/actions_xeno.dmi', button, action_icon_result)
+	return ..()
+
+/datum/action/xeno_action/activable/vicious_stomp
+	name = "Vicious Stomp"
+	action_icon_state = "lunge"
+	//macro_path =
+	ability_primacy = XENO_PRIMARY_ACTION_3
+	action_type = XENO_ACTION_CLICK
+	xeno_cooldown = 12 SECONDS
+	plasma_cost = 80
+
+	var/max_range = 4
+	var/bleed_toggle = FALSE // Will the stomp break or bleed?
+
+/datum/action/xeno_action/onclick/sadistic_rush
+	name = "Sadistic Rush"
+	action_icon_state = "regurgitate"
+	//macro_path =
+	ability_primacy = XENO_PRIMARY_ACTION_4
+	action_type = XENO_ACTION_CLICK
+	xeno_cooldown = 20 SECONDS
+	plasma_cost = 200

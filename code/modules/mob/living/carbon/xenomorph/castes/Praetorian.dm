@@ -31,6 +31,7 @@
 		/datum/xeno_strain/oppressor,
 		/datum/xeno_strain/vanguard,
 		/datum/xeno_strain/valkyrie,
+		/datum/xeno_strain/torturer,
 	)
 	behavior_delegate_type = /datum/behavior_delegate/praetorian_base
 

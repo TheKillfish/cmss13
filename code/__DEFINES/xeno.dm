@@ -405,6 +405,7 @@
 #define PRAETORIAN_DANCER "Dancer"
 #define PRAETORIAN_VALKYRIE "Valkyrie"
 #define PRAETORIAN_OPPRESSOR "Oppressor"
+#define PRAETORIAN_TORTURER "Torturer"
 
 /////////////////////////////////////////////////////////////////////////////////////
 //
