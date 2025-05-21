@@ -403,3 +403,16 @@
 
 /datum/ammo/xeno/oppressor_tail/proc/remove_tail_overlay(mob/overlayed_mob, image/tail_image)
 	overlayed_mob.overlays -= tail_image
+
+/datum/ammo/xeno/resin
+	name = "resin spit"
+	damage_falloff = 0
+	damage_type = BRUTE
+	flags_ammo_behavior = AMMO_XENO|AMMO_IGNORE_RESIST
+	spit_cost = 30
+
+/datum/ammo/xeno/resin/on_hit_mob(mob/target, obj/projectile/fired_proj)
+	var/mob/living/carbon/xenomorph/xeno_firer = fired_proj.firer
+
+	if(xeno_firer.can_not_harm(target))
+		return
