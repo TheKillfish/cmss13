@@ -37,21 +37,20 @@
 	no_cooldown_msg = FALSE // Needed for onclick actions
 	hide_on_special_state = TRUE
 
-
 /datum/action/xeno_action/activable/frontal_assault
 	name = "Frontal Assault"
 	action_icon_state = "rav_eviscerate"
-	//macro_path = /datum/action/xeno_action/verb/
+	//macro_path = /datum/action/xeno_action/verb/verb_frontal_assault
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
-	xeno_cooldown = 6 SECONDS
+	xeno_cooldown = 10 SECONDS
 	plasma_cost = 25
 	hide_on_special_state = TRUE
 
 /datum/action/xeno_action/onclick/disarming_sweep
 	name = "Disarming Sweep"
 	action_icon_state = "tail_sweep"
-	//macro_path = /datum/action/xeno_action/verb/
+	//macro_path = /datum/action/xeno_action/verb/verb_disarming_sweep
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_3
 	xeno_cooldown = 8 SECONDS
@@ -93,17 +92,6 @@
 	hide_on_special_state = TRUE
 	// Configs
 	var/max_range = 3
-/*
-/datum/aciton/xeno_action/activable/resin_spit
-	name = "Resin Spit"
-	action_icon_state = "shift_spit_sticky"
-	//macro_path = /datum/action/xeno_action/verb/verb_resin_spit
-	action_type = XENO_ACTION_CLICK
-	ability_primacy = XENO_PRIMARY_ACTION_5
-	xeno_cooldown = 3 SECONDS
-	plasma_cost = 25
-
-*/
 
 /datum/action/xeno_action/activable/gut
 	name = "Gut (200)"
@@ -145,7 +133,6 @@
 	hide_off_special_state = TRUE
 
 	care_about_adjacency = FALSE
-	build_speed_mod = 1.2
 
 	var/boosted = FALSE
 
@@ -196,17 +183,24 @@
 /datum/action/xeno_action/onclick/plant_weeds/queen
 	hide_on_special_state = TRUE
 
-/datum/action/xeno_action/onclick/choose_resin/queen_macro
+/datum/action/xeno_action/onclick/choose_resin/queen
 	ability_primacy = XENO_PRIMARY_ACTION_4
-	hide_off_special_state = TRUE
-
-/datum/action/xeno_action/activable/secrete_resin/queen_macro
-	ability_primacy = XENO_PRIMARY_ACTION_5
 	hide_off_special_state = TRUE
 
 /datum/action/xeno_action/activable/place_construction/queen
 	ability_primacy = XENO_NOT_PRIMARY_ACTION
-	hide_off_special_state = TRUE
 
 /datum/action/xeno_action/activable/tail_stab/queen
 	block_on_special_state = TRUE
+
+/datum/action/xeno_action/activable/xeno_spit/queen
+	ability_primacy = XENO_PRIMARY_ACTION_5
+	hide_on_special_state = TRUE
+
+/datum/action/xeno_action/onclick/choose_resin/queen_off_ovi
+	ability_primacy = XENO_NOT_PRIMARY_ACTION
+	hide_on_special_state = TRUE
+
+/datum/action/xeno_action/activable/secrete_resin/queen_off_ovi
+	ability_primacy = XENO_NOT_PRIMARY_ACTION
+	hide_on_special_state = TRUE

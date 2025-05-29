@@ -621,17 +621,23 @@
 /datum/action/xeno_action/onclick/screech/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
 
-	if (!istype(xeno))
+	if(!istype(xeno))
 		return
 
-	if (!action_cooldown_check())
+	if(!action_cooldown_check())
 		return
 
-	if (!xeno.check_state())
+	if(!xeno.check_state())
 		return
 
-	if (!check_and_use_plasma_owner())
+	if(!check_and_use_plasma_owner())
 		return
+
+	var/cooldown_mult = 1
+	if(xeno.stamina_tier <= 2)
+		cooldown_mult = 1.5
+	else
+		cooldown_mult = 1
 
 	//screech is so powerful it kills huggers in our hands
 	if(istype(xeno.r_hand, /obj/item/clothing/mask/facehugger))
@@ -663,7 +669,7 @@
 			continue
 		mob.handle_queen_screech(xeno, mobs_in_view)
 
-	apply_cooldown()
+	apply_cooldown(cooldown_mult)
 
 	return ..()
 
@@ -723,7 +729,6 @@
 	SPAN_XENOWARNING("You have grown an ovipositor!"))
 	xeno.mount_ovipositor()
 	return ..()
-
 
 /datum/action/xeno_action/activable/frontal_assault/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
@@ -970,7 +975,7 @@
 
 	else if(istype(target, /obj/structure/machinery/door/poddoor))
 		var/obj/structure/machinery/door/poddoor/poddoor_target = target
-		visible_message(SPAN_DANGER("[src] rams straight through [poddoor_target]!"), SPAN_XENODANGER("We ram straight through [poddoor_target]!"))
+		visible_message(SPAN_DANGER("[src] rams into [poddoor_target], destroying it!"), SPAN_XENODANGER("We ram into [poddoor_target], destroying it!"))
 		playsound(poddoor_target, 'sound/effects/metal_door_close.ogg', 25)
 		ramAction.impassable_collide = TRUE
 		return FALSE
@@ -1044,7 +1049,7 @@
 		if(vendor_target.unslashable)
 			target.hitby(src)
 		else
-			visible_message(SPAN_DANGER("[src] rams [vendor_target]!"), SPAN_XENODANGER("We ram straight into [vendor_target]!"))
+			visible_message(SPAN_DANGER("[src] rams [vendor_target]!"), SPAN_XENODANGER("We ram [vendor_target]!"))
 			playsound(loc, "punch", 25, 1)
 			vendor_target.tip_over()
 
@@ -1417,6 +1422,9 @@
 	recently_built_turfs -= T
 
 /datum/action/xeno_action/activable/secrete_resin/remote/queen/use_ability(atom/target_atom, mods)
+	var/mob/living/carbon/xenomorph/queen/xeno = owner
+	build_speed_mod = xeno.building_mult
+
 	if(boosted)
 		var/area/target_area = get_area(target_atom)
 		if(!target_area)

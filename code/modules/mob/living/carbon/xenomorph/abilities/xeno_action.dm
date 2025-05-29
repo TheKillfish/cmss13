@@ -87,8 +87,12 @@
 	if(!owner)
 		return FALSE
 	var/mob/living/carbon/xenomorph/xeno = owner
-	if(xeno.needs_maturity && maturity_restricted && !xeno.is_mature)
-		return FALSE
+	if(xeno.needs_maturity && maturity_restricted)
+		if(!xeno.is_mature)
+			hide_from(xeno)
+			return FALSE
+		if(xeno.is_mature)
+			unhide_from(xeno)
 	if(xeno.utilizes_special_states)
 		if(hide_on_special_state)
 			if(!xeno.special_state)

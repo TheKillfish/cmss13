@@ -410,9 +410,34 @@
 	damage_type = BRUTE
 	flags_ammo_behavior = AMMO_XENO|AMMO_IGNORE_RESIST
 	spit_cost = 30
+	var/restrain_time = 30 SECONDS // Very long if left to pass on its own. Resist and get help!
 
 /datum/ammo/xeno/resin/on_hit_mob(mob/target, obj/projectile/fired_proj)
 	var/mob/living/carbon/xenomorph/xeno_firer = fired_proj.firer
 
-	if(xeno_firer.can_not_harm(target))
+	if(!iscarbon(target))
 		return
+
+	var/mob/living/carbon/carbon_target = target
+	if(xeno_firer.can_not_harm(carbon_target))
+		return
+
+//	if(ishuman(carbon_target))
+//		carbon_target.()
+
+	carbon_target.visible_message(SPAN_DANGER("A glob of sticky resin explodes over [target], binding their arms and hindering their movement!"))
+	carbon_target.resin_spit_escape_counter = 100
+	carbon_target.resin_spit_restrained = TRUE
+	if(carbon_target.resin_spit_timer_id != TIMER_ID_NULL) // If they're already bound, refresh the timer
+		deltimer(carbon_target.resin_spit_timer_id)
+	carbon_target.resin_spit_timer_id = addtimer(CALLBACK(src, PROC_REF(remove_resin_spit_restraint), carbon_target), restrain_time, TIMER_STOPPABLE)
+
+/datum/ammo/xeno/resin/proc/remove_resin_spit_restraint(mob/living/carbon/target)
+	if(isxeno(target))
+		target.visible_message(SPAN_NOTICE("The sticky resin binding [target] rapidly decays, losing cohesion and sloughing off!"),
+			SPAN_NOTICE("The sticky resin binding us has fallen off us!"))
+	else if(ishuman(target))
+		target.visible_message(SPAN_NOTICE("The sticky resin binding [target] rapidly decays, losing cohesion and sloughing off!"),
+			SPAN_NOTICE("The sticky resin binding you has fallen off you!"))
+
+	target.resin_spit_restrained = FALSE

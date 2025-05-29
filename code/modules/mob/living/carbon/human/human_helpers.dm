@@ -214,7 +214,9 @@
 /mob/living/carbon/human/is_mob_restrained(check_grab = TRUE)
 	if(check_grab && pulledby && pulledby.grab_level >= GRAB_AGGRESSIVE)
 		return TRUE
-	if (handcuffed)
+	if(handcuffed)
+		return TRUE
+	if(resin_spit_restrained)
 		return TRUE
 	if (istype(wear_suit, /obj/item/clothing/suit/straight_jacket))
 		return TRUE

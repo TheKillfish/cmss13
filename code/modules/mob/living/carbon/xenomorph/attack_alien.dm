@@ -27,6 +27,17 @@
 		if(INTENT_HELP)
 			if(on_fire)
 				extinguish_mob(attacking_xeno)
+			if(attacking_xeno.can_not_harm(src) && resin_spit_restrained)
+				resin_spit_escape_counter -= 25
+				attacking_xeno.visible_message(SPAN_DANGER("[attacking_xeno] claws away at the sticky resin binding [src]!"),
+					SPAN_NOTICE("We claw away at the sticky resin binding [src]!"))
+				if(resin_spit_escape_counter <= 0)
+					attacking_xeno.visible_message(SPAN_DANGER("[attacking_xeno] has successfully freed [src] from the sticky resin!"),
+						SPAN_NOTICE("You claw off enough of the sticky resin binding [src] to free them!"))
+					resin_spit_restrained = FALSE
+					if(resin_spit_timer_id != TIMER_ID_NULL)
+						deltimer(resin_spit_timer_id)
+						resin_spit_timer_id = TIMER_ID_NULL
 			else
 				attacking_xeno.visible_message(SPAN_NOTICE("[attacking_xeno] caresses [src] with its claws."),
 				SPAN_NOTICE("We caress [src] with our claws."), null, 5, CHAT_TYPE_XENO_FLUFF)

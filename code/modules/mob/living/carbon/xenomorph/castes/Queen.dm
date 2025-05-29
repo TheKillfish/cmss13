@@ -23,7 +23,7 @@
 	evolution_allowed = FALSE
 	fire_immunity = FIRE_IMMUNITY_NO_DAMAGE|FIRE_IMMUNITY_NO_IGNITE
 	caste_desc = "The Queen, in all her glory."
-//		spit_types = list(/datum/ammo/xeno/resin)
+	spit_types = list(/datum/ammo/xeno/resin)
 	can_hold_eggs = CAN_HOLD_ONE_HAND
 	acid_level = 2
 	weed_level = WEED_LEVEL_STANDARD
@@ -59,9 +59,9 @@
 			if(hive.living_xeno_queen)
 				if(hive.living_xeno_queen.hivenumber == hive.hivenumber)
 					continue
-			for(var/mob/living/carbon/xenomorph/queen/Q in GLOB.living_xeno_list)
-				if(Q.hivenumber == hive.hivenumber && !should_block_game_interaction(Q))
-					hive.living_xeno_queen = Q
+			for(var/mob/living/carbon/xenomorph/queen/queen in GLOB.living_xeno_list)
+				if(queen.hivenumber == hive.hivenumber && !should_block_game_interaction(queen))
+					hive.living_xeno_queen = queen
 					xeno_message(SPAN_XENOANNOUNCE("A new Queen has risen to lead the Hive! Rejoice!"),3,hive.hivenumber)
 					continue outer_loop
 			hive.living_xeno_queen = null
@@ -82,40 +82,42 @@
 	var/point_delay = 1 SECONDS
 
 
-/mob/hologram/queen/Initialize(mapload, mob/living/carbon/xenomorph/queen/Q)
-	if(!Q)
+/mob/hologram/queen/Initialize(mapload, mob/living/carbon/xenomorph/queen/queen)
+	if(!queen)
 		return INITIALIZE_HINT_QDEL
 
-	if(!istype(Q))
-		stack_trace("Tried to initialize a /mob/hologram/queen on type ([Q.type])")
+	if(!istype(queen))
+		stack_trace("Tried to initialize a /mob/hologram/queen on type ([queen.type])")
 		return INITIALIZE_HINT_QDEL
 
-	if(!Q.ovipositor)
+	if(!queen.ovipositor)
 		return INITIALIZE_HINT_QDEL
 
 	// Make sure to turn off any previous overwatches
-	Q.overwatch(stop_overwatch = TRUE)
+	queen.overwatch(stop_overwatch = TRUE)
 
 	. = ..()
-	RegisterSignal(Q, COMSIG_MOB_PRE_CLICK, PROC_REF(handle_overwatch))
-	RegisterSignal(Q, COMSIG_QUEEN_DISMOUNT_OVIPOSITOR, PROC_REF(exit_hologram))
-	RegisterSignal(Q, COMSIG_XENO_OVERWATCH_XENO, PROC_REF(start_watching))
-	RegisterSignal(Q, list(
+	RegisterSignal(queen, COMSIG_MOB_PRE_CLICK, PROC_REF(handle_overwatch))
+	RegisterSignal(queen, COMSIG_QUEEN_DISMOUNT_OVIPOSITOR, PROC_REF(exit_hologram))
+	RegisterSignal(queen, COMSIG_XENO_OVERWATCH_XENO, PROC_REF(start_watching))
+	RegisterSignal(queen, list(
 		COMSIG_XENO_STOP_OVERWATCH,
 		COMSIG_XENO_STOP_OVERWATCH_XENO
 	), PROC_REF(stop_watching))
-	RegisterSignal(Q, COMSIG_MOB_REAL_NAME_CHANGED, PROC_REF(on_name_changed))
+	RegisterSignal(queen, COMSIG_MOB_REAL_NAME_CHANGED, PROC_REF(on_name_changed))
 	RegisterSignal(src, COMSIG_MOVABLE_TURF_ENTER, PROC_REF(turf_weed_only))
 
-	// Default color
-	if(Q.hive.color)
-		color = Q.hive.color
+	queen.current_queen_eye = src
 
-	hivenumber = Q.hivenumber
+	// Default color
+	if(queen.hive.color)
+		color = queen.hive.color
+
+	hivenumber = queen.hivenumber
 	med_hud_set_status()
 	add_to_all_mob_huds()
 
-	Q.sight |= SEE_TURFS|SEE_OBJS
+	queen.sight |= SEE_TURFS|SEE_OBJS
 
 /mob/hologram/queen/proc/exit_hologram()
 	SIGNAL_HANDLER
@@ -186,7 +188,7 @@
 
 	return COMPONENT_TURF_DENY_MOVEMENT
 
-/mob/hologram/queen/proc/handle_overwatch(mob/living/carbon/xenomorph/queen/Q, atom/A, mods)
+/mob/hologram/queen/proc/handle_overwatch(mob/living/carbon/xenomorph/queen/queen, atom/A, mods)
 	SIGNAL_HANDLER
 
 	var/turf/T = get_turf(A)
@@ -199,11 +201,11 @@
 
 		next_point = world.time + point_delay
 
-		var/message = SPAN_XENONOTICE("[Q] points at [A].")
+		var/message = SPAN_XENONOTICE("[queen] points at [A].")
 
-		to_chat(Q, message)
+		to_chat(queen, message)
 		for(var/mob/living/carbon/xenomorph/X in viewers(7, src))
-			if(X == Q)
+			if(X == queen)
 				continue
 			to_chat(X, message)
 
@@ -218,7 +220,7 @@
 	if(isxeno(A))
 		var/mob/living/carbon/xenomorph/X = A
 		if(X.ally_of_hivenumber(hivenumber))
-			Q.overwatch(A)
+			queen.overwatch(A)
 		return COMPONENT_INTERRUPT_CLICK
 
 	if(!(turf_weed_only(src, T) & COMPONENT_TURF_ALLOW_MOVEMENT))
@@ -226,7 +228,7 @@
 
 	forceMove(T)
 	if(is_watching)
-		Q.overwatch(stop_overwatch = TRUE)
+		queen.overwatch(stop_overwatch = TRUE)
 
 	return COMPONENT_INTERRUPT_CLICK
 
@@ -243,9 +245,10 @@
 
 /mob/hologram/queen/Destroy()
 	if(linked_mob)
-		var/mob/living/carbon/xenomorph/queen/Q = linked_mob
-		if(Q.ovipositor)
+		var/mob/living/carbon/xenomorph/queen/queen = linked_mob
+		if(queen.ovipositor)
 			give_action(linked_mob, /datum/action/xeno_action/onclick/eye)
+		queen.current_queen_eye = null
 
 		linked_mob.sight &= ~(SEE_TURFS|SEE_OBJS)
 
@@ -290,6 +293,10 @@
 	var/queen_standing_icon
 
 	// QUEEN REWORK STUFF
+	// Queen eye tracker
+	var/current_queen_eye = null /// Used for an onscreen hostile proximity checker
+	// Building speed modifier
+	var/building_mult = 1 /// This gets modified based on if enemies are nearby Queen
 	// Core Stamina vars
 	var/queen_stamina = 0 /// Current stamina
 	var/stamina_cap = 600 /// Maximum stamina
@@ -302,9 +309,9 @@
 	var/stamina_drain_delay_duration = 60
 	var/stamina_drain_delay = 60 /// How long after getting off ovi will drain be delayed for?
 	var/stamina_drain_delay_active = FALSE /// Is the delay for stamina draining active?
-	// Screech Accuracy Degredation
-	var/screech_accdeg_str = 95
-	var/screech_accdeg_dur = 10 SECONDS
+	// Screech Accuracy/Scatter Degredation
+	var/screech_deg_str = 90 // How much is
+	var/screech_deg_dur = 8 SECONDS
 	// Brutality vars
 	var/smashing = FALSE /// Same as Predalien to prevent grab shenanigans
 
@@ -318,6 +325,7 @@
 		/datum/action/xeno_action/activable/tail_stab/queen, // Not usable on ovi
 		/datum/action/xeno_action/activable/corrosive_acid/queen, // Not usable on ovi
 		/datum/action/xeno_action/onclick/emit_pheromones,
+		/datum/action/xeno_action/activable/place_construction/queen,
 		/datum/action/xeno_action/onclick/queen_word,
 		/datum/action/xeno_action/onclick/send_thoughts,
 		/datum/action/xeno_action/onclick/manage_hive,
@@ -326,17 +334,18 @@
 		// Mobile Abilities
 		/datum/action/xeno_action/onclick/grow_ovipositor,
 		/datum/action/xeno_action/onclick/plant_weeds/queen, // First macro
+		/datum/action/xeno_action/onclick/choose_resin/queen_off_ovi,
+		/datum/action/xeno_action/activable/secrete_resin/queen_off_ovi,
 		/datum/action/xeno_action/activable/frontal_assault, // Second macro
 		/datum/action/xeno_action/onclick/disarming_sweep, // Third macro
 		/datum/action/xeno_action/activable/ram, // Fourth macro, needs to be mature to use
 		/datum/action/xeno_action/activable/brutality, // Needs to be mature to use
-		// Rework Ability 5 Resin Spit // Fifth macro
+		/datum/action/xeno_action/activable/xeno_spit/queen, // Fifth macro
 		/datum/action/xeno_action/activable/gut,
 		// Immobile Abilities
 		/datum/action/xeno_action/onclick/remove_eggsac,
-		/datum/action/xeno_action/activable/place_construction/queen,
 		/datum/action/xeno_action/activable/expand_weeds, // Third macro
-		/datum/action/xeno_action/onclick/choose_resin/queen_macro, // Fourth macro
+		/datum/action/xeno_action/onclick/choose_resin/queen, // Fourth macro
 		/datum/action/xeno_action/activable/secrete_resin/remote/queen, // Fifth macro
 		/datum/action/xeno_action/onclick/set_xeno_lead,
 		/datum/action/xeno_action/activable/queen_heal, // First macro
@@ -426,6 +435,7 @@
 /mob/living/carbon/xenomorph/queen/combat_ready
 	AUTOWIKI_SKIP(FALSE)
 	is_mature = TRUE
+	queen_stamina = 600
 
 /mob/living/carbon/xenomorph/queen/Initialize()
 	. = ..()
@@ -448,6 +458,8 @@
 
 /mob/living/carbon/xenomorph/queen/proc/check_block(mob/queen, turf/new_loc)
 	SIGNAL_HANDLER
+	if(body_position == LYING_DOWN || stat == UNCONSCIOUS)
+		return
 	for(var/mob/living/carbon/xenomorph/xeno in new_loc.contents)
 		if(xeno == queen)
 			continue
@@ -546,15 +558,15 @@
 				overwatch(observed_xeno, TRUE)
 
 		switch(queen_stamina)
-			if(0)
+			if(0 to 99)
 				stamina_tier = 0
-			if(100)
+			if(100 to 199)
 				stamina_tier = 1
-			if(200)
+			if(200 to 299)
 				stamina_tier = 2
-			if(300)
+			if(300 to 399)
 				stamina_tier = 3
-			if(400)
+			if(400 to 499)
 				stamina_tier = 4
 			if(500)
 				stamina_tier = 5
@@ -569,13 +581,25 @@
 					if(length(T.contents) <= 25) //so we don't end up with a million object on that turf.
 						egg_amount--
 						new /obj/item/xeno_egg(loc, hivenumber)
+
 			if(stamina != 0)
 				modify_stamina(stamina_gain) // Approx. 1 stamina per second based on how ticks work
 
+			var/current_presence
+			if(current_queen_eye)
+				current_presence = current_queen_eye
+			else
+				current_presence = src
+			var/turf/turf = get_turf(current_presence)
+			if(hostiles_in_proximity(turf)) // Check if hostiles are close to wherever you are doing stuff (i.e. where your Queen Eye is if you're using that)
+				building_mult = 2
+			else
+				building_mult = 0.7
 
 		if(!ovipositor)
-			if(stamina_drain_delay_active == TRUE)
-				/* [Insert code for cancelling the delay early if multiple living humans are on screen] */
+			if(stamina_drain_delay_active == TRUE && hostiles_in_proximity(get_turf(src))) // Checking if hostiles are near, but only if you have a delay that can be cancelled
+				stamina_drain_delay_active = FALSE
+			else if(stamina_drain_delay_active == TRUE)
 				stamina_drain_delay_countdown(stamina_drain)
 
 			if(queen_stamina > 0)
@@ -585,6 +609,19 @@
 
 			if(queen_stamina <= 0)
 				stamina_extras_active = FALSE
+
+/mob/living/carbon/xenomorph/queen/proc/hostiles_in_proximity(turf/current_turf)
+	var/list/mobs_in_range = oviewers(7, current_turf)
+
+	for(var/mob/living/carbon/mob in mobs_in_range)
+		if(mob.stat == DEAD || HAS_TRAIT(mob, TRAIT_NESTED) || HAS_TRAIT(mob, TRAIT_CLOAKED))
+			continue
+		if(src.can_not_harm(mob))
+			continue
+
+		return TRUE
+
+	return FALSE
 
 /mob/living/carbon/xenomorph/queen/proc/modify_stamina(amount)
 	queen_stamina += amount

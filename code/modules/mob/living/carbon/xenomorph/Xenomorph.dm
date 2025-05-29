@@ -1074,6 +1074,39 @@
 	visible_message(SPAN_DANGER("<b>[src] manages to remove [legcuffed]!</b>"), SPAN_NOTICE("We successfully remove [legcuffed]."))
 	drop_inv_item_on_ground(legcuffed)
 
+/mob/living/carbon/xenomorph/resist_resin_spit_restraint()
+	if(!resin_spit_restrained || resin_spit_escape_counter <= 0)
+		return
+
+	var/amount_escaped = 0
+	var/amount_verb = ""
+	switch(mob_size)
+		if(MOB_SIZE_BIG to MOB_SIZE_IMMOBILE)
+			amount_escaped = 50 // Big xenos won't be stopped for long
+			amount_verb = "large clumps"
+		if(MOB_SIZE_XENO)
+			amount_escaped = 25 // Smaller xenos have a harder time
+			amount_verb = "clumps"
+		if(MOB_SIZE_XENO_VERY_SMALL to MOB_SIZE_XENO_SMALL)
+			amount_escaped = 10 // Smallest xenos have a very hard time
+			amount_verb = "small clumps"
+		else
+			amount_escaped = 15 // Failsafe, same as human resisting
+			amount_verb = "clumps"
+
+	visible_message(SPAN_XENODANGER("[src] struggles against the sticky resin binding them, flinging [amount_verb] as they do!"),
+		SPAN_XENOWARNING("We thrash against the sticky resin binding us!"))
+	resin_spit_escape_counter -= amount_escaped
+
+	if(resin_spit_escape_counter >= 0)
+		return
+
+	visible_message(SPAN_XENODANGER("[src] successfully struggles free of the sticky resin!"), SPAN_XENONOTICE("We manage to free ourselves from the sticky resin!"))
+	resin_spit_restrained = FALSE
+	if(resin_spit_timer_id != TIMER_ID_NULL)
+		deltimer(resin_spit_timer_id)
+		resin_spit_timer_id = TIMER_ID_NULL
+
 /mob/living/carbon/xenomorph/IgniteMob()
 	. = ..()
 	if (. & IGNITE_IGNITED)

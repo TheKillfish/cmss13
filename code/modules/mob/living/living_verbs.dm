@@ -173,8 +173,12 @@
 			C.open()
 			return
 
-	//breaking out of handcuffs & putting out fires
+	//breaking out of handcuffs, putting out fires/acid, and escaping resin spit restraints
 	if(mobility_flags & MOBILITY_MOVE)
+		if(iscarbon(src))
+			var/mob/living/carbon/carb_src = src
+			if(carb_src.resin_spit_restrained)
+				resist_resin_spit_restraint()
 		if(on_fire)
 			resist_fire()
 		if(locate(/datum/effects/acid) in effects_list)
@@ -194,4 +198,7 @@
 	return
 
 /mob/living/proc/resist_restraints()
+	return
+
+/mob/living/proc/resist_resin_spit_restraint()
 	return

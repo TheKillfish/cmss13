@@ -192,6 +192,9 @@
 	if(legcuffed)
 		msg += SPAN_ORANGE("[capitalize(t_his)] ankles are restrained by [legcuffed].\n")
 
+	if(resin_spit_restrained)
+		msg += SPAN_ORANGE("[t_He] [t_is] covered in sticky resin.")
+
 	//Admin-slept
 	if(sleeping > 8000000)
 		msg += SPAN_HIGHDANGER(SPAN_BOLD("This player has been slept by staff.\n"))

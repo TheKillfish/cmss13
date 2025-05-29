@@ -53,7 +53,9 @@
 
 //These don't do much currently. Or anything? Only around for legacy code.
 /mob/living/carbon/xenomorph/is_mob_restrained()
-	return 0
+	if(resin_spit_restrained)
+		return TRUE
+	return FALSE
 
 // Count how many xenos are in the same area as you. Used in hijacking.
 /mob/living/carbon/xenomorph/proc/count_hivemember_same_area()

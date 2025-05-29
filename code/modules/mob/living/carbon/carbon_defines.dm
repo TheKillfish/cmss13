@@ -6,6 +6,10 @@
 
 	var/obj/item/restraint/handcuffs/handcuffed = null //Whether or not the mob is handcuffed
 
+	var/resin_spit_restrained = FALSE // Whether or not the mob is restrained by resin spit
+	var/resin_spit_escape_counter = 100 // A counter for escaping the restraining: hastened by resisting or being helped by friendlies
+	var/resin_spit_timer_id = TIMER_ID_NULL // To track removal over time, and to cancel if freed prematurely (via resisting or being helped)
+
 	var/overeat_cooldown = 0
 
 	//Active emote/pose

@@ -26,6 +26,19 @@
 						SPAN_NOTICE("You extinguished the fire on [src]."), null, 5)
 				return 1
 
+			if(resin_spit_restrained && attacking_mob != src)
+				resin_spit_escape_counter -= 20
+				attacking_mob.visible_message(SPAN_DANGER("[attacking_mob] tries removing some of the sticky resin binding [src]!"),
+					SPAN_NOTICE("You try removing some of the sticky resin binding [src]!"), null, 5)
+				if(resin_spit_escape_counter <= 0)
+					attacking_mob.visible_message(SPAN_DANGER("[attacking_mob] has successfully freed [src] from the sticky resin!"),
+						SPAN_NOTICE("You remove enough of the sticky resin binding [src] to free them!"))
+					resin_spit_restrained = FALSE
+					if(resin_spit_timer_id != TIMER_ID_NULL)
+						deltimer(resin_spit_timer_id)
+						resin_spit_timer_id = TIMER_ID_NULL
+				return TRUE // Note to self: return to this file later and convert all returns to TRUE and FALSE - Killfish
+
 			// If unconscious with oxygen damage, do CPR. If dead, we do CPR
 			if(!(stat == UNCONSCIOUS && getOxyLoss() > 0) && !(stat == DEAD))
 				help_shake_act(attacking_mob)

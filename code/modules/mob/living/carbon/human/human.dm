@@ -1673,6 +1673,31 @@
 		to_chat(src, SPAN_NOTICE(" You successfully remove [restraint]."))
 		drop_inv_item_on_ground(restraint)
 
+/mob/living/carbon/human/resist_resin_spit_restraint()
+	if(!resin_spit_restrained || resin_spit_escape_counter <= 0)
+		return
+
+	var/amount_escaped = 0
+	if(isyautja(src))
+		amount_escaped = 35
+		visible_message(SPAN_DANGER("[src] violently struggles against the sticky resin binding them, flinging large clumps as they do!"),
+			SPAN_NOTICE("You struggle as hard as you can to get free of the sticky resin binding you!"), null, 5)
+	else
+		amount_escaped = 15
+		visible_message(SPAN_DANGER("[src] struggles against the sticky resin binding them, flinging clumps as they do!"),
+			SPAN_NOTICE("You struggle as hard as you can to get free of the sticky resin binding you!"), null, 5)
+
+	resin_spit_escape_counter -= amount_escaped
+
+	if(resin_spit_escape_counter >= 0)
+		return
+
+	visible_message(SPAN_XENODANGER("[src] successfully struggles free of the sticky resin!"), SPAN_XENONOTICE("You manage to struggle free of the sticky resin!"))
+	resin_spit_restrained = FALSE
+	if(resin_spit_timer_id != TIMER_ID_NULL)
+		deltimer(resin_spit_timer_id)
+		resin_spit_timer_id = TIMER_ID_NULL
+
 /mob/living/carbon/human/equip_to_appropriate_slot(obj/item/W, ignore_delay = 1, list/slot_equipment_priority)
 	if(species && !slot_equipment_priority)
 		slot_equipment_priority = species.slot_equipment_priority

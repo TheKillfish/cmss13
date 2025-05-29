@@ -1,14 +1,16 @@
 
 /mob/living/carbon/can_use_hands()
 	if(handcuffed)
-		return 0
+		return FALSE
 	if(buckled && ! istype(buckled, /obj/structure/bed/chair)) // buckling does not restrict hands
-		return 0
-	return 1
+		return FALSE
+	return TRUE
 
 /mob/living/carbon/is_mob_restrained()
-	if (handcuffed)
-		return 1
+	if(handcuffed)
+		return TRUE
+	if(resin_spit_restrained)
+		return TRUE
 	return
 
 /mob/living/carbon/check_view_change(new_size, atom/source)
@@ -40,12 +42,13 @@
 			AdjustEarDeafness(2)
 		to_chat(src, SPAN_DANGER("The roar shakes your body to the core, freezing you in place!"))
 	else if(dist >= 8 && dist <= 11)
-		to_chat(src, SPAN_DANGER("The distant roar triggers a primal fear within you, causing you to hesitate!"))
+		to_chat(src, SPAN_DANGER("The distant roar triggers a primal fear within you, causing you to hesitate and fumble your aim!"))
 	if(dist <= 11)
 		adjust_effect(6, SUPERSLOW)
 		if(ishuman(src))
 			var/mob/living/carbon/human/human_target = src
-			human_target.activate_degraded_accuracy(queen.screech_accdeg_str, queen.screech_accdeg_dur)
+			human_target.activate_degraded_accuracy(queen.screech_deg_str, queen.screech_deg_dur)
+			human_target.activate_degraded_scatter(queen.screech_deg_str, queen.screech_deg_dur)
 
 ///Checks if something prevents sharp objects from interacting with the mob (such as armor blocking surgical tools / surgery)
 /mob/living/carbon/proc/get_sharp_obj_blocker(obj/limb/limb)

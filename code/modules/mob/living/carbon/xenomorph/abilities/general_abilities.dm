@@ -76,6 +76,9 @@
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
 
+/datum/action/xeno_action/onclick/choose_resin/no_macro
+	ability_primacy = XENO_NOT_PRIMARY_ACTION
+
 // Secrete Resin
 /datum/action/xeno_action/activable/secrete_resin
 	name = "Secrete Resin"
