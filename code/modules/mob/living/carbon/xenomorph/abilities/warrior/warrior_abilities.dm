@@ -71,9 +71,6 @@
 	xeno_cooldown = 6 SECONDS
 	ability_primacy = XENO_PRIMARY_ACTION_2
 
-	// Configs
-	var/punching_wall_damage = 500
-
 /datum/action/xeno_action/activable/demolisher_lunge_punch
 	name = "Lunge Punch"
 	action_icon_state = "lunge"
@@ -82,5 +79,5 @@
 	ability_primacy = XENO_PRIMARY_ACTION_3
 
 	// Configs
-	var/range = 5
+	var/max_range = 4
 	var/fling_distance = 2

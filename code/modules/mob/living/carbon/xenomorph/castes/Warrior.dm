@@ -65,6 +65,8 @@
 	weed_food_states = list("Warrior_1","Warrior_2","Warrior_3")
 	weed_food_states_flipped = list("Warrior_1","Warrior_2","Warrior_3")
 
+	var/lunging = FALSE // whether or not the warrior is currently lunging (holding) a target
+
 	skull = /obj/item/skull/warrior
 	pelt = /obj/item/pelt/warrior
 
@@ -77,23 +79,20 @@
 	var/lifesteal_lock_duration = 20 // This will remove the glow effect on warrior after 2 seconds
 	var/color = "#6c6f24"
 	var/emote_cooldown = 0
-	var/lunging = FALSE // whether or not the warrior is currently lunging (holding) a target
 
 /mob/living/carbon/xenomorph/warrior/throw_item(atom/target)
 	toggle_throw_mode(THROW_MODE_OFF)
 
 /mob/living/carbon/xenomorph/warrior/stop_pulling()
-	var/datum/behavior_delegate/warrior_base/warrior_delegate = behavior_delegate
-	if(isliving(pulling) && warrior_delegate.lunging)
-		warrior_delegate.lunging = FALSE // To avoid extreme cases of stopping a lunge then quickly pulling and stopping to pull someone else
+	if(isliving(pulling) && lunging)
+		lunging = FALSE // To avoid extreme cases of stopping a lunge then quickly pulling and stopping to pull someone else
 		var/mob/living/lunged = pulling
 		lunged.set_effect(0, STUN)
 		lunged.set_effect(0, WEAKEN)
 	return ..()
 
 /mob/living/carbon/xenomorph/warrior/start_pulling(atom/movable/movable_atom, lunge)
-	var/datum/behavior_delegate/warrior_base/warrior_delegate = behavior_delegate
-	if (!check_state())
+	if(!check_state())
 		return FALSE
 
 	if(!isliving(movable_atom))
@@ -122,12 +121,11 @@
 				return // Grab was broken, probably as Stun side effect (eg. target getting knocked away from a manned M56D)
 			visible_message(SPAN_XENOWARNING("[src] grabs [living_mob] by the throat!"),
 			SPAN_XENOWARNING("We grab [living_mob] by the throat!"))
-			warrior_delegate.lunging = TRUE
+			lunging = TRUE
 			addtimer(CALLBACK(src, PROC_REF(stop_lunging)), get_xeno_stun_duration(living_mob, 2) SECONDS + 1 SECONDS)
 
 /mob/living/carbon/xenomorph/warrior/proc/stop_lunging(world_time)
-	var/datum/behavior_delegate/warrior_base/warrior_delegate = behavior_delegate
-	warrior_delegate.lunging = FALSE
+	lunging = FALSE
 
 /mob/living/carbon/xenomorph/warrior/hitby(atom/movable/movable_atom)
 	if(ishuman(movable_atom))
@@ -174,8 +172,8 @@
 	if(!isxeno_human(target_carbon))
 		return
 
-
-	if(lunging && target_carbon)
+	var/mob/living/carbon/xenomorph/warrior/xeno = bound_xeno
+	if(xeno.lunging && target_carbon)
 		return INTENT_HARM
 
 

@@ -120,6 +120,30 @@
 			break
 		new /datum/effects/acid(target, bound_xeno, initial(bound_xeno.caste_type))
 
+/datum/behavior_delegate/warrior_demolisher/proc/do_demolish_punch(mob/living/carbon/target_mob, obj/limb/target_limb)
+
+
+	if(ishuman(target_mob))
+		if((target_limb.status & LIMB_SPLINTED) && !(target_limb.status & LIMB_SPLINTED_INDESTRUCTIBLE)) //If they have it splinted, the splint won't hold.
+			target_limb.status &= ~LIMB_SPLINTED
+			playsound(get_turf(target_mob), 'sound/items/splintbreaks.ogg', 20)
+			to_chat(target_mob, SPAN_DANGER("The splint on your [target_limb.display_name] comes apart!"))
+			target_mob.pain.apply_pain(PAIN_BONE_BREAK_SPLINTED)
+
+		if(ishuman_strict(target_mob))
+			target_mob.apply_effect(3, SLOW)
+
+	playsound(target_mob, "punch", 50, 1)
+	target_mob.last_damage_data = create_cause_data(initial(bound_xeno.caste_type), bound_xeno)
+	target_mob.apply_armoured_damage(get_xeno_damage_slash(target_mob, bound_xeno.melee_damage_upper), ARMOR_MELEE, BRUTE, target_limb ? target_limb.name : "chest")
+	melee_attack_additional_effects_target(target_mob)
+
+	// Hmm today I will kill a marine while looking away from them
+	bound_xeno.face_atom(target_mob)
+	bound_xeno.animation_attack_on(target_mob)
+	bound_xeno.flick_attack_overlay(target_mob, "punch")
+	shake_camera(target_mob, 2, 1)
+
 // Powers
 
 /datum/action/xeno_action/activable/wrecking_tail/use_ability(atom/targetted_atom)
@@ -135,21 +159,21 @@
 
 	var/turf/closed/wall/target_wall = targetted_atom
 	if(istype(targetted_atom, /turf/closed/wall) && !(target_wall.turf_flags & TURF_HULL))
+		if(target_wall.acided_hole)
+			target_wall.acided_hole.expand_hole(demolisher)
+			return
 		if(target_wall.claws_minimum == CLAW_TYPE_SHARP)
 			if(!do_after(demolisher, wrecking_delay, INTERRUPT_ALL | BEHAVIOR_IMMOBILE, BUSY_ICON_HOSTILE))
 				return
 			playsound(target_wall, 'sound/effects/metalhit.ogg', 50, TRUE)
 			target_wall.take_damage(wrecking_wall_damage)
-			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently smashes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We smash \the [targetted_atom] with our tail!"))
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently smashes [targetted_atom] with their tail!"), SPAN_XENOWARNING("We smash [targetted_atom] with our tail!"))
+			apply_cooldown(0.5)
 
-		if(target_wall.acided_hole)
-			target_wall.acided_hole.expand_hole(demolisher)
-			return
-		var/obj/effect/acid_hole/target_acid_hole = targetted_atom
-		if(istype(targetted_atom, /obj/effect/acid_hole))
-			target_acid_hole.expand_hole(demolisher)
-			return
-		apply_cooldown()
+	var/obj/effect/acid_hole/target_acid_hole = targetted_atom
+	if(istype(targetted_atom, /obj/effect/acid_hole))
+		target_acid_hole.expand_hole(demolisher)
+		return
 
 	var/mob/living/target_carbon = targetted_atom
 	if(isxeno_human(targetted_atom))
@@ -160,7 +184,7 @@
 			target_carbon.KnockDown(2)
 		else
 			target_carbon.Slow(3)
-		playsound(target, "punch", 50, TRUE)
+		playsound(target_carbon, "punch", 50, TRUE)
 		shake_camera(target_carbon)
 		demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently clobbers [targetted_atom] with their tail!"), SPAN_XENOWARNING("We clobber [targetted_atom] with our tail!"))
 		apply_cooldown()
@@ -172,7 +196,7 @@
 		if(istype(target_structure, /obj/structure/surface/table))
 			playsound(get_turf(target_table), 'sound/effects/metalhit.ogg', 30, TRUE)
 			target_table.deconstruct()
-			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] smashes \the [targetted_atom] apart with their tail!"), SPAN_XENOWARNING("We smash \the [targetted_atom] apart with our tail!"))
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] smashes [targetted_atom] apart with their tail!"), SPAN_XENOWARNING("We smash [targetted_atom] apart with our tail!"))
 			apply_cooldown(0.3)
 
 		// Demolisher shatters breakable windows with ease
@@ -180,7 +204,7 @@
 		if(istype(target_structure, /obj/structure/window/framed))
 			playsound(get_turf(target_window), "windowshatter", 30, TRUE)
 			target_window.shatter_window(TRUE)
-			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] effortlessly shatters \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We shatter \the [targetted_atom] with our tail!"))
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] effortlessly shatters [targetted_atom] with their tail!"), SPAN_XENOWARNING("We shatter [targetted_atom] with our tail!"))
 			apply_cooldown(0.3)
 
 		// Window frames similarly cannot endure the smashing of Demolisher's tail
@@ -188,7 +212,16 @@
 		if(istype(target_structure, /obj/structure/window_frame))
 			playsound(get_turf(target_window), 'sound/effects/metalhit.ogg', 30, TRUE)
 			target_frame.deconstruct()
-			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] crushes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We crush \the [targetted_atom] with our tail!"))
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] crushes [targetted_atom] with their tail!"), SPAN_XENOWARNING("We crush [targetted_atom] with our tail!"))
+			apply_cooldown(0.3)
+
+		// Girders are easily broken
+		var/obj/structure/girder/target_girder = target_structure
+		if(istype(target_structure, /obj/structure/girder) && target_girder.health <= 0)
+			playsound(get_turf(target_window), 'sound/effects/metalhit.ogg', 30, TRUE)
+			target_girder.health = 0
+			target_girder.update_state()
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] destroys part of [targetted_atom] with their tail!"), SPAN_XENOWARNING("We destroy part of [targetted_atom] with our tail!"))
 			apply_cooldown(0.3)
 
 		// Doors will take a bit more to break but will go faster than from slashing
@@ -203,7 +236,7 @@
 
 			playsound(target_airlock, 'sound/effects/metalhit.ogg', 50, TRUE)
 			target_airlock.take_damage(target_airlock.damage_cap / 4, demolisher)
-			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently bashes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We bash \the [targetted_atom] with our tail!"))
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently bashes [targetted_atom] with their tail!"), SPAN_XENOWARNING("We bash [targetted_atom] with our tail!"))
 			apply_cooldown(0.6)
 
 		// Normal cades will still take a bit of a beating to break, but wood or snow ones will be instantly broken
@@ -218,7 +251,7 @@
 				target_cade.update_health(target_cade.maxhealth + 10) // Extra 10 damage is for posterity in ensuring the cade is destroyed
 			else
 				target_cade.take_damage(target_cade.maxhealth / 6)
-			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently strikes \the [targetted_atom] with their tail!"), SPAN_XENOWARNING("We strike \the [targetted_atom] with our tail!"))
+			demolisher.visible_message(SPAN_XENOWARNING("[demolisher] violently strikes [targetted_atom] with their tail!"), SPAN_XENOWARNING("We strike [targetted_atom] with our tail!"))
 			apply_cooldown(0.8)
 
 	var/last_dir = demolisher.dir
@@ -268,4 +301,79 @@
 		for(var/obj/item/explosive/plastic/explosive in targetted_atom.contents)
 			demolisher.corrosive_acid(explosive, acid_type, 0)
 
+	return ..()
+
+/datum/action/xeno_action/activable/demolisher_hook_punch/use_ability(atom/targetted_atom)
+	var/mob/living/carbon/xenomorph/xeno = owner
+	var/datum/behavior_delegate/warrior_demolisher/demolisher = xeno.behavior_delegate
+
+	if(!action_cooldown_check())
+		return
+
+	if(!isxeno_human(targetted_atom) || xeno.can_not_harm(targetted_atom))
+		return
+
+	if(!xeno.check_state() || xeno.agility)
+		return
+
+	var/distance = get_dist(xeno, targetted_atom)
+	if(distance > 2)
+		return
+
+	var/mob/living/carbon/carbon = targetted_atom
+	if(!xeno.Adjacent(carbon))
+		return
+
+	if(carbon.stat == DEAD || HAS_TRAIT(carbon, TRAIT_NESTED))
+		return
+
+	var/obj/limb/target_limb = carbon.get_limb(check_zone(xeno.zone_selected))
+	if(ishuman(carbon) && (!target_limb || (target_limb.status & LIMB_DESTROYED)))
+		target_limb = carbon.get_limb("chest")
+
+	if(!check_and_use_plasma_owner())
+		return
+
+	xeno.visible_message(SPAN_XENOWARNING("[xeno] hits [carbon] in the [target_limb ? target_limb.display_name : "chest"] with a powerful hook punch!"),
+	SPAN_XENOWARNING("We hit [carbon] in the [target_limb ? target_limb.display_name : "chest"] with a devastatingly powerful punch!"))
+
+	demolisher.do_demolish_punch(carbon, target_limb)
+
+	apply_cooldown()
+	return ..()
+
+/datum/action/xeno_action/activable/demolisher_lunge_punch/use_ability(atom/targetted_atom)
+	var/mob/living/carbon/xenomorph/xeno = owner
+	var/datum/behavior_delegate/warrior_demolisher/demolisher = xeno.behavior_delegate
+
+	if(!action_cooldown_check())
+		return
+
+	if(!isxeno_human(targetted_atom) || xeno.can_not_harm(targetted_atom))
+		return
+
+	if(!xeno.check_state() || xeno.agility)
+		return
+
+	var/distance = get_dist(xeno, targetted_atom)
+	if(distance > max_range)
+		return
+
+	var/mob/living/carbon/carbon_target = targetted_atom
+	if(carbon_target.stat == DEAD || HAS_TRAIT(carbon_target, TRAIT_NESTED))
+		return
+
+	if(!check_and_use_plasma_owner())
+		return
+
+	xeno.throw_atom(get_step_towards(targetted_atom, xeno), max_range, SPEED_FAST, xeno, tracking=TRUE)
+
+	if(xeno.Adjacent(carbon_target))
+		xeno.visible_message(SPAN_XENOWARNING("[xeno] leaps towards [carbon_target] and flings them with a mighty punch!"),
+		SPAN_XENOWARNING("We leap towards [carbon_target] and fling them with a mighty punch!"))
+		var/obj/limb/target_limb = carbon_target.get_limb("chest")
+		demolisher.do_demolish_punch(carbon_target, target_limb)
+		xeno.throw_carbon(carbon_target, get_dir(xeno, carbon_target), fling_distance, SPEED_VERY_FAST, shake_camera = TRUE, immobilize = TRUE)
+
+	apply_cooldown()
 	return ..()
