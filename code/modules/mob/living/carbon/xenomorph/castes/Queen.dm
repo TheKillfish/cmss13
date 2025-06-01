@@ -597,10 +597,11 @@
 				building_mult = 0.7
 
 		if(!ovipositor)
-			if(stamina_drain_delay_active == TRUE && hostiles_in_proximity(get_turf(src))) // Checking if hostiles are near, but only if you have a delay that can be cancelled
-				stamina_drain_delay_active = FALSE
-			else if(stamina_drain_delay_active == TRUE)
-				stamina_drain_delay_countdown(stamina_drain)
+			if(stamina_drain_delay_active == TRUE)
+				if(hostiles_in_proximity(get_turf(src)))
+					stamina_drain_delay_active = FALSE
+				else
+					stamina_drain_delay_countdown(stamina_drain)
 
 			if(queen_stamina > 0)
 				if(stamina_drain_delay_active != TRUE)
