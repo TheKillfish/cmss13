@@ -536,14 +536,14 @@
 	hivenumber = xeno.hive.hivenumber
 	RegisterSignal(xeno.hive, COMSIG_HIVE_NEW_QUEEN, PROC_REF(handle_new_queen))
 
-	if(!xeno.hive.living_xeno_queen)
+	if(!xeno.hive.living_hiveleader)
 		hide_from(xeno)
 		return
 
-	if(!xeno.hive.living_xeno_queen.ovipositor)
+	if(!xeno.hive.living_hiveleader.special_state)
 		hide_from(xeno)
 
-	handle_new_queen(new_queen = xeno.hive.living_xeno_queen)
+	handle_new_queen(new_queen = xeno.hive.living_hiveleader)
 
 /datum/action/xeno_action/onclick/tacmap/remove_from(mob/living/carbon/xenomorph/xeno)
 	. = ..()
@@ -558,7 +558,7 @@
 
 	tracked_queen = new_queen
 
-	if(!tracked_queen?.ovipositor)
+	if(!tracked_queen?.special_state)
 		hide_from(owner)
 
 	RegisterSignal(tracked_queen, COMSIG_QUEEN_MOUNT_OVIPOSITOR, PROC_REF(handle_mount_ovipositor))

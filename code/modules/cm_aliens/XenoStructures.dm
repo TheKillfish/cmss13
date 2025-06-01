@@ -1134,7 +1134,7 @@
 	rolling_candidates = TRUE
 	var/datum/hive_status/hive = GLOB.hive_datum[hive_number]
 
-	var/list/mob/living/carbon/xenomorph/voting_candidates = hive.totalXenos.Copy() - hive.living_xeno_queen
+	var/list/mob/living/carbon/xenomorph/voting_candidates = hive.totalXenos.Copy() - hive.living_hiveleader
 
 	for(var/mob/living/carbon/xenomorph/voting_candidate in voting_candidates)
 		if(!is_candidate_valid(hive, voting_candidate))
@@ -1207,7 +1207,7 @@
 			return
 
 	// Lastly all of the above again, without playtime requirements
-	for(var/mob/living/carbon/xenomorph/candidate in shuffle(hive.totalXenos.Copy() - hive.living_xeno_queen))
+	for(var/mob/living/carbon/xenomorph/candidate in shuffle(hive.totalXenos.Copy() - hive.living_hiveleader))
 		if(try_roll_candidate(hive, candidate, playtime_restricted = FALSE))
 			chosen_candidate = candidate.client
 			rolling_candidates = FALSE

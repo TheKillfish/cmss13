@@ -149,7 +149,7 @@ SUBSYSTEM_DEF(who)
 		var/datum/hive_status/hive = GLOB.hive_datum[faction_to_get]
 		if(!hive || !length(hive.totalXenos))
 			continue
-		factions_additional += list(list("content" = "[hive.name]: [length(hive.totalXenos)]", "color" = hive.color ? hive.color : "#8200FF", "text" = "Queen: [hive.living_xeno_queen ? "Alive" : "Dead"]"))
+		factions_additional += list(list("content" = "[hive.name]: [length(hive.totalXenos)]", "color" = hive.color ? hive.color : "#8200FF", "text" = "Queen: [hive.living_hiveleader ? "Alive" : "Dead"]"))
 
 	src.base_data = base_data
 	src.admin_sorted_additional = admin_sorted_additional

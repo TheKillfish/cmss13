@@ -86,14 +86,14 @@
 	if(!hive.hardcore) // Cannot progress if the hive has entered hardcore mode.
 		if(affected_mob.in_stasis || affected_mob.bodytemperature < BODYTEMP_CRYO_LIQUID_THRESHOLD)
 			if(stage < 5)
-				counter += 0.33 * hive.larva_gestation_multiplier * delta_time
+				counter += 0.33 * hive.hive_larva_gestation_mult * delta_time
 			if(stage == 4) // Stasis affects late-stage less
-				counter += 0.11 * hive.larva_gestation_multiplier * delta_time
+				counter += 0.11 * hive.hive_larva_gestation_mult * delta_time
 		else if(HAS_TRAIT(affected_mob, TRAIT_NESTED)) //Hosts who are nested in resin nests provide an ideal setting, larva grows faster
-			counter += 1.5 * hive.larva_gestation_multiplier * delta_time //Currently twice as much, can be changed
+			counter += 1.5 * hive.hive_larva_gestation_mult * delta_time //Currently twice as much, can be changed
 		else
 			if(stage < 5)
-				counter += 1 * hive.larva_gestation_multiplier * delta_time
+				counter += 1 * hive.hive_larva_gestation_mult * delta_time
 
 		if(stage < 5 && counter >= per_stage_hugged_time)
 			counter = 0
@@ -345,7 +345,7 @@
 		GLOB.larva_burst_by_hive[hive] = (GLOB.larva_burst_by_hive[hive] || 0) + 1
 		burstcount++
 
-		if(!larva_embryo.ckey && larva_embryo.burrowable && loc && is_ground_level(loc.z) && (locate(/obj/structure/bed/nest) in loc) && hive.living_xeno_queen && hive.living_xeno_queen.z == loc.z)
+		if(!larva_embryo.ckey && larva_embryo.burrowable && loc && is_ground_level(loc.z) && (locate(/obj/structure/bed/nest) in loc) && hive.living_hiveleader && hive.living_hiveleader.z == loc.z)
 			larva_embryo.visible_message(SPAN_XENODANGER("[larva_embryo] quickly burrows into the ground."))
 			if(GLOB.round_statistics && !larva_embryo.statistic_exempt)
 				GLOB.round_statistics.track_new_participant(faction, 0) // keep stats sane

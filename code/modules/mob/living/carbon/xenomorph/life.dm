@@ -44,7 +44,7 @@
 	var/progress_amount = 1
 	if(SSxevolution)
 		progress_amount = SSxevolution.get_evolution_boost_power(hive.hivenumber)
-	var/ovipositor_check = (hive.allow_no_queen_evo || hive.evolution_without_ovipositor || (hive.living_xeno_queen && hive.living_xeno_queen.ovipositor))
+	var/ovipositor_check = (hive.allow_reliance_evo || hive.evogain_without_hiveleader_specialstate || (hive.living_hiveleader && hive.living_hiveleader.special_state))
 	if(caste && caste.evolution_allowed && (ovipositor_check || caste?.evolve_without_queen))
 		if(evolution_stored >= evolution_threshold)
 			if(!got_evolution_message)
@@ -118,7 +118,7 @@
 				else
 					use_current_aura = TRUE
 
-		if(leader_current_aura && hive && hive.living_xeno_queen && SSmapping.same_z_map(hive.living_xeno_queen.loc.z, loc.z)) //Same map as the Queen!
+		if(leader_current_aura && hive && hive.living_hiveleader && SSmapping.same_z_map(hive.living_hiveleader.loc.z, loc.z)) //Same map as the Queen!
 			use_leader_aura = TRUE
 
 		if(use_current_aura || use_leader_aura)
@@ -386,7 +386,7 @@ Make sure their actual health updates immediately.*/
 	var/atom/tracking_atom
 	switch(locator.tracker_type)
 		if(TRACKER_QUEEN)
-			tracking_atom = hive.living_xeno_queen
+			tracking_atom = hive.living_hiveleader
 		if(TRACKER_HIVE)
 			tracking_atom = hive.hive_location
 		if(TRACKER_LEADER)
@@ -563,6 +563,6 @@ Make sure their actual health updates immediately.*/
 		return TRUE //weeds, yes!
 	if(need_weeds)
 		return FALSE //needs weeds, doesn't have any
-	if(hive && hive.living_xeno_queen && !is_mainship_level(hive.living_xeno_queen.loc.z) && is_mainship_level(loc.z))
+	if(hive && hive.living_hiveleader && !is_mainship_level(hive.living_hiveleader.loc.z) && is_mainship_level(loc.z))
 		return FALSE //We are on the ship, but the Queen isn't
 	return TRUE //we have off-weed healing, and either we're on Almayer with the Queen, or we're on non-Almayer, or the Queen is dead, good enough!

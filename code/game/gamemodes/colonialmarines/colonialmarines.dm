@@ -442,10 +442,10 @@
 		var/datum/hive_status/hive
 		for(var/hivenumber in GLOB.hive_datum)
 			hive = GLOB.hive_datum[hivenumber]
-			if(!hive.xeno_queen_timer)
+			if(!hive.hiveleader_timer)
 				continue
 
-			if(!hive.living_xeno_queen && hive.xeno_queen_timer < world.time)
+			if(!hive.living_hiveleader && hive.hiveleader_timer < world.time)
 				xeno_message("The Hive is ready for a new Queen to evolve.", 3, hive.hivenumber)
 
 		if(!active_lz && world.time > lz_selection_timer)
@@ -480,9 +480,9 @@
 		if(!evolution_ovipositor_threshold && world.time >= SSticker.round_start_time + round_time_evolution_ovipositor)
 			for(var/hivenumber in GLOB.hive_datum)
 				hive = GLOB.hive_datum[hivenumber]
-				hive.evolution_without_ovipositor = FALSE
-				if(hive.living_xeno_queen && !hive.living_xeno_queen.ovipositor)
-					to_chat(hive.living_xeno_queen, SPAN_XENODANGER("It is time to settle down and let your children grow."))
+				hive.evogain_without_hiveleader_specialstate = FALSE
+				if(hive.living_hiveleader && !hive.living_hiveleader.special_state)
+					to_chat(hive.living_hiveleader, SPAN_XENODANGER("It is time to settle down and let your children grow."))
 			evolution_ovipositor_threshold = TRUE
 			msg_admin_niche("Xenomorphs now require the queen's ovipositor for evolution progress.")
 
@@ -596,7 +596,7 @@
 		hive = GLOB.hive_datum[cur_number]
 		if(hive.need_round_end_check && !hive.can_delay_round_end())
 			continue
-		if(hive.living_xeno_queen && !should_block_game_interaction(hive.living_xeno_queen.loc))
+		if(hive.living_hiveleader && !should_block_game_interaction(hive.living_hiveleader.loc))
 			//Some Queen is alive, we shouldn't end the game yet
 			.[2]++
 	return .
@@ -621,7 +621,7 @@
 		hive = GLOB.hive_datum[cur_number]
 		if(hive.need_round_end_check && !hive.can_delay_round_end())
 			continue
-		if(hive.living_xeno_queen && !should_block_game_interaction(hive.living_xeno_queen.loc))
+		if(hive.living_hiveleader && !should_block_game_interaction(hive.living_hiveleader.loc))
 			//Some Queen is alive, we shouldn't end the game yet
 			return
 

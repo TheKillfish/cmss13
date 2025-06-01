@@ -1,15 +1,18 @@
 /datum/hive_status
 	var/name = "Normal Hive"
 
-	// Used for the faction of the xenomorph. Not recommended to modify.
-	var/internal_faction
+	// What hivenumber?
+	var/hivenumber = XENO_HIVE_NORMAL
 
 	/// Short Hive ID as string used in stats reporting
 	var/reporting_id = "normal"
 
-	var/hivenumber = XENO_HIVE_NORMAL
-	var/mob/living/carbon/xenomorph/queen/living_xeno_queen
-	var/egg_planting_range = 15
+	// Used for the faction of the xenomorph. Not recommended to modify.
+	var/internal_faction
+
+	// What is the hivetype?
+	var/hivetype = /datum/hive_type/classic
+
 	var/slashing_allowed = XENO_SLASH_ALLOWED //This initial var allows the queen to turn on or off slashing. Slashing off means harm intent does much less damage.
 	var/construction_allowed = NORMAL_XENO //Who can place construction nodes for special structures
 	var/destruction_allowed = NORMAL_XENO //Who can destroy special structures
@@ -18,19 +21,17 @@
 	var/color = null
 	var/ui_color = null // Color for hive status collapsible buttons and xeno count list
 	var/prefix = ""
-	var/queen_leader_limit = 2
+
+	var/hiveleader_leader_limit = 2
 	var/list/open_xeno_leader_positions = list(1, 2) // Ordered list of xeno leader positions (indexes in xeno_leader_list) that are not occupied
 	var/list/xeno_leader_list[2] // Ordered list (i.e. index n holds the nth xeno leader)
-	var/stored_larva = 0
 
+	var/stored_larva = 0
 	///used by /datum/hive_status/proc/increase_larva_after_burst() to support non-integer increases to larva
 	var/partial_larva = 0
+
 	/// Assoc list of free slots available to specific castes
-	var/list/free_slots = list(
-		/datum/caste_datum/burrower = 1,
-		/datum/caste_datum/hivelord = 1,
-		/datum/caste_datum/carrier = 1
-	)
+	var/list/free_slots = list()
 	/// Assoc list of slots currently used by specific castes (for calculating free_slot usage)
 	var/list/used_slots = list()
 	/// list of living tier2 xenos
@@ -41,13 +42,23 @@
 	var/list/totalXenos = list()
 	/// list of previously living xenos (hardrefs currently)
 	var/list/total_dead_xenos = list()
-	var/xeno_queen_timer
+	/// Keeps track of delay for a new Hive Leader evolving
+	var/hiveleader_timer
 	var/isSlotOpen = TRUE //Set true for starting alerts only after the hive has reached its full potential
-	var/allowed_nest_distance = 15 //How far away do we allow nests from an ovied Queen. Default 15 tiles.
 	var/obj/effect/alien/resin/special/pylon/core/hive_location = null //Set to ref every time a core is built, for defining the hive location
 
+	// Hive modifiers
+	// Everything with _mod are additive, everything with _mult are multiplicative
+	// End values will not be based on defines, just plain numbers
+	var/hive_health_mult = 1
+	var/hive_plasma_mult = 1
+	var/hive_evo_need_mult = 1
+	var/hive_larva_gestation_mult = 1
+	var/hive_speed_mod = 0
+	var/hive_armor_mod = 0
+	var/hive_slash_mod = 0
+
 	var/tier_slot_multiplier = 1
-	var/larva_gestation_multiplier = 1
 	var/bonus_larva_spawn_chance = 1
 	var/hijack_burrowed_surge = FALSE //at hijack, start spawning lots of burrowed
 	/// how many burrowed is going to spawn during larva surge
@@ -57,12 +68,33 @@
 	var/evolution_rate = 3 // Only has use if dynamic_evolution is false
 	var/evolution_bonus = 0
 
-	var/allow_no_queen_actions = FALSE
-	var/allow_no_queen_evo = FALSE
-	var/evolution_without_ovipositor = TRUE //Temporary for the roundstart.
-	/// Set to false if you want to prevent evolutions into Queens
-	var/allow_queen_evolve = TRUE
-	/// Set to true if you want to prevent bursts and spawns of new xenos. Will also prevent healing if the queen no longer exists
+	/// The specific Hive Leader, determined further by a variable
+	var/mob/living/carbon/xenomorph/living_hiveleader
+	/// Whatever special structure has been decided as a substitute for a Hive Leader, also determined further by a variable
+	var/obj/effect/alien/resin/special/specialstructure
+	/// Is the Hive reliant on a Hive Leader?
+	var/hiveleader_reliance = TRUE
+	/// Is the Hive reliant on a special structure?
+	var/specialstructure_reliace = FALSE
+	/// Is the Hive allowed to do things that normally need a living Hive Leader or specific intact special structure to function?
+	var/allow_reliance_actions = FALSE
+	/// Is the Hive allowed to evolve without a living Hive Leader or specific intact special structure?
+	var/allow_reliance_evo = FALSE
+	/// Is the Hive able to build up Evo points without a Hive Leader being in a defined Special State (i.e. on Ovi for Queens)? Enabled on roundstart.
+	var/evogain_without_hiveleader_specialstate = TRUE
+	/// Is the Hive able to build up Evo points without a living Hive Leader?
+	var/evogain_without_hiveleader_living = FALSE
+	/// Is the Hive able to build up Evo points without a specific intact special structure?
+	var/evogain_without_specialstructure_active = FALSE
+	/// Is the Hive able to look at Tacmap without a Hive Leader being in a defined Special state?
+	var/tacmap_without_hiveleader_specialstate = FALSE
+	/// Is the Hive able to look at Tacmap without a living Hive Leader?
+	var/tacmap_without_hiveleader_living = FALSE
+	/// Is the Hive able to look at Tacmap without a specific intact special structure?
+	var/tacmap_without_specialstructure_active = FALSE
+	/// Set to false if you want to prevent evolutions into Hive Leaders
+	var/allow_hiveleader_evolve = TRUE
+	/// Set to true if you want to prevent bursts and spawns of new xenos. Will also prevent healing if the Hive Leader no longer exists
 	var/hardcore = FALSE
 	/// Set to false if you want to prevent getting burrowed larva from latejoin marines
 	var/latejoin_burrowed = TRUE
@@ -245,8 +277,8 @@
 
 	// Can only have one queen.
 	if(isqueen(X))
-		if(!living_xeno_queen && !should_block_game_interaction(X)) // Don't consider xenos in admin level
-			set_living_xeno_queen(X)
+		if(!living_hiveleader && !should_block_game_interaction(X)) // Don't consider xenos in admin level
+			set_living_hiveleader(X)
 
 	X.hivenumber = hivenumber
 	X.hive = src
@@ -277,14 +309,14 @@
 		return
 
 	// This might be a redundant check now that Queen/Destroy() checks, but doesn't hurt to double check
-	if(living_xeno_queen == xeno)
+	if(living_hiveleader == xeno)
 		var/mob/living/carbon/xenomorph/queen/next_queen = null
 		for(var/mob/living/carbon/xenomorph/queen/queen in totalXenos)
 			if(!should_block_game_interaction(queen) && queen != src && !QDELETED(queen))
 				next_queen = queen
 				break
 
-		set_living_xeno_queen(next_queen) // either null or a queen
+		set_living_hiveleader(next_queen) // either null or a queen
 
 	// We allow "soft" removals from the hive (the xeno still retains information about the hive)
 	// This is so that xenos can add themselves back to the hive if they should die or otherwise go "on leave" from the hive
@@ -312,33 +344,33 @@
 		hive_ui.update_xeno_counts()
 		hive_ui.xeno_removed(xeno)
 
-/datum/hive_status/proc/set_living_xeno_queen(mob/living/carbon/xenomorph/queen/queen)
+/datum/hive_status/proc/set_living_hiveleader(mob/living/carbon/xenomorph/queen/queen)
 	if(!queen)
 		SStracking.delete_leader("hive_[hivenumber]")
-		SStracking.stop_tracking("hive_[hivenumber]", living_xeno_queen)
+		SStracking.stop_tracking("hive_[hivenumber]", living_hiveleader)
 		SShive_status.wait = 10 SECONDS
 	else
 		SStracking.set_leader("hive_[hivenumber]", queen)
 		SShive_status.wait = 2 SECONDS
 
 	SEND_SIGNAL(src, COMSIG_HIVE_NEW_QUEEN, queen)
-	living_xeno_queen = queen
+	living_hiveleader = queen
 
 	recalculate_hive()
 
 /datum/hive_status/proc/recalculate_hive()
 	//No leaders for a Hive without a Queen!
-	queen_leader_limit = living_xeno_queen ? 4 : 0
+	hiveleader_leader_limit = living_hiveleader ? 4 : 0
 
-	if (length(xeno_leader_list) > queen_leader_limit)
+	if (length(xeno_leader_list) > hiveleader_leader_limit)
 		var/diff = 0
-		for (var/i in queen_leader_limit + 1 to length(xeno_leader_list))
+		for (var/i in hiveleader_leader_limit + 1 to length(xeno_leader_list))
 			if(!open_xeno_leader_positions.Remove(i))
 				remove_hive_leader(xeno_leader_list[i])
 			diff++
 		xeno_leader_list.len -= diff // Changing the size of xeno_leader_list needs to go at the end or else it won't iterate through the list properly
-	else if (length(xeno_leader_list) < queen_leader_limit)
-		for (var/i in length(xeno_leader_list) + 1 to queen_leader_limit)
+	else if (length(xeno_leader_list) < hiveleader_leader_limit)
+		for (var/i in length(xeno_leader_list) + 1 to hiveleader_leader_limit)
 			open_xeno_leader_positions += i
 			xeno_leader_list.len++
 
@@ -379,7 +411,7 @@
 		xeno.hud_update() // To remove leader star
 
 	// Need to maintain ascending order of open_xeno_leader_positions
-	for (var/i in 1 to queen_leader_limit)
+	for (var/i in 1 to hiveleader_leader_limit)
 		if (i > length(open_xeno_leader_positions) || open_xeno_leader_positions[i] > leader_num)
 			open_xeno_leader_positions.Insert(i, leader_num)
 			break
@@ -733,7 +765,7 @@
 	return length(hive_structures[name_ref])
 
 /datum/hive_status/proc/abandon_on_hijack()
-	var/area/hijacked_dropship = get_area(living_xeno_queen)
+	var/area/hijacked_dropship = get_area(living_hiveleader)
 	var/shipside_humans_weighted_count = 0
 	var/xenos_count = 0
 	for(var/name_ref in hive_structures)
@@ -820,8 +852,8 @@
 	var/spawning_area
 	if(hive_location)
 		spawning_area = hive_location
-	else if(living_xeno_queen)
-		spawning_area = living_xeno_queen
+	else if(living_hiveleader)
+		spawning_area = living_hiveleader
 	else
 		for(var/mob/living/carbon/xenomorpheus as anything in totalXenos)
 			if(islarva(xenomorpheus) || isxeno_builder(xenomorpheus)) //next to xenos that should be in a safe spot
@@ -878,7 +910,7 @@
 /datum/hive_status/proc/faction_is_ally(faction, ignore_queen_check = FALSE)
 	if(faction == internal_faction)
 		return TRUE
-	if(!ignore_queen_check && !living_xeno_queen)
+	if(!ignore_queen_check && !living_hiveleader)
 		return FALSE
 
 	return allies[faction]
@@ -1008,7 +1040,7 @@
 		to_chat(user, SPAN_WARNING("The hive has fallen, you can't join it!"))
 		return FALSE
 
-	if(!living_xeno_queen)
+	if(!living_hiveleader)
 		to_chat(user, SPAN_WARNING("The selected hive does not have a Queen!"))
 		return FALSE
 
@@ -1150,9 +1182,9 @@
 	construction_allowed = XENO_NOBODY
 	destruction_allowed = XENO_NOBODY
 	dynamic_evolution = FALSE
-	allow_no_queen_actions = TRUE
-	allow_no_queen_evo = TRUE
-	allow_queen_evolve = FALSE
+	allow_reliance_actions = TRUE
+	allow_reliance_evo = TRUE
+	allow_hiveleader_evolve = FALSE
 	latejoin_burrowed = FALSE
 
 /datum/hive_status/forsaken
@@ -1164,9 +1196,9 @@
 	ui_color = "#cc8ec4"
 
 	dynamic_evolution = FALSE
-	allow_no_queen_actions = TRUE
-	allow_no_queen_evo = TRUE
-	allow_queen_evolve = FALSE
+	allow_reliance_actions = TRUE
+	allow_reliance_evo = TRUE
+	allow_hiveleader_evolve = FALSE
 	latejoin_burrowed = FALSE
 
 	need_round_end_check = TRUE
@@ -1182,9 +1214,9 @@
 	latejoin_burrowed = FALSE
 
 	dynamic_evolution = FALSE
-	allow_queen_evolve = TRUE
-	evolution_without_ovipositor = FALSE
-	allow_no_queen_actions = TRUE
+	allow_hiveleader_evolve = TRUE
+	evogain_without_hiveleader_specialstate = FALSE
+	allow_reliance_actions = TRUE
 
 	///Can have many tutorials going at once.
 	hive_structures_limit = list(
@@ -1205,9 +1237,9 @@
 
 	ui_color = "#135029"
 	dynamic_evolution = FALSE
-	allow_no_queen_actions = TRUE
-	allow_no_queen_evo = TRUE
-	allow_queen_evolve = FALSE
+	allow_reliance_actions = TRUE
+	allow_reliance_evo = TRUE
+	allow_hiveleader_evolve = FALSE
 	latejoin_burrowed = FALSE
 
 	need_round_end_check = TRUE
@@ -1234,9 +1266,9 @@
 	color = "#80ff80"
 
 	dynamic_evolution = FALSE
-	allow_no_queen_actions = TRUE
-	allow_no_queen_evo = TRUE
-	allow_queen_evolve = FALSE
+	allow_reliance_actions = TRUE
+	allow_reliance_evo = TRUE
+	allow_hiveleader_evolve = FALSE
 	latejoin_burrowed = FALSE
 
 	var/mob/living/carbon/human/leader
@@ -1298,8 +1330,8 @@
 	ui_color ="#ad732c"
 
 	dynamic_evolution = FALSE
-	allow_queen_evolve = FALSE
-	allow_no_queen_evo = TRUE
+	allow_hiveleader_evolve = FALSE
+	allow_reliance_evo = TRUE
 	latejoin_burrowed = FALSE
 
 /datum/hive_status/corrupted/renegade/New()
@@ -1334,7 +1366,7 @@
 	return ..()
 
 /datum/hive_status/proc/on_queen_death() //break alliances on queen's death
-	if(allow_no_queen_actions || living_xeno_queen)
+	if(allow_reliance_actions || living_hiveleader)
 		return
 	var/broken_alliances = FALSE
 	for(var/faction in allies)
@@ -1354,7 +1386,7 @@
 		return
 	allies[faction] = should_ally
 
-	if(living_xeno_queen)
+	if(living_hiveleader)
 		if(allies[faction])
 			xeno_message(SPAN_XENOANNOUNCE("Our Queen set up an alliance with [faction]!"), 3, hivenumber)
 		else
@@ -1364,13 +1396,13 @@
 		var/datum/hive_status/target_hive = GLOB.hive_datum[number]
 		if(target_hive.name != faction)
 			continue
-		if(!target_hive.living_xeno_queen && !target_hive.allow_no_queen_actions)
+		if(!target_hive.living_hiveleader && !target_hive.allow_reliance_actions)
 			return
 		if(allies[faction])
-			xeno_message(SPAN_XENOANNOUNCE("We sense that [name] [living_xeno_queen ? "Queen " : ""]set up an alliance with us!"), 3, target_hive.hivenumber)
+			xeno_message(SPAN_XENOANNOUNCE("We sense that [name] [living_hiveleader ? "Queen " : ""]set up an alliance with us!"), 3, target_hive.hivenumber)
 			return
 
-		xeno_message(SPAN_XENOANNOUNCE("We sense that [name] [living_xeno_queen ? "Queen " : ""]broke the alliance with us!"), 3, target_hive.hivenumber)
+		xeno_message(SPAN_XENOANNOUNCE("We sense that [name] [living_hiveleader ? "Queen " : ""]broke the alliance with us!"), 3, target_hive.hivenumber)
 		if(target_hive.allies[name]) //autobreak alliance on betrayal
 			target_hive.change_stance(name, FALSE)
 

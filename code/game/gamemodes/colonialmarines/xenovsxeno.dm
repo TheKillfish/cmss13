@@ -1,4 +1,4 @@
-#define is_hive_living(hive) (!hive.hardcore || hive.living_xeno_queen)
+#define is_hive_living(hive) (!hive.hardcore || hive.living_hiveleader)
 
 /datum/game_mode/xenovs
 	name = GAMEMODE_HIVE_WARS

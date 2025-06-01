@@ -69,8 +69,8 @@
 		message_admins("[key_name_admin(user_xeno)] has deevolved [key_name_admin(target_xeno)]. Reason: [reason]")
 		log_admin("[key_name_admin(user_xeno)] has deevolved [key_name_admin(target_xeno)]. Reason: [reason]")
 
-		if(user_xeno.hive.living_xeno_queen && user_xeno.hive.living_xeno_queen.observed_xeno == target_xeno)
-			user_xeno.hive.living_xeno_queen.overwatch(new_xeno)
+		if(user_xeno.hive.living_hiveleader && user_xeno.hive.living_hiveleader.observed_xeno == target_xeno)
+			user_xeno.hive.living_hiveleader.overwatch(new_xeno)
 
 		if(new_xeno.ckey)
 			GLOB.deevolved_ckeys += new_xeno.ckey

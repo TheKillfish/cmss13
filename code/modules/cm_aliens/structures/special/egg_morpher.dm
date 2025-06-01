@@ -171,7 +171,7 @@
 	join_as_facehugger_from_this(user)
 
 /obj/effect/alien/resin/special/eggmorph/proc/get_egg_cooldown()
-	if(linked_hive?.living_xeno_queen?.ovipositor)
+	if(linked_hive?.living_hiveleader?.special_state)
 		return spawn_cooldown_length_ovi
 	return spawn_cooldown_length
 

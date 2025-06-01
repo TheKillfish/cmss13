@@ -183,7 +183,7 @@
 		SPAN_XENONOTICE("We designate a new [structure_template] construction. ([remaining_constructions]/[max_constructions] remaining)"), null, 5)
 	playsound(new_structure, "alien_resin_build", 25)
 
-	if(hive.living_xeno_queen)
+	if(hive.living_hiveleader)
 		xeno_message("Hive: A new <b>[structure_template]<b> construction has been designated at [sanitize_area(current_area_name)]!", 3, hivenumber)
 
 /mob/living/carbon/xenomorph/proc/make_marker(turf/target_turf)
@@ -219,7 +219,7 @@
 		NM.color = "#7a21c4"
 	else
 		NM.color = "#db6af1"
-	if(hive.living_xeno_queen)
+	if(hive.living_hiveleader)
 		var/current_area_name = get_area_name(target_turf)
 
 		for(var/mob/living/carbon/xenomorph/X in hive.totalXenos)

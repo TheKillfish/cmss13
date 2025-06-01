@@ -496,7 +496,7 @@
 	if(!user.hive)
 		to_chat(user, SPAN_WARNING("We don't belong to a hive!"))
 		return FALSE
-	if(!user.hive.living_xeno_queen)
+	if(!user.hive.living_hiveleader)
 		to_chat(user, SPAN_WARNING("Without a queen our psychic link is broken!"))
 		return FALSE
 	if(HAS_TRAIT(user, TRAIT_ABILITY_BURROWED) || user.is_mob_incapacitated() || user.buckled)
@@ -526,7 +526,7 @@
 		return FALSE
 	if(mods[ALT_CLICK])
 		var/list/options = list()
-		if(user.hive.living_xeno_queen)
+		if(user.hive.living_hiveleader)
 			// Don't need weakrefs to this or the hive core, since there's only one possible target.
 			options["Queen"] = list(null, TRACKER_QUEEN)
 
@@ -547,14 +547,14 @@
 			tracker_type = selected_data[2] // Tracker category
 		return
 
-	if(!user.hive.living_xeno_queen)
+	if(!user.hive.living_hiveleader)
 		to_chat(user, SPAN_WARNING("Our hive doesn't have a living queen!"))
 		return FALSE
 	if(HAS_TRAIT(user, TRAIT_ABILITY_BURROWED) || user.is_mob_incapacitated() || user.buckled)
 		return FALSE
 	//Xenos should not be able to track tunnels. Queen's weakref is equal to null if selected.
 	if(tracker_type != TRACKER_LEADER || !tracking_ref)
-		user.overwatch(user.hive.living_xeno_queen)
+		user.overwatch(user.hive.living_hiveleader)
 		return
 	user.overwatch(tracking_ref.resolve())
 

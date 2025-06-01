@@ -845,7 +845,7 @@ Additional game mode variables.
 	var/datum/mind/ghost_mind = player.mind
 	var/mob/living/original = ghost_mind.current
 	var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
-	if(hive.living_xeno_queen || !original || !original.client)
+	if(hive.living_hiveleader || !original || !original.client)
 		return
 
 	if(!length(GLOB.queen_spawns))
@@ -865,7 +865,7 @@ Additional game mode variables.
 	original.sight = BLIND
 
 	var/selected_spawn = tgui_input_list(original, "Where do you want you and your hive to spawn?", "Queen Spawn", spawn_list_map, QUEEN_SPAWN_TIMEOUT, theme="hive_status")
-	if(hive.living_xeno_queen)
+	if(hive.living_hiveleader)
 		to_chat(original, SPAN_XENOANNOUNCE("You have taken too long to pick a spawn location, a queen has already evolved before you."))
 		player.send_to_lobby()
 	if(!selected_spawn)
@@ -891,7 +891,7 @@ Additional game mode variables.
 /datum/game_mode/proc/transform_queen(datum/mind/ghost_mind, turf/xeno_turf, hivenumber = XENO_HIVE_NORMAL)
 	var/mob/living/original = ghost_mind.current
 	var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
-	if(hive.living_xeno_queen || !original || !original.client)
+	if(hive.living_hiveleader || !original || !original.client)
 		return
 
 	var/mob/living/carbon/xenomorph/new_queen = new /mob/living/carbon/xenomorph/queen(xeno_turf, null, hivenumber)

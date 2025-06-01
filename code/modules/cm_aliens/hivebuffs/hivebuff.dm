@@ -149,7 +149,7 @@
 	if(!on_engage(purchased_pylon))
 		if(engage_failure_message && istext(engage_failure_message))
 			to_chat(purchasing_mob, SPAN_XENONOTICE(engage_failure_message))
-			to_chat(hive.living_xeno_queen, SPAN_XENONOTICE(engage_failure_message))
+			to_chat(hive.living_hiveleader, SPAN_XENONOTICE(engage_failure_message))
 			return
 		else
 			stack_trace("[purchasing_mob] attempted to purchase a hive buff: [name] and failed to engage and returned an invalid failure message or no failure message.")
@@ -167,7 +167,7 @@
 	if(apply_on_new_xeno)
 		RegisterSignal(SSdcs, COMSIG_GLOB_XENO_SPAWN, PROC_REF(_handle_xenomorph_new))
 
-	var/involved = purchasing_mob == hive.living_xeno_queen ? "[key_name_admin(purchasing_mob)]" : "[key_name_admin(purchasing_mob)] and [key_name_admin(hive.living_xeno_queen)]"
+	var/involved = purchasing_mob == hive.living_hiveleader ? "[key_name_admin(purchasing_mob)]" : "[key_name_admin(purchasing_mob)] and [key_name_admin(hive.living_hiveleader)]"
 	message_admins("[involved] of [hive.hivenumber] has purchased a hive buff: [name].")
 
 	// Add to the relevant hive lists.
@@ -285,10 +285,10 @@
 	return TRUE
 
 /datum/hivebuff/proc/_seek_queen_approval(mob/living/purchasing_mob)
-	if(!hive.living_xeno_queen)
+	if(!hive.living_hiveleader)
 		return FALSE
 
-	var/mob/living/queen = hive.living_xeno_queen
+	var/mob/living/queen = hive.living_hiveleader
 	var/queen_response = tgui_alert(queen, "You are trying to Purchase [name] at a cost of [cost] [BUFF_POINTS_NAME]. Our hive has [hive.buff_points] [BUFF_POINTS_NAME]. Are you sure you want to purchase it? Description: [desc]", "Approve Hive Buff", list("Yes", "No"), 20 SECONDS)
 
 	return queen_response == "Yes"
@@ -384,13 +384,13 @@
 	radial_icon = "health_m"
 
 /datum/hivebuff/evo_buff/major/on_engage(obj/effect/alien/resin/special/pylon/purchased_pylon)
-	hive.allow_no_queen_evo = TRUE
+	hive.allow_reliance_evo = TRUE
 
 	return ..()
 
 /datum/hivebuff/evo_buff/major/on_cease()
 	. = ..()
-	hive.allow_no_queen_evo = FALSE
+	hive.allow_reliance_evo = FALSE
 
 /datum/hivebuff/game_ender_caste
 	name = "His Grace"

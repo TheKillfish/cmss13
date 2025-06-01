@@ -72,10 +72,10 @@
 
 	if(caste && caste.evolution_allowed)
 		evolve_progress = "[min(stored_evolution, evolution_threshold)]/[evolution_threshold]"
-		if(hive && !hive.allow_no_queen_evo && !caste?.evolve_without_queen)
-			if(!hive.living_xeno_queen)
+		if(hive && !hive.allow_reliance_evo && !caste?.evolve_without_queen)
+			if(!hive.living_hiveleader)
 				evolve_progress += " (NO QUEEN)"
-			else if(!(hive.living_xeno_queen.ovipositor || hive.evolution_without_ovipositor))
+			else if(!(hive.living_hiveleader.special_state || hive.evogain_without_hiveleader_specialstate))
 				evolve_progress += " (NO OVIPOSITOR)"
 
 	if(evolve_progress)
@@ -112,10 +112,10 @@
 		. += ""
 
 	if(hive)
-		if(!hive.living_xeno_queen)
+		if(!hive.living_hiveleader)
 			. += "Queen's Location: NO QUEEN"
 		else if(!(caste_type == XENO_CASTE_QUEEN))
-			. += "Queen's Location: [hive.living_xeno_queen.loc.loc.name]"
+			. += "Queen's Location: [hive.living_hiveleader.loc.loc.name]"
 
 		if(hive.slashing_allowed == XENO_SLASH_ALLOWED)
 			. += "Slashing: PERMITTED"
@@ -555,14 +555,14 @@
 /mob/living/carbon/xenomorph/proc/handle_xeno_leader_pheromones()
 	if(!hive)
 		return
-	var/mob/living/carbon/xenomorph/queen/Q = hive.living_xeno_queen
-	if(!Q || !Q.ovipositor || hive_pos == NORMAL_XENO || !Q.current_aura || !SSmapping.same_z_map(Q.loc.z, loc.z)) //We are no longer a leader, or the Queen attached to us has dropped from her ovi, disabled her pheromones or even died
+	var/mob/living/carbon/xenomorph/hiveleader = hive.living_hiveleader
+	if(!hiveleader || !hiveleader.special_state|| hive_pos == NORMAL_XENO || !hiveleader.current_aura || !SSmapping.same_z_map(hiveleader.loc.z, loc.z)) //We are no longer a leader, or the Queen attached to us has dropped from her ovi, disabled her pheromones or even died
 		leader_aura_strength = 0
 		leader_current_aura = ""
 		to_chat(src, SPAN_XENOWARNING("Our pheromones wane. The Queen is no longer granting us her pheromones."))
 	else
-		leader_aura_strength = Q.aura_strength
-		leader_current_aura = Q.current_aura
+		leader_aura_strength = hiveleader.aura_strength
+		leader_current_aura = hiveleader.current_aura
 		to_chat(src, SPAN_XENOWARNING("Our pheromones have changed. The Queen has new plans for the Hive."))
 	hud_set_pheromone()
 

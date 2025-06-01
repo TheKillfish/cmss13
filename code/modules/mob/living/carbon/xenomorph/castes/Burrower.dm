@@ -416,7 +416,7 @@
 		msg_admin_niche("[xenomorph]/([key_name(xenomorph)]) has named a new tunnel \"[msg]\".")
 		tunnelobj.tunnel_desc = "[msg]"
 
-	if(xenomorph.hive.living_xeno_queen || xenomorph.hive.allow_no_queen_actions)
+	if(xenomorph.hive.living_hiveleader || xenomorph.hive.allow_reliance_actions)
 		for(var/mob/living/carbon/xenomorph/target_for_message as anything in xenomorph.hive.totalXenos)
 			var/overwatch_target = XENO_OVERWATCH_TARGET_HREF
 			var/overwatch_src = XENO_OVERWATCH_SRC_HREF

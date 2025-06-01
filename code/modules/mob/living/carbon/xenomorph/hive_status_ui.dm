@@ -137,7 +137,7 @@
 		return UI_INTERACTIVE
 
 	// If the Queen died or is otherwise missing.
-	if(!assoc_hive.living_xeno_queen && !assoc_hive.allow_no_queen_actions)
+	if(!assoc_hive.living_hiveleader && !assoc_hive.allow_reliance_actions)
 		return UI_CLOSE
 
 /datum/hive_status_ui/ui_data(mob/user)
@@ -149,15 +149,15 @@
 	.["xeno_info"] = xeno_info
 	.["xeno_vitals"] = xeno_vitals
 	.["queen_location"] = null
-	if(assoc_hive.living_xeno_queen)
-		.["queen_location"] = get_area_name(assoc_hive.living_xeno_queen)
+	if(assoc_hive.living_hiveleader)
+		.["queen_location"] = get_area_name(assoc_hive.living_hiveleader)
 	.["hive_location"] = hive_location
 	.["burrowed_larva"] = burrowed_larva
 	.["evilution_level"] = evilution_level
 	.["pylon_status"] = pylon_status
 
 	var/mob/living/carbon/xenomorph/queen/Q = user
-	.["is_in_ovi"] = istype(Q) && Q.ovipositor
+	.["is_in_ovi"] = istype(Q) && Q.special_state
 
 /datum/hive_status_ui/ui_static_data(mob/user)
 	. = list()

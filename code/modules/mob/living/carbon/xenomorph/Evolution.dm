@@ -25,7 +25,7 @@ GLOBAL_LIST_EMPTY(deevolved_ckeys)
 	var/list/castes_available = caste.evolves_to.Copy()
 
 	// Also offer queen to any tier 1 that can evolve at all if there isn't a queen
-	if(tier == 1 && hive.allow_queen_evolve && !hive.living_xeno_queen)
+	if(tier == 1 && hive.allow_hiveleader_evolve && !hive.living_hiveleader)
 		castes_available |= XENO_CASTE_QUEEN
 
 	// Allow drones to evo into any T2 before first drop
@@ -63,8 +63,8 @@ GLOBAL_LIST_EMPTY(deevolved_ckeys)
 	if(!evolve_checks())
 		return
 
-	if(!hive.living_xeno_queen && castepick != XENO_CASTE_QUEEN && !islarva(src) && !hive.allow_no_queen_evo)
-		if(hive.xeno_queen_timer > world.time)
+	if(!hive.living_hiveleader && castepick != XENO_CASTE_QUEEN && !islarva(src) && !hive.allow_reliance_evo)
+		if(hive.hiveleader_timer > world.time)
 			to_chat(src, SPAN_WARNING("The Hive is shaken by the death of the last Queen. We can't find the strength to evolve."))
 		else
 			to_chat(src, SPAN_XENONOTICE("The hive currently has no Queen! We can't find the strength to evolve."))
@@ -75,13 +75,13 @@ GLOBAL_LIST_EMPTY(deevolved_ckeys)
 			to_chat(src, SPAN_WARNING("Nuh-uhh."))
 			return
 
-		if(SSticker.mode && hive.xeno_queen_timer > world.time)
-			to_chat(src, SPAN_WARNING("We must wait about [DisplayTimeText(hive.xeno_queen_timer - world.time, 1)] for the hive to recover from the previous Queen's death."))
+		if(SSticker.mode && hive.hiveleader_timer > world.time)
+			to_chat(src, SPAN_WARNING("We must wait about [DisplayTimeText(hive.hiveleader_timer - world.time, 1)] for the hive to recover from the previous Queen's death."))
 			return
 
 		var/required_plasma = min(500, plasma_max)
 		if(plasma_stored >= required_plasma)
-			if(hive.living_xeno_queen)
+			if(hive.living_hiveleader)
 				to_chat(src, SPAN_WARNING("There already is a living Queen."))
 				return
 		else
@@ -126,10 +126,10 @@ GLOBAL_LIST_EMPTY(deevolved_ckeys)
 		if(jobban_isbanned(src, XENO_CASTE_QUEEN))
 			to_chat(src, SPAN_WARNING("You are jobbanned from the Queen role."))
 			return
-		if(hive.living_xeno_queen)
+		if(hive.living_hiveleader)
 			to_chat(src, SPAN_WARNING("There already is a Queen."))
 			return
-		if(!hive.allow_queen_evolve)
+		if(!hive.allow_hiveleader_evolve)
 			to_chat(src, SPAN_WARNING("We can't find the strength to evolve into a Queen"))
 			return
 	else if(!can_evolve(castepick, potential_queens))
@@ -192,8 +192,8 @@ GLOBAL_LIST_EMPTY(deevolved_ckeys)
 	new_xeno.visible_message(SPAN_XENODANGER("A [new_xeno.caste.caste_type] emerges from the husk of [src]."),
 	SPAN_XENODANGER("We emerge in a greater form from the husk of our old body. For the hive!"))
 
-	if(hive.living_xeno_queen && hive.living_xeno_queen.observed_xeno == src)
-		hive.living_xeno_queen.overwatch(new_xeno)
+	if(hive.living_hiveleader && hive.living_hiveleader.observed_xeno == src)
+		hive.living_hiveleader.overwatch(new_xeno)
 
 	transfer_observers_to(new_xeno)
 	new_xeno._status_traits = _status_traits
@@ -354,7 +354,7 @@ GLOBAL_LIST_EMPTY(deevolved_ckeys)
 		return FALSE
 
 	var/alleged_queens = hive.get_potential_queen_count()
-	if(hive.allow_queen_evolve && !hive.living_xeno_queen && alleged_queens < 2 && isdrone(src))
+	if(hive.allow_hiveleader_evolve && !hive.living_hiveleader && alleged_queens < 2 && isdrone(src))
 		to_chat(src, SPAN_XENONOTICE("The hive currently has no sister able to become Queen! The survival of the hive requires you to be a Drone!"))
 		return FALSE
 
@@ -491,7 +491,7 @@ GLOBAL_LIST_EMPTY(deevolved_ckeys)
 	else if(tier == 2 && ((used_tier_3_slots / totalXenos) * hive.tier_slot_multiplier) >= 0.20 && castepick != XENO_CASTE_QUEEN)
 		to_chat(src, SPAN_WARNING("The hive cannot support another Tier 3, wait for either more aliens to be born or someone to die."))
 		return FALSE
-	else if(hive.allow_queen_evolve && !hive.living_xeno_queen && potential_queens == 1 && islarva(src) && castepick != XENO_CASTE_DRONE)
+	else if(hive.allow_hiveleader_evolve && !hive.living_hiveleader && potential_queens == 1 && islarva(src) && castepick != XENO_CASTE_DRONE)
 		to_chat(src, SPAN_XENONOTICE("The hive currently has no sister able to become Queen! The survival of the hive requires you to be a Drone!"))
 		return FALSE
 

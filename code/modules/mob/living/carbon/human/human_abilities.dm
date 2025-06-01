@@ -348,7 +348,7 @@ CULT
 	if(!hive)
 		return
 
-	if(!hive.living_xeno_queen && !hive.allow_no_queen_actions)
+	if(!hive.living_hiveleader && !hive.allow_reliance_actions)
 		return
 
 	return hive

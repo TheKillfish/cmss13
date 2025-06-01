@@ -351,8 +351,8 @@
 
 	var/datum/hive_status/main_hive = GLOB.hive_datum[XENO_HIVE_NORMAL]
 	var/list/queens = list()
-	if(main_hive.living_xeno_queen)
-		queens += list(list("designation" = main_hive.living_xeno_queen.full_designation, "caste_type" = main_hive.living_xeno_queen.name))
+	if(main_hive.living_hiveleader)
+		queens += list(list("designation" = main_hive.living_hiveleader.full_designation, "caste_type" = main_hive.living_hiveleader.name))
 	data["queens"] = queens
 	var/list/leaders = list()
 	for(var/mob/living/carbon/xenomorph/xeno_leader in main_hive.xeno_leader_list)

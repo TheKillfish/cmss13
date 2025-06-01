@@ -104,8 +104,6 @@
 
 #define FLAG_EMBRYO_PREDATOR 1 // Useful for passing down flags from an egg to the very moment an embryo is in someone
 
-#define XENO_STARTING_CRYSTAL 100 //How much building resource the queen gets to start with
-
 #define XENO_SLASH_ALLOWED 0
 #define XENO_SLASH_FORBIDDEN 1
 // Holds defines for /datum/caste_datum, which is the primary datum for the caste system,
@@ -522,113 +520,6 @@
 
 // Hive Pylon protection range
 #define XENO_HIVE_PYLON_PROTECTION_RANGE 8
-
-/////////////////////////////////////////////////////////////////////////////////////
-//
-// Default scaling values
-//
-// In the abscence of a scalar (documented below) these values are what are used
-// to scale xeno stats by age.
-//
-/////////////////////////////////////////////////////////////////////////////////////
-
-#define XENO_MULTIPLIER_HEALTH_YOUNG 1
-#define XENO_MULTIPLIER_HEALTH_MATURE 1.25
-#define XENO_MULTIPLIER_HEALTH_ELDER 1.4
-#define XENO_MULTIPLIER_HEALTH_ANCIENT 1.5
-#define XENO_MULTIPLIER_HEALTH_PRIMORDIAL 1.75
-
-#define XENO_MULTIPLIER_DAMAGE_YOUNG 1
-#define XENO_MULTIPLIER_DAMAGE_MATURE 1.2
-#define XENO_MULTIPLIER_DAMAGE_ELDER 1.3
-#define XENO_MULTIPLIER_DAMAGE_ANCIENT 1.35
-#define XENO_MULTIPLIER_DAMAGE_PRIMORDIAL 1.45
-
-#define XENO_MULTIPLIER_PLASMA_YOUNG 1
-#define XENO_MULTIPLIER_PLASMA_MATURE 1.25
-#define XENO_MULTIPLIER_PLASMA_ELDER 1.5
-#define XENO_MULTIPLIER_PLASMA_ANCIENT 2
-#define XENO_MULTIPLIER_PLASMA_PRIMORDIAL 2.25
-
-#define XENO_MULTIPLIER_CRYSTAL_YOUNG 1
-#define XENO_MULTIPLIER_CRYSTAL_MATURE 1.1
-#define XENO_MULTIPLIER_CRYSTAL_ELDER 1.2
-#define XENO_MULTIPLIER_CRYSTAL_ANCIENT 1.3
-#define XENO_MULTIPLIER_CRYSTAL_PRIMORDIAL 1.5
-
-#define XENO_MULTIPLIER_PLASMA_GAIN_YOUNG 1
-#define XENO_MULTIPLIER_PLASMA_GAIN_MATURE 1.2
-#define XENO_MULTIPLIER_PLASMA_GAIN_ELDER 1.4
-#define XENO_MULTIPLIER_PLASMA_GAIN_ANCIENT 1.6
-#define XENO_MULTIPLIER_PLASMA_GAIN_PRIMORDIAL 1.8
-
-#define XENO_MULTIPLIER_ARMOR_FACTOR_YOUNG 0.6
-#define XENO_MULTIPLIER_ARMOR_FACTOR_MATURE 1.1
-#define XENO_MULTIPLIER_ARMOR_FACTOR_ELDER 1.15
-#define XENO_MULTIPLIER_ARMOR_FACTOR_ANCIENT 1.20
-#define XENO_MULTIPLIER_ARMOR_FACTOR_PRIMORDIAL 1.30
-
-#define XENO_MULTIPLIER_EVASION_YOUNG 0.6
-#define XENO_MULTIPLIER_EVASION_MATURE 1.10
-#define XENO_MULTIPLIER_EVASION_ELDER 1.15
-#define XENO_MULTIPLIER_EVASION_ANCIENT 1.20
-#define XENO_MULTIPLIER_EVASION_PRIMORDIAL 1.3
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Scalars
-//
-// These are used to adjust caste scaling. Define in them in the caste datum definitions
-// for each age to override the default. Bear in mind that these scale from the base caste
-// values; they are NOT multiplicative. The actual variables for doing that are down below.
-//
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-#define XENO_SCALAR_HEALTH_NONE 1
-#define XENO_SCALAR_HEALTH_LOW 1.1
-#define XENO_SCALAR_HEALTH_LOWMED 1.15
-#define XENO_SCALAR_HEALTH_MED 1.2
-#define XENO_SCALAR_HEALTH_MEDHIGH 1.25
-#define XENO_SCALAR_HEALTH_HIGH 1.3
-#define XENO_SCALAR_HEALTH_VERYHIGH 1.35
-#define XENO_SCALAR_HEALTH_ULTRAHIGH 1.4
-#define XENO_SCALAR_HEALTH_IMMORTAL 1.5
-#define XENO_SCALAR_HEALTH_OHLAWD 1.7
-
-#define XENO_SCALAR_DAMAGE_NONE 1
-#define XENO_SCALAR_DAMAGE_LOW 1.1
-#define XENO_SCALAR_DAMAGE_MED 1.2
-#define XENO_SCALAR_DAMAGE_HIGH 1.3
-#define XENO_SCALAR_DAMAGE_VERYHIGH 1.4
-#define XENO_SCALAR_DAMAGE_ULTRAHIGH 1.5
-
-#define XENO_SCALAR_PLASMA_NONE 1
-#define XENO_SCALAR_PLASMA_LOW 1.25
-#define XENO_SCALAR_PLASMA_MED 1.5
-#define XENO_SCALAR_PLASMA_HIGH 1.75
-#define XENO_SCALAR_PLASMA_VERYHIGH 2
-#define XENO_SCALAR_PLASMA_ULTRAHIGH 2.25
-
-#define XENO_SCALAR_PLASMA_GAIN_NONE 1
-#define XENO_SCALAR_PLASMA_GAIN_LOW 1.15
-#define XENO_SCALAR_PLASMA_GAIN_MED 1.3
-#define XENO_SCALAR_PLASMA_GAIN_HIGH 1.45
-#define XENO_SCALAR_PLASMA_GAIN_VERYHIGH 1.6
-#define XENO_SCALAR_PLASMA_GAIN_ULTRAHIGH 1.75
-
-#define XENO_SCALAR_ARMORFACTOR_NONE 1
-#define XENO_SCALAR_ARMORFACTOR_LOW 1.05
-#define XENO_SCALAR_ARMORFACTOR_MED 1.1
-#define XENO_SCALAR_ARMORFACTOR_HIGH 1.15
-#define XENO_SCALAR_ARMORFACTOR_VERYHIGH 1.20
-#define XENO_SCALAR_ARMORFACTOR_ULTRAHIGH 1.25
-
-#define XENO_SCALAR_EVASION_NONE 1
-#define XENO_SCALAR_EVASION_LOW 1.05
-#define XENO_SCALAR_EVASION_MED 1.1
-#define XENO_SCALAR_EVASION_HIGH 1.15
-#define XENO_SCALAR_EVASION_VERYHIGH 1.20
-#define XENO_SCALAR_EVASION_ULTRAHIGH 1.25
 
 #define XENO_STRUCTURE_BUILD_TIME    20
 

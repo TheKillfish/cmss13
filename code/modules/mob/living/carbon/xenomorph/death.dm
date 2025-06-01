@@ -69,15 +69,15 @@ GLOBAL_VAR_INIT(total_dead_xenos, 0)
 					if(count)
 						message_alien_candidates(players_with_xeno_pref, dequeued = count)
 
-			if(hive && hive.living_xeno_queen == src)
+			if(hive && hive.living_hiveleader == src)
 				notify_ghosts(header = "Queen Death", message = "The Queen has been slain!", source = src, action = NOTIFY_ORBIT)
 				xeno_message(SPAN_XENOANNOUNCE("A sudden tremor ripples through the hive... the Queen has been slain! Vengeance!"),3, hivenumber)
 				hive.slashing_allowed = XENO_SLASH_ALLOWED
-				hive.set_living_xeno_queen(null)
+				hive.set_living_hiveleader(null)
 				//on the off chance there was somehow two queen alive
 				for(var/mob/living/carbon/xenomorph/queen/Q in GLOB.living_xeno_list)
 					if(!QDELETED(Q) && Q != src && Q.hivenumber == hivenumber)
-						hive.set_living_xeno_queen(Q)
+						hive.set_living_hiveleader(Q)
 						break
 				hive.on_queen_death()
 				hive.handle_xeno_leader_pheromones()
@@ -92,14 +92,14 @@ GLOBAL_VAR_INIT(total_dead_xenos, 0)
 		else
 			playsound(loc, prob(50) == 1 ? 'sound/voice/alien_death.ogg' : 'sound/voice/alien_death2.ogg', 25, 1)
 		var/area/A = get_area(src)
-		if(hive && hive.living_xeno_queen)
+		if(hive && hive.living_hiveleader)
 			if(!HAS_TRAIT(src, TRAIT_TEMPORARILY_MUTED))
 				xeno_message("Hive: [src] has <b>died</b>[A? " at [sanitize_area(A.name)]":""]! [banished ? "They were banished from the hive." : ""]", death_fontsize, hivenumber)
 
 	if(hive && IS_XENO_LEADER(src)) //Strip them from the Xeno leader list, if they are indexed in here
 		hive.remove_hive_leader(src)
-		if(hive.living_xeno_queen)
-			to_chat(hive.living_xeno_queen, SPAN_XENONOTICE("A leader has fallen!")) //alert queens so they can choose another leader
+		if(hive.living_hiveleader)
+			to_chat(hive.living_hiveleader, SPAN_XENONOTICE("A leader has fallen!")) //alert queens so they can choose another leader
 
 	hud_update() //updates the overwatch hud to remove the upgrade chevrons, gold star, etc
 	SSminimaps.remove_marker(src)

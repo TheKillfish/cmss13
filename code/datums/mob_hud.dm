@@ -599,7 +599,7 @@ GLOBAL_LIST_INIT_TYPED(huds, /datum/mob_hud, list(
 	holder.icon_state = "hudblank"
 	if (stat != DEAD && hivenumber && hivenumber <= GLOB.hive_datum)
 		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
-		var/mob/living/carbon/xenomorph/queen/Q = hive.living_xeno_queen
+		var/mob/living/carbon/xenomorph/queen/Q = hive.living_hiveleader
 		if (Q && Q.observed_xeno == src)
 			holder.icon_state = "queen_overwatch"
 	hud_list[QUEEN_OVERWATCH_HUD] = holder

@@ -47,6 +47,6 @@ GLOBAL_LIST_INIT(hive_state_queen, setup_hive_queen_states())
 	if(. == UI_CLOSE)
 		return
 
-	if(hive.living_xeno_queen == user)
+	if(hive.living_hiveleader == user)
 		return UI_INTERACTIVE
 	return UI_UPDATE
