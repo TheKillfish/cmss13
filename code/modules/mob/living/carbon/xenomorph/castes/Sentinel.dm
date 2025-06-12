@@ -14,7 +14,7 @@
 	speed = XENO_SPEED_TIER_7
 
 	caste_desc = "A weak ranged combat alien."
-	evolves_to = list(XENO_CASTE_SPITTER)
+	evolves_to = list(XENO_CASTE_SPITTER, XENO_CASTE_CENTURION)
 	deevolves_to = list(XENO_CASTE_LARVA)
 	acid_level = 1
 

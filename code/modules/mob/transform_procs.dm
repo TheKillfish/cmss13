@@ -88,6 +88,8 @@
 				new_xeno = new /mob/living/carbon/xenomorph/carrier(loc)
 			if(XENO_CASTE_SPITTER)
 				new_xeno = new /mob/living/carbon/xenomorph/spitter(loc)
+			if(XENO_CASTE_CENTURION)
+				new_xeno = new /mob/living/carbon/xenomorph/centurion(loc)
 			if(XENO_CASTE_HIVELORD)
 				new_xeno = new /mob/living/carbon/xenomorph/hivelord(loc)
 			if(XENO_CASTE_RAVAGER)
