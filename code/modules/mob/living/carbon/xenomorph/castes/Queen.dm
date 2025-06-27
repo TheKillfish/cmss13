@@ -297,12 +297,10 @@
 	var/current_queen_eye = null /// Used for an onscreen hostile proximity checker
 	// Building speed modifier
 	var/building_mult = 1 /// This gets modified based on if enemies are nearby Queen
-	// Core Stamina vars
+	// Queen Stamina vars
 	var/queen_stamina = 0 /// Current stamina
 	var/stamina_cap = 600 /// Maximum stamina
 	var/stamina_tier = 0 /// Which tier increment is stamina at? 6 is highest, 0 is lowest.
-	var/stamina_extras_threshold = 300 /// Threshold for stamina extra effects to activate after recovering from full depletion.
-	var/stamina_extras_active = FALSE /// Are extra effects related to stamina active or not?
 	var/stamina_gain = 2 /// How much stamina Queen gains per second while on ovi (adjusted for tick updates)
 	// Stamina Drain vars
 	var/stamina_drain = -2 /// How much stamina Queen loses per second while off ovi (adjusted for tick updates)
@@ -310,10 +308,8 @@
 	var/stamina_drain_delay = 60 /// How long after getting off ovi will drain be delayed for?
 	var/stamina_drain_delay_active = FALSE /// Is the delay for stamina draining active?
 	// Screech Accuracy/Scatter Degredation
-	var/screech_deg_str = 90 // How much is
-	var/screech_deg_dur = 8 SECONDS
-	// Brutality vars
-	var/smashing = FALSE /// Same as Predalien to prevent grab shenanigans
+	var/screech_deg_str = 90 /// How much is human gun accuracy/scatter degraded when affected by Queen's screech?
+	var/screech_deg_dur = 8 SECONDS /// How long does the accuracy/scatter degredation last?
 
 	tileoffset = 0
 	viewsize = 12
@@ -339,7 +335,6 @@
 		/datum/action/xeno_action/activable/frontal_assault, // Second macro
 		/datum/action/xeno_action/onclick/disarming_sweep, // Third macro
 		/datum/action/xeno_action/activable/ram, // Fourth macro, needs to be mature to use
-		/datum/action/xeno_action/activable/brutality, // Needs to be mature to use
 		/datum/action/xeno_action/activable/xeno_spit/queen, // Fifth macro
 		/datum/action/xeno_action/activable/gut,
 		// Immobile Abilities
@@ -558,20 +553,16 @@
 				overwatch(observed_xeno, TRUE)
 
 		switch(queen_stamina)
-			if(0 to 99)
+			if(0 to 120)
 				stamina_tier = 0
-			if(100 to 199)
+			if(121 to 240)
 				stamina_tier = 1
-			if(200 to 299)
+			if(241 to 360)
 				stamina_tier = 2
-			if(300 to 399)
+			if(361 to 480)
 				stamina_tier = 3
-			if(400 to 499)
+			if(481 to 600)
 				stamina_tier = 4
-			if(500)
-				stamina_tier = 5
-			if(600)
-				stamina_tier = 6
 
 		if(ovipositor && !is_mob_incapacitated(TRUE))
 			egg_amount += 0.07 //one egg approximately every 30 seconds
@@ -598,7 +589,7 @@
 
 		if(!ovipositor)
 			if(stamina_drain_delay_active == TRUE)
-				if(hostiles_in_proximity(get_turf(src)))
+				if(hostiles_in_proximity(get_turf(src))) // If someone is near the Queen, disable this grace period
 					stamina_drain_delay_active = FALSE
 				else
 					stamina_drain_delay_countdown(stamina_drain)
@@ -606,10 +597,7 @@
 			if(queen_stamina > 0)
 				if(stamina_drain_delay_active != TRUE)
 					modify_stamina(stamina_drain) // Also approx. 1 stamina per second
-				stamina_speed_buff(stamina_tier, stamina_extras_active)
-
-			if(queen_stamina <= 0)
-				stamina_extras_active = FALSE
+				stamina_speed_buff(stamina_tier)
 
 /mob/living/carbon/xenomorph/queen/proc/hostiles_in_proximity(turf/current_turf)
 	var/list/mobs_in_range = oviewers(7, current_turf)
@@ -643,16 +631,12 @@
 		if(0)
 			speed_buff = 0
 		if(1)
-			speed_buff = -0.2
+			speed_buff = -0.3
 		if(2)
-			speed_buff = -0.4
-		if(3)
 			speed_buff = -0.6
+		if(3)
+			speed_buff = -0.9
 		if(4)
-			speed_buff = -0.8
-		if(5)
-			speed_buff = -1
-		if(6)
 			speed_buff = -1.2
 	speed_modifier = speed_buff
 	recalculate_speed()
@@ -666,7 +650,7 @@
 	. += "Leaders: [xeno_leader_num] / [hive?.queen_leader_limit]"
 	. += "Royal Resin: [hive?.buff_points]"
 	if(queen_stamina != 0)
-		. += "Impatience: [round((queen_stamina / stamina_cap) * 100, 0.01)]%, Tier [stamina_tier]"
+		. += "Vigor: [round((queen_stamina / stamina_cap) * 100, 0.01)]%"
 	if(!is_mature && maturity_timer_id != TIMER_ID_NULL)
 		. += "Maturity: [time2text(timeleft(maturity_timer_id), "mm:ss")] remaining"
 
@@ -1005,18 +989,14 @@
 	for(var/mob/living/carbon/xenomorph/leader in hive.xeno_leader_list)
 		leader.handle_xeno_leader_pheromones()
 
-	if(queen_stamina >= stamina_extras_threshold)
-		stamina_extras_active = TRUE
 	stamina_drain_delay_active = TRUE
 
 	if(stamina_tier != 0)
 		switch(stamina_tier)
+			if(1 to 3)
+				emote("tail")
 			if(4)
-				src.emote("tail")
-			if(5)
-				src.emote("tail")
-			if(6)
-				src.emote("roar")
+				emote("roar")
 
 	if(!instant_dismount)
 		xeno_message(SPAN_XENOANNOUNCE("The Queen has shed her ovipositor, evolution progress paused."), 3, hivenumber)

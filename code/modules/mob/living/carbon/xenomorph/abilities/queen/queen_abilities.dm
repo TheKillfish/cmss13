@@ -20,7 +20,7 @@
 	action_icon_state = "screech"
 	macro_path = /datum/action/xeno_action/verb/verb_screech
 	action_type = XENO_ACTION_CLICK
-	xeno_cooldown = 50 SECONDS
+	xeno_cooldown = 60 SECONDS
 	plasma_cost = 250
 	cooldown_message = "You feel your throat muscles vibrate. You are ready to screech again."
 	no_cooldown_msg = FALSE // Needed for onclick actions
@@ -40,7 +40,7 @@
 /datum/action/xeno_action/activable/frontal_assault
 	name = "Frontal Assault"
 	action_icon_state = "rav_eviscerate"
-	//macro_path = /datum/action/xeno_action/verb/verb_frontal_assault
+	macro_path = /datum/action/xeno_action/verb/verb_frontal_assault
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
 	xeno_cooldown = 10 SECONDS
@@ -50,7 +50,7 @@
 /datum/action/xeno_action/onclick/disarming_sweep
 	name = "Disarming Sweep"
 	action_icon_state = "tail_sweep"
-	//macro_path = /datum/action/xeno_action/verb/verb_disarming_sweep
+	macro_path = /datum/action/xeno_action/verb/verb_disarming_sweep
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_3
 	xeno_cooldown = 8 SECONDS
@@ -60,7 +60,7 @@
 /datum/action/xeno_action/activable/ram
 	name = "Ram"
 	action_icon_state = "ram"
-	//macro_path = /datum/action/xeno_action/verb/verb_ram
+	macro_path = /datum/action/xeno_action/verb/verb_ram
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_4
 	xeno_cooldown = 14 SECONDS
@@ -80,18 +80,6 @@
 	ram_callbacks[/mob] = DYNAMIC(/mob/living/carbon/xenomorph/queen/proc/ram_mob)
 	ram_callbacks[/obj] = DYNAMIC(/mob/living/carbon/xenomorph/queen/proc/ram_obj)
 	ram_callbacks[/turf] = DYNAMIC(/mob/living/carbon/xenomorph/queen/proc/ram_turf)
-
-/datum/action/xeno_action/activable/brutality
-	name = "Brutality"
-	action_icon_state = "lunge"
-	//macro_path = /datum/action/xeno_action/verb/verb_brutality
-	action_type = XENO_ACTION_CLICK
-	xeno_cooldown = 30 SECONDS
-	plasma_cost = 200
-	maturity_restricted = TRUE
-	hide_on_special_state = TRUE
-	// Configs
-	var/max_range = 3
 
 /datum/action/xeno_action/activable/gut
 	name = "Gut (200)"

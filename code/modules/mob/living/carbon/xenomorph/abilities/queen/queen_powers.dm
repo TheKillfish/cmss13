@@ -633,12 +633,6 @@
 	if(!check_and_use_plasma_owner())
 		return
 
-	var/cooldown_mult = 1
-	if(xeno.stamina_tier <= 2)
-		cooldown_mult = 1.5
-	else
-		cooldown_mult = 1
-
 	//screech is so powerful it kills huggers in our hands
 	if(istype(xeno.r_hand, /obj/item/clothing/mask/facehugger))
 		var/obj/item/clothing/mask/facehugger/hugger = xeno.r_hand
@@ -669,7 +663,7 @@
 			continue
 		mob.handle_queen_screech(xeno, mobs_in_view)
 
-	apply_cooldown(cooldown_mult)
+	apply_cooldown()
 
 	return ..()
 
@@ -806,8 +800,6 @@
 
 			carbon_target.apply_armoured_damage(get_xeno_damage_slash(carbon_target, xeno.melee_damage_upper * 1.4), ARMOR_MELEE, BRUTE, random_limb_target)
 			carbon_target.last_damage_data = create_cause_data(xeno.caste_type, xeno)
-			if(xeno.stamina_extras_active && ishuman(carbon_target))
-				affected_limb.add_bleeding(damage_amount = xeno.melee_damage_lower)
 
 			xeno.flick_attack_overlay(carbon_target, "slash")
 			to_chat(carbon_target, SPAN_DANGER("[xeno] violently gashes you in [affected_limb ? affected_limb.display_name : "chest"]!"))
@@ -840,7 +832,7 @@
 		if(HAS_TRAIT(carbon_target, TRAIT_NESTED))
 			continue
 
-		if(xeno.stamina_extras_active && carbon_target.mob_size < MOB_SIZE_BIG)
+		if(carbon_target.slowed && carbon_target.mob_size < MOB_SIZE_BIG)
 			new /datum/effects/xeno_slow(carbon_target, xeno, ttl = get_xeno_stun_duration(carbon_target, 2.5 SECONDS))
 			carbon_target.apply_effect(get_xeno_stun_duration(carbon_target, 1.5 SECONDS), WEAKEN)
 			to_chat(carbon_target, SPAN_XENOWARNING("You are swept off your feet by [xeno]'s tail sweep!"))
@@ -886,24 +878,10 @@
 
 	xeno.face_atom(target)
 
-	switch(xeno.stamina_tier)
-		if(0)
-			windup_duration = 3 SECONDS
-		if(1)
-			windup_duration = 2.5 SECONDS
-		if(2)
-			windup_duration = 2 SECONDS
-		if(3)
-			windup_duration = 1.5 SECONDS
-		if(4)
-			windup_duration = 1 SECONDS
-		if(5, 6)
-			windup_duration = 0.5 SECONDS
-
 	ADD_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
 	xeno.anchored = TRUE
 
-	if(!do_after(xeno, windup_duration, INTERRUPT_NO_NEEDHAND, BUSY_ICON_HOSTILE))
+	if(!do_after(xeno, 2 SECONDS, INTERRUPT_NO_NEEDHAND, BUSY_ICON_HOSTILE))
 		// Just in case
 		to_chat(xeno, SPAN_XENODANGER("We fail to charge!"))
 		REMOVE_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
@@ -1196,112 +1174,6 @@
 		turf_launch_collision(target)
 		ramAction.impassable_collide = TRUE
 		return FALSE
-
-/datum/action/xeno_action/activable/brutality/use_ability(atom/target)
-	var/mob/living/carbon/xenomorph/queen/xeno = owner
-
-	if(!xeno.check_state() || !action_cooldown_check())
-		return
-
-	if(!target || target.layer >= FLY_LAYER || !isturf(xeno.loc))
-		return
-
-	if(xeno.can_not_harm(target) || !iscarbon(target))
-		return
-
-	if(get_dist(xeno, target) > max_range)
-		return
-
-	var/mob/living/carbon/carbon_target = target
-	if(carbon_target.stat == DEAD)
-		return
-
-	if(!check_and_use_plasma_owner())
-		return
-
-	var/stamina_scaled_damage = 0
-	switch(xeno.stamina_tier)
-		if(0, 2)
-			stamina_scaled_damage = 80
-		if(3, 4)
-			stamina_scaled_damage = 120
-		if(5, 6)
-			stamina_scaled_damage = 160
-
-	xeno.throw_atom(get_step_towards(target, xeno), max_range, SPEED_FAST, xeno, tracking = TRUE)
-
-	if(xeno.Adjacent(carbon_target) && xeno.start_pulling(carbon_target, TRUE))
-		xeno.face_atom(target)
-		if(ishuman(carbon_target))
-			INVOKE_ASYNC(carbon_target, TYPE_PROC_REF(/mob, emote), "scream")
-		playsound(carbon_target, 'sound/effects/bang.ogg', 25, 0)
-		animate(carbon_target, pixel_y = carbon_target.pixel_y + 16, time = 8, easing = SINE_EASING)
-
-	if(!do_after(xeno, 4 SECONDS, INTERRUPT_ALL, BUSY_ICON_HOSTILE, carbon_target) || carbon_target.stat == DEAD)
-		xeno.stop_pulling()
-		animate(carbon_target, pixel_y = 0, time = 4, easing = SINE_EASING)
-		xeno.visible_message(SPAN_XENOWARNING("[xeno] abruptly drops [carbon_target]!"))
-		apply_cooldown(0.15)
-		return
-
-	animate_slam_and_throw(xeno, carbon_target, stamina_scaled_damage)
-	apply_cooldown()
-
-	return ..()
-
-/datum/action/xeno_action/activable/brutality/proc/animate_slam_and_throw(mob/living/carbon/xenomorph/queen/xeno, mob/living/carbon/target, damage)
-	xeno.emote("roar")
-	animate(target, pixel_y = target.pixel_y + 16, time = 4, easing = SINE_EASING)
-	sleep(6)
-	playsound(target, "punch", 40, 0)
-	playsound(target,"slam", 50, 1)
-	animate(target, pixel_y = 0, time = 4, easing = BOUNCE_EASING)
-	target.apply_armoured_damage(get_xeno_damage_slash(target, damage), ARMOR_MELEE, BRUTE, "chest", 20)
-	sleep(4)
-	playsound(target,'sound/weapons/alien_claw_block.ogg', 75, 1)
-	xeno.face_atom(target)
-	var/facing = get_dir(xeno, target)
-	xeno.animation_attack_on(target)
-	xeno.flick_attack_overlay(target, "disarm")
-	xeno.throw_carbon(target, facing, 4, SPEED_VERY_FAST, shake_camera = TRUE, immobilize = TRUE)
-	target.last_damage_data = create_cause_data(initial(xeno.caste_type), xeno)
-
-/mob/living/carbon/xenomorph/queen/throw_item(atom/target)
-	toggle_throw_mode(THROW_MODE_OFF)
-
-/mob/living/carbon/xenomorph/queen/stop_pulling()
-	if(isliving(pulling) && smashing)
-		smashing = FALSE // To avoid extreme cases of stopping a lunge then quickly pulling and stopping to pull someone else
-		var/mob/living/smashed = pulling
-		if(isxeno(smashed))
-			smashed.set_effect(0, WEAKEN)
-		smashed.set_effect(0, STUN)
-	return ..()
-
-/mob/living/carbon/xenomorph/queen/start_pulling(atom/movable/movable_atom, brutality)
-	if(!check_state())
-		return FALSE
-
-	if(!isliving(movable_atom))
-		return FALSE
-	var/mob/living/living_mob = movable_atom
-	var/should_neckgrab = !(src.can_not_harm(living_mob)) && brutality
-
-
-	. = ..(living_mob, brutality, should_neckgrab)
-
-	if(. && iscarbon(living_mob))
-		if(should_neckgrab)
-			visible_message(SPAN_XENOWARNING("[src] concusses [living_mob] and lifts them by the neck!"),
-			SPAN_XENOWARNING("We concuss [living_mob] and lift them by the neck, preparing to smash them into the ground!"))
-			smashing = TRUE
-			living_mob.face_atom(src)
-			living_mob.drop_held_items()
-			var/duration = get_xeno_stun_duration(living_mob, 4)
-			if(isxeno(living_mob))
-				living_mob.KnockDown(duration)
-			living_mob.Stun(duration)
-			addtimer(VARSET_CALLBACK(src, smashing, FALSE), duration)
 
 /datum/action/xeno_action/activable/gut/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/queen/xeno = owner
