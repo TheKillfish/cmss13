@@ -69,7 +69,7 @@
 	hide_on_special_state = TRUE
 	// Configs
 	var/max_distance = 5
-	var/windup_duration = 3 SECONDS
+	var/windup_duration = 2 SECONDS
 	var/list/ram_callbacks = null
 	var/impassable_collide = FALSE
 	var/mob/living/carbon/hit_mob = null

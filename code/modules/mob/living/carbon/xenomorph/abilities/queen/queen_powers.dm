@@ -881,7 +881,7 @@
 	ADD_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
 	xeno.anchored = TRUE
 
-	if(!do_after(xeno, 2 SECONDS, INTERRUPT_NO_NEEDHAND, BUSY_ICON_HOSTILE))
+	if(!do_after(xeno, windup_duration, INTERRUPT_NO_NEEDHAND, BUSY_ICON_HOSTILE))
 		// Just in case
 		to_chat(xeno, SPAN_XENODANGER("We fail to charge!"))
 		REMOVE_TRAIT(xeno, TRAIT_IMMOBILIZED, TRAIT_SOURCE_ABILITY("Queen Ram"))
