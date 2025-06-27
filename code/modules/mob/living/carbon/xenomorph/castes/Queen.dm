@@ -302,10 +302,15 @@
 	var/stamina_cap = 600 /// Maximum stamina
 	var/stamina_tier = 0 /// Which tier increment is stamina at? 6 is highest, 0 is lowest.
 	var/stamina_gain = 2 /// How much stamina Queen gains per second while on ovi (adjusted for tick updates)
+	var/last_stamina_tier = 0 /// The previous stamina tier
+	// Queen Stamina Speed Buff
+	var/speed_per_tier = 0.3 /// How much speed Queen gets when going off Ovi, multiplied by stamina_tier for desired result
+	// Queen Stamina Plasma Gain
+	var/plasma_per_tier = 3.5 /// How much plasma does the Queen get while off ovi with stamina, multiplied by stamina_tier for desired result
 	// Stamina Drain vars
 	var/stamina_drain = -2 /// How much stamina Queen loses per second while off ovi (adjusted for tick updates)
-	var/stamina_drain_delay_duration = 60
-	var/stamina_drain_delay = 60 /// How long after getting off ovi will drain be delayed for?
+	var/stamina_drain_delay_timer_id = TIMER_ID_NULL
+	var/stamina_drain_delay = 60 SECONDS /// How long after getting off ovi will drain be delayed for?
 	var/stamina_drain_delay_active = FALSE /// Is the delay for stamina draining active?
 	// Screech Accuracy/Scatter Degredation
 	var/screech_deg_str = 90 /// How much is human gun accuracy/scatter degraded when affected by Queen's screech?
@@ -591,13 +596,19 @@
 			if(stamina_drain_delay_active == TRUE)
 				if(hostiles_in_proximity(get_turf(src))) // If someone is near the Queen, disable this grace period
 					stamina_drain_delay_active = FALSE
+					if(stamina_drain_delay_timer_id != TIMER_ID_NULL)
+						deltimer(stamina_drain_delay_timer_id)
+						stamina_drain_delay_timer_id = TIMER_ID_NULL
 				else
-					stamina_drain_delay_countdown(stamina_drain)
+					stamina_drain_delay_timer_id = addtimer(CALLBACK(src, VARSET_CALLBACK(src, stamina_drain_delay_active, FALSE)), stamina_drain_delay, TIMER_STOPPABLE)
 
 			if(queen_stamina > 0)
 				if(stamina_drain_delay_active != TRUE)
 					modify_stamina(stamina_drain) // Also approx. 1 stamina per second
-				stamina_speed_buff(stamina_tier)
+				stamina_speed_buff()
+				stamina_plasma_regen()
+
+			last_stamina_tier = stamina_tier
 
 /mob/living/carbon/xenomorph/queen/proc/hostiles_in_proximity(turf/current_turf)
 	var/list/mobs_in_range = oviewers(7, current_turf)
@@ -619,27 +630,33 @@
 	if(queen_stamina < 0)
 		queen_stamina = 0
 
-/mob/living/carbon/xenomorph/queen/proc/stamina_drain_delay_countdown(amount)
-	stamina_drain_delay += amount
-	if(stamina_drain_delay < 0)
-		stamina_drain_delay = 0
-		stamina_drain_delay_active = FALSE
+/mob/living/carbon/xenomorph/queen/proc/stamina_speed_buff()
+	if(stamina_tier == last_stamina_tier) // If these are the same, we don't need to run the rest of the proc; there's no point to it.
+		return
 
-/mob/living/carbon/xenomorph/queen/proc/stamina_speed_buff(gear = 0)
-	var/speed_buff = 0
-	switch(gear)
-		if(0)
-			speed_buff = 0
-		if(1)
-			speed_buff = -0.3
-		if(2)
-			speed_buff = -0.6
-		if(3)
-			speed_buff = -0.9
-		if(4)
-			speed_buff = -1.2
-	speed_modifier = speed_buff
+	var/speed_buff = round(speed_per_tier * stamina_tier, 0.1)
+
+	if(stamina_tier < last_stamina_tier)
+		// If the current stamina tier is less than the previously logged one,
+		// Reduce current speed_modifier by speed_per_tier * the difference between the last tier and current tier (in case the diff is more than 1 for some reason).
+		speed_modifier += speed_per_tier * (last_stamina_tier - stamina_tier)
+	else if(stamina_tier > last_stamina_tier && last_stamina_tier != 0)
+		// If the current stamina tier is higher than the previously logged one but the previous one wasn't 0,
+		// It means the old speed buff didn't run out before Queen went back on Ovi.
+		// Therefore, we first remove the old speed buff (speed_per_tier * last_stamina_tier) and then add the new one to prevent unintended exponential speed gain.
+		speed_modifier += speed_per_tier * last_stamina_tier
+		speed_modifier -= speed_buff
+		// As stamina tiers are only supposed to increase when the Queen is on ovi, and this proc is only called when Queen is off ovi,
+		// We don't need to worry about edge cases where the stamina tier increases while Queen is off ovi, because that shouldn't be happening.
+	else
+		// If neither of the previous are applied, it means the old speed buff ran out before Queen returned to Ovi and we're safe to add a fresh speed buff.
+		speed_modifier -= speed_buff
 	recalculate_speed()
+
+/mob/living/carbon/xenomorph/queen/proc/stamina_plasma_regen()
+	var/regen_buff = plasma_per_tier * stamina_tier
+	if(regen_buff != 0)
+		gain_plasma(regen_buff)
 
 /mob/living/carbon/xenomorph/queen/get_status_tab_items()
 	. = ..()
@@ -650,7 +667,7 @@
 	. += "Leaders: [xeno_leader_num] / [hive?.queen_leader_limit]"
 	. += "Royal Resin: [hive?.buff_points]"
 	if(queen_stamina != 0)
-		. += "Vigor: [round((queen_stamina / stamina_cap) * 100, 0.01)]%"
+		. += "Vigor: Tier [stamina_tier] ([round((queen_stamina / stamina_cap) * 100, 0.01)]%)"
 	if(!is_mature && maturity_timer_id != TIMER_ID_NULL)
 		. += "Maturity: [time2text(timeleft(maturity_timer_id), "mm:ss")] remaining"
 
@@ -934,7 +951,7 @@
 	for(var/mob/living/carbon/xenomorph/leader in hive.xeno_leader_list)
 		leader.handle_xeno_leader_pheromones()
 
-	stamina_drain_delay = stamina_drain_delay_duration
+	stamina_drain_delay = initial(stamina_drain_delay)
 
 	xeno_message(SPAN_XENOANNOUNCE("The Queen has grown an ovipositor, evolution progress resumed."), 3, hivenumber)
 
