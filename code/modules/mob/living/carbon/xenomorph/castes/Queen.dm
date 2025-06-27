@@ -553,15 +553,15 @@
 				overwatch(observed_xeno, TRUE)
 
 		switch(queen_stamina)
-			if(0 to 120)
+			if(0)
 				stamina_tier = 0
-			if(121 to 240)
+			if(1 to 150)
 				stamina_tier = 1
-			if(241 to 360)
+			if(151 to 300)
 				stamina_tier = 2
-			if(361 to 480)
+			if(301 to 450)
 				stamina_tier = 3
-			if(481 to 600)
+			if(451 to 600)
 				stamina_tier = 4
 
 		if(ovipositor && !is_mob_incapacitated(TRUE))
