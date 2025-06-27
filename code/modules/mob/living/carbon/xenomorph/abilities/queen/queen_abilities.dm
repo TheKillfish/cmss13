@@ -44,7 +44,7 @@
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_2
 	xeno_cooldown = 10 SECONDS
-	plasma_cost = 25
+	plasma_cost = 50
 	hide_on_special_state = TRUE
 
 /datum/action/xeno_action/onclick/disarming_sweep
@@ -54,7 +54,7 @@
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_3
 	xeno_cooldown = 8 SECONDS
-	plasma_cost = 35
+	plasma_cost = 70
 	hide_on_special_state = TRUE
 
 /datum/action/xeno_action/activable/ram
@@ -64,7 +64,7 @@
 	action_type = XENO_ACTION_CLICK
 	ability_primacy = XENO_PRIMARY_ACTION_4
 	xeno_cooldown = 14 SECONDS
-	plasma_cost = 50
+	plasma_cost = 75
 	maturity_restricted = TRUE
 	hide_on_special_state = TRUE
 	// Configs
