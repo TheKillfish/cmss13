@@ -350,7 +350,7 @@
 		/datum/action/xeno_action/onclick/set_xeno_lead,
 		/datum/action/xeno_action/activable/queen_heal, // First macro
 		/datum/action/xeno_action/activable/queen_give_plasma, // Second macro
-		/datum/action/xeno_action/onclick/queen_tacmap,
+		/datum/action/xeno_action/onclick/tacmap,
 		/datum/action/xeno_action/onclick/eye,
 	)
 
@@ -984,9 +984,10 @@
 		overwatch(observed_xeno, TRUE)
 	zoom_out()
 
-	set_resin_build_order(GLOB.resin_build_order_drone) // This needs to occur before we update the abilities so we can update the choose resin icon
+	if(hive.tacmap_requires_queen_ovi)
+		remove_verb(src, /mob/living/carbon/xenomorph/proc/xeno_tacmap)
 
-	remove_verb(src, /mob/living/carbon/xenomorph/proc/xeno_tacmap)
+	set_resin_build_order(GLOB.resin_build_order_drone) // This needs to occur before we update the abilities so we can update the choose resin icon
 
 	REMOVE_TRAIT(src, TRAIT_ABILITY_NO_PLASMA_TRANSFER, TRAIT_SOURCE_ABILITY("Ovipositor"))
 	REMOVE_TRAIT(src, TRAIT_ABILITY_OVIPOSITOR, TRAIT_SOURCE_ABILITY("Ovipositor"))

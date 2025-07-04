@@ -151,12 +151,6 @@
 	xeno_cooldown = 12 SECONDS
 	hide_off_special_state = TRUE
 
-/datum/action/xeno_action/onclick/queen_tacmap
-	name = "View Xeno Tacmap"
-	action_icon_state = "toggle_queen_zoom"
-	plasma_cost = 0
-	hide_off_special_state = TRUE
-
 // Queen variants of basic abilities for special state restrictions
 
 /datum/action/xeno_action/activable/corrosive_acid/queen
