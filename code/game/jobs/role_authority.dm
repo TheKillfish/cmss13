@@ -617,6 +617,8 @@ I hope it's easier to tell what the heck this proc is even doing, unlike previou
 			M = /mob/living/carbon/xenomorph/crusher
 		if(XENO_CASTE_BOILER)
 			M = /mob/living/carbon/xenomorph/boiler
+		if(XENO_CASTE_DECIEVER)
+			M = /mob/living/carbon/xenomorph/deciever
 		if(XENO_CASTE_PREDALIEN)
 			M = /mob/living/carbon/xenomorph/predalien
 		if(XENO_CASTE_HELLHOUND)

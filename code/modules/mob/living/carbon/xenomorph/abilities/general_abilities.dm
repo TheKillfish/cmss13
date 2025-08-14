@@ -534,6 +534,8 @@
 	. = ..()
 
 	hivenumber = xeno.hive.hivenumber
+	if(xeno.always_has_tacmap)
+		return
 	RegisterSignal(xeno.hive, COMSIG_HIVE_NEW_QUEEN, PROC_REF(handle_new_queen))
 	RegisterSignal(xeno.hive, COMSIG_XENO_REVEAL_TACMAP, PROC_REF(handle_unhide_tacmap))
 
@@ -548,7 +550,8 @@
 
 /datum/action/xeno_action/onclick/tacmap/remove_from(mob/living/carbon/xenomorph/xeno)
 	. = ..()
-	UnregisterSignal(GLOB.hive_datum[hivenumber], COMSIG_HIVE_NEW_QUEEN)
+	if(!xeno.always_has_tacmap)
+		UnregisterSignal(GLOB.hive_datum[hivenumber], COMSIG_HIVE_NEW_QUEEN)
 
 /// handles the addition of a new queen, hiding if appropriate
 /datum/action/xeno_action/onclick/tacmap/proc/handle_new_queen(datum/hive_status/hive, mob/living/carbon/xenomorph/queen/new_queen)

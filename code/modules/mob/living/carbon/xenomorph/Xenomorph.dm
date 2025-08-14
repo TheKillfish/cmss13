@@ -316,6 +316,9 @@
 	var/max_design_nodes = 0
 	var/selected_design_mark
 
+	// Deciever vars related to tacmap
+	var/always_has_tacmap = FALSE // If true, the xeno in question will always have Tacmap avaliable
+
 	var/icon_xeno
 	var/icon_xenonid
 

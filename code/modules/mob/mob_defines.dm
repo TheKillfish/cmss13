@@ -182,6 +182,8 @@
 	//Whether or not mobs can understand other mobtypes. These stay in /mob so that ghosts can hear everything.
 	var/universal_speak = 0 // Set to 1 to enable the mob to speak to everyone -- TLE
 	var/universal_understand = 0 // Set to 1 to enable the mob to understand everyone, not necessarily speak
+	var/understand_no_speak = 0 // Like universal_understand, but uses a list to determine if they understand or not
+	var/list/datum/language/understood_languages = list() // List used by understand_no_speak
 
 	var/immune_to_ssd = 0
 	var/aghosted = FALSE //If the mob owner is currently aghosted.
