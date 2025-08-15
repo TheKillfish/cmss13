@@ -532,11 +532,12 @@
 	for(var/obj/structure/machinery/m56d_hmg/auto/gun in cur_turf)
 		gun.update_health(XENO_ACID_HMG_DAMAGE)
 
-//No effect when merely entering the smoke turf, for balance reasons
+// Effects are only at 10% strength
 /obj/effect/particle_effect/smoke/xeno_burn/Crossed(mob/living/carbon/affected_mob as mob)
-	return
+	if(iscarbon(affected_mob))
+		affect(affected_mob, 0.05)
 
-/obj/effect/particle_effect/smoke/xeno_burn/affect(mob/living/carbon/affected_mob)
+/obj/effect/particle_effect/smoke/xeno_burn/affect(mob/living/carbon/affected_mob, effect_coefficient = 1)
 	. = ..()
 	if(!.)
 		return FALSE
@@ -550,12 +551,12 @@
 		return FALSE
 
 	affected_mob.last_damage_data = cause_data
-	affected_mob.apply_damage(3, OXY) //Basic oxyloss from "can't breathe"
+	affected_mob.apply_damage(ceil(round(3 * effect_coefficient, 1), 1), OXY) //Basic oxyloss from "can't breathe"
 
 	if(isxeno(affected_mob))
-		affected_mob.apply_damage(gas_damage * XVX_ACID_DAMAGEMULT, BURN) //Inhalation damage
+		affected_mob.apply_damage(round(gas_damage * XVX_ACID_DAMAGEMULT * effect_coefficient, 1), BURN) //Inhalation damage
 	else
-		affected_mob.apply_damage(gas_damage, BURN) //Inhalation damage
+		affected_mob.apply_damage(round(gas_damage * effect_coefficient, 1), BURN) //Inhalation damage
 
 	if(affected_mob.coughedtime < world.time && !affected_mob.stat && ishuman(affected_mob)) //Coughing/gasping
 		affected_mob.coughedtime = world.time + 1.5 SECONDS
@@ -572,7 +573,7 @@
 	to_chat(affected_mob, SPAN_DANGER("Your skin feels like it is melting away!"))
 	if(ishuman(affected_mob))
 		var/mob/living/carbon/human/human = affected_mob
-		human.apply_armoured_damage(amount*rand(15, 20), ARMOR_BIO, BURN) //Burn damage, randomizes between various parts //Amount corresponds to upgrade level, 1 to 2.5
+		human.apply_armoured_damage(round(amount * rand(15, 20) * effect_coefficient, 1), ARMOR_BIO, BURN) //Burn damage, randomizes between various parts //Amount corresponds to upgrade level, 1 to 2.5
 	else
 		affected_mob.burn_skin(5) //Failsafe for non-humans
 	affected_mob.last_damage_data = cause_data
@@ -589,11 +590,12 @@
 	var/neuro_dose = 6
 	var/msg = "Your skin tingles as the gas consumes you!" // Message given per tick. Changes depending on which species is hit.
 
-//No effect when merely entering the smoke turf, for balance reasons
+// Effects are only at 30% strength
 /obj/effect/particle_effect/smoke/xeno_weak/Crossed(mob/living/carbon/moob as mob)
-	return
+	if(iscarbon(moob))
+		affect(moob, 0.1)
 
-/obj/effect/particle_effect/smoke/xeno_weak/affect(mob/living/carbon/moob) // This applies every tick someone is in the smoke
+/obj/effect/particle_effect/smoke/xeno_weak/affect(mob/living/carbon/moob, effect_coefficient = 1) // This applies every tick someone is in the smoke
 	. = ..()
 	if(!.)
 		return FALSE
@@ -613,15 +615,15 @@
 			return FALSE
 
 	var/effect_amt = floor(6 + amount*6)
-	moob.eye_blurry = max(moob.eye_blurry, effect_amt)
-	moob.EyeBlur(max(moob.eye_blurry, effect_amt))
-	moob.apply_damage(5, OXY) //  Base "I can't breath oxyloss" Slightly more longer lasting then stamina damage
+	moob.eye_blurry = max(moob.eye_blurry, round(effect_amt * effect_coefficient, 1))
+	moob.EyeBlur(max(moob.eye_blurry, round(effect_amt * effect_coefficient, 1)))
+	moob.apply_damage(ceil(round(5 * effect_coefficient, 1), 1), OXY) //  Base "I can't breath oxyloss" Slightly more longer lasting then stamina damage
 	// reworked code below
 	if(!issynth(moob))
 		var/datum/effects/neurotoxin/neuro_effect = locate() in moob.effects_list
 		if(!neuro_effect)
 			neuro_effect = new(moob, cause_data.resolve_mob())
-			neuro_effect.strength = effect_amt
+			neuro_effect.strength = round(effect_amt * effect_coefficient, 1)
 		neuro_effect.duration += neuro_dose
 		if(human_moob && moob.coughedtime < world.time && !moob.stat) //Coughing/gasping
 			moob.coughedtime = world.time + 1.5 SECONDS
