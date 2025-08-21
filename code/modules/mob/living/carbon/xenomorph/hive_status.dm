@@ -21,6 +21,8 @@
 	var/queen_leader_limit = 2
 	var/list/open_xeno_leader_positions = list(1, 2) // Ordered list of xeno leader positions (indexes in xeno_leader_list) that are not occupied
 	var/list/xeno_leader_list[2] // Ordered list (i.e. index n holds the nth xeno leader)
+	var/subleader_message_usable = TRUE
+	var/subleader_message_timer_id = TIMER_ID_NULL // All sub-leaders share the same cooldown to prevent multiple spammed messages
 	var/stored_larva = 0
 
 	///used by /datum/hive_status/proc/increase_larva_after_burst() to support non-integer increases to larva
@@ -354,8 +356,8 @@
 /datum/hive_status/proc/add_hive_leader(mob/living/carbon/xenomorph/xeno)
 	if(!xeno)
 		return FALSE //How did this even happen?
-	if(!length(open_xeno_leader_positions))
-		return FALSE //Too many leaders already (no available xeno leader positions)
+	if(!xeno.always_subleader && !length(open_xeno_leader_positions))
+		return FALSE //Too many leaders already (no available xeno leader positions) and not always a leader (and thus exempt from the limits)
 	if(xeno.hive_pos != NORMAL_XENO)
 		return FALSE //Already on the list
 	var/leader_num = open_xeno_leader_positions[1]
@@ -363,7 +365,8 @@
 	xeno.hive_pos = XENO_LEADER_HIVE_POS(leader_num)
 	xeno.handle_xeno_leader_pheromones()
 	xeno.hud_update() // To add leader star
-	open_xeno_leader_positions -= leader_num
+	if(!xeno.always_subleader) // Always leaders won't take up a slot
+		open_xeno_leader_positions -= leader_num
 
 	xeno.update_minimap_icon()
 

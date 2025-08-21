@@ -140,6 +140,7 @@
 	var/datum/hive_status/hive
 	hivenumber = XENO_HIVE_NORMAL
 	var/hive_pos = NORMAL_XENO // The position of the xeno in the hive (0 = normal xeno; 1 = queen; 2+ = hive leader)
+	var/always_subleader = FALSE // Decides if the Xeno is always a leader and thus doesn't take up a leadership slot
 
 	// Variables that can be mutated
 	var/ability_speed_modifier = 0 //Things that add on top of our base speed, based on what powers we are using
@@ -476,7 +477,7 @@
 
 	. = ..()
 
-					//Set leader to the new mob
+	//Set leader to the new mob
 	if(old_xeno && hive && IS_XENO_LEADER(old_xeno))
 		hive.replace_hive_leader(old_xeno, src)
 
@@ -490,7 +491,7 @@
 	time_of_birth = world.time
 
 	//Minimap
-	if(z && hivenumber != XENO_HIVE_TUTORIAL)
+	if(z && hivenumber != XENO_HIVE_TUTORIAL && !always_subleader)
 		INVOKE_NEXT_TICK(src, PROC_REF(add_minimap_marker))
 
 	//Sight
@@ -524,12 +525,22 @@
 	Decorate()
 
 	RegisterSignal(src, COMSIG_MOB_SCREECH_ACT, PROC_REF(handle_screech_act))
+	if(always_subleader)
+		if(hive.living_xeno_queen && !should_block_game_interaction(src)) // If Queen is already alive, give always leaders their leadership
+			INVOKE_ASYNC(src, PROC_REF(always_subleader_handler))
+		RegisterSignal(hive, COMSIG_HIVE_NEW_QUEEN, PROC_REF(always_subleader_handler)) // Makes sure always leaders regain/gain leadership once a new Queen rises
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_XENO_SPAWN, src)
 
 /mob/living/carbon/xenomorph/proc/handle_screech_act(mob/self, mob/living/carbon/xenomorph/queen/queen)
 	SIGNAL_HANDLER
 	if(queen.can_not_harm(src))
 		return COMPONENT_SCREECH_ACT_CANCEL
+
+/mob/living/carbon/xenomorph/proc/always_subleader_handler()
+	SIGNAL_HANDLER
+	if(!IS_XENO_LEADER(src) && hivenumber != XENO_HIVE_TUTORIAL)
+		hive.add_hive_leader(src)
+		to_chat(src, SPAN_XENOBOLDNOTICE("As a new Queen rises, we naturally assume leadership!"))
 
 /// Adds a minimap marker for this xeno using the provided flags.
 /// If flags is 0, it will use get_minimap_flag_for_faction for this xeno
@@ -664,6 +675,9 @@
 
 	if(isxeno(user) && caste && caste.caste_desc)
 		. += caste.caste_desc
+
+	if(!isxeno(user) && hive_pos == XENO_LEADER)
+		. += "<span style='font-weight: bold; color: yellow;'>It has an air of leadership about it!\n</span>"
 
 	if(l_hand)
 		. += "It's holding[l_hand.get_examine_line(user)] in its left hand."

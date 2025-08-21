@@ -46,6 +46,7 @@
 	claw_type = CLAW_TYPE_VERY_SHARP
 	age = -1
 	aura_strength = 6
+	always_subleader = TRUE
 
 	base_actions = list(
 		/datum/action/xeno_action/onclick/xeno_resting,
