@@ -214,3 +214,20 @@
 	if(istype(held_item))
 		held_item.toggle_tube()
 		return TRUE
+
+/datum/keybinding/human/combat/perform_gun_trick
+	hotkey_keys = list("Unbound")
+	classic_keys = list("Unbound")
+	name = "perform_gun_trick"
+	full_name = "Perform Gun Trick"
+	keybind_signal = COMSIG_KB_HUMAN_WEAPON_GUN_TRICK
+
+/datum/keybinding/human/combat/perform_gun_trick/down(client/user)
+	. = ..()
+	if(.)
+		return
+	var/mob/living/carbon/human/human = user.mob
+	var/obj/item/weapon/gun/held_gun = human.get_held_item()
+	if(istype(held_gun) && held_gun.can_perform_tricks)
+		held_gun.perform_gun_trick()
+		return TRUE

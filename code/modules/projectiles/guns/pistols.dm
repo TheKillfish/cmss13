@@ -36,6 +36,8 @@
 	flags_gun_features = GUN_AUTO_EJECTOR|GUN_CAN_POINTBLANK|GUN_ONE_HAND_WIELDED //For easy reference.
 	gun_category = GUN_CATEGORY_HANDGUN
 
+	can_perform_tricks = TRUE
+
 /obj/item/weapon/gun/pistol/Initialize(mapload, spawn_empty)
 	. = ..()
 	if(current_mag && current_mag.current_rounds > 0)
@@ -107,6 +109,8 @@
 	desc = "This M4A3 sports a nickel finish and faux ivory grips. This one is a slightly customized variant produced by a well known gunsmith on Gateway Station. These are commonly purchased by low level enlisted men and junior officers who have nothing better to spend their salary on. Chambered in 9mm."
 	icon_state = "m4a3c"
 	item_state = "m4a3c"
+
+	trick_chance_bonus = 10
 
 /obj/item/weapon/gun/pistol/m4a3/custom/set_gun_config_values()
 	..()

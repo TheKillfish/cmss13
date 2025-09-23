@@ -359,3 +359,11 @@
 	desc = "A pamphlet used to quickly impart vital knowledge of how to shoot big guns and spot for them."
 	icon_state = "pamphlet_vulture"
 	trait_to_give = TRAIT_VULTURE_USER
+
+/obj/item/pamphlet/trait/guntricks
+	name = "\improper Wild Cat Adam's Gunplay 101"
+	desc = "A small instructional handbook on performing various flashy tricks with pistols, revolvers, and other miscellaneous tidbits about the Old West. The author's full name is in untranslated Russian."
+	icon_state = "pamphlet_written" // Placeholder for now
+	trait_to_give = TRAIT_GUN_TRICKS
+	flavour_text = "You read through the handbook a few times, instilling you with confidence to perform flashy tricks with pistols!"
+	bypass_pamphlet_limit = TRUE

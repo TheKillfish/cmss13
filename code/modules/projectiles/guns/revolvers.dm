@@ -25,14 +25,13 @@
 	reload_sound = 'sound/weapons/gun_44mag_speed_loader.wav'
 	cocked_sound = 'sound/weapons/gun_revolver_spun.ogg'
 	unload_sound = 'sound/weapons/gun_44mag_open_chamber.wav'
+
+	can_perform_tricks = TRUE
+
 	var/chamber_close_sound = 'sound/weapons/gun_44mag_close_chamber.wav'
 	var/hand_reload_sound = 'sound/weapons/gun_revolver_load3.ogg'
-	var/spin_sound = 'sound/effects/spin.ogg'
-	var/thud_sound = 'sound/effects/thud.ogg'
 	var/list/cylinder_click = list('sound/weapons/gun_empty.ogg')
 
-	var/trick_delay = 4 SECONDS
-	var/recent_trick //So they're not spamming tricks.
 	var/russian_roulette = 0 //God help you if you do this.
 
 /obj/item/weapon/gun/revolver/Initialize(mapload, spawn_empty)
@@ -204,103 +203,6 @@
 /obj/item/weapon/gun/revolver/unique_action(mob/user)
 	spin_cylinder(user)
 
-/obj/item/weapon/gun/revolver/proc/revolver_basic_spin(mob/living/carbon/human/user, direction = 1, obj/item/weapon/gun/revolver/double)
-	set waitfor = 0
-	playsound(user, spin_sound, 25, 1)
-	if(double)
-		user.visible_message("[user] deftly flicks and spins [src] and [double]!", SPAN_NOTICE("You flick and spin [src] and [double]!"),  null, 3)
-		animation_wrist_flick(double, 1)
-	else
-		user.visible_message("[user] deftly flicks and spins [src]!",SPAN_NOTICE("You flick and spin [src]!"),  null, 3)
-
-	animation_wrist_flick(src, direction)
-	sleep(3)
-	if(loc && user)
-		playsound(user, thud_sound, 25, 1)
-
-/obj/item/weapon/gun/revolver/proc/revolver_throw_catch(mob/living/carbon/human/user)
-	set waitfor = 0
-	user.visible_message("[user] deftly flicks [src] and tosses it into the air!", SPAN_NOTICE("You flick and toss [src] into the air!"), null, 3)
-	var/img_layer = MOB_LAYER+0.1
-	var/image/trick = image(icon,user,icon_state,img_layer)
-	switch(pick(1,2))
-		if(1)
-			animation_toss_snatch(trick)
-		if(2)
-			animation_toss_flick(trick, pick(1,-1))
-
-	invisibility = 100
-	var/list/client/displayed_for = list()
-	for(var/mob/M as anything in viewers(user))
-		var/client/C = M.client
-		if(C)
-			C.images += trick
-			displayed_for += C
-
-	sleep(6) // BOO
-
-	for(var/client/C in displayed_for)
-		C.images -= trick
-	trick = null
-	invisibility = 0
-
-	if(loc && user)
-		playsound(user, thud_sound, 25, 1)
-		if(user.get_inactive_hand())
-			user.visible_message("[user] catches [src] with the same hand!", SPAN_NOTICE("You catch [src] as it spins in to your hand!"), null, 3)
-		else
-			user.visible_message("[user] catches [src] with \his other hand!", SPAN_NOTICE("You snatch [src] with your other hand! Awesome!"), null, 3)
-			user.temp_drop_inv_item(src)
-			user.put_in_inactive_hand(src)
-			user.swap_hand()
-			user.update_inv_l_hand(0)
-			user.update_inv_r_hand()
-
-/obj/item/weapon/gun/revolver/proc/revolver_trick(mob/living/carbon/human/user)
-	if(world.time < (recent_trick + trick_delay) )
-		return //Don't spam it.
-	if(!istype(user))
-		return //Not human.
-	var/chance = -5
-	chance = user.health < 6 ? 0 : user.health - 5
-
-	//Pain is largely ignored, since it deals its own effects on the mob. We're just concerned with health.
-	//And this proc will only deal with humans for now.
-
-	recent_trick = world.time //Turn on the delay for the next trick.
-	var/obj/item/weapon/gun/revolver/double = user.get_inactive_hand()
-	if(prob(chance))
-		switch(rand(1,8))
-			if(1)
-				revolver_basic_spin(user, -1)
-			if(2)
-				revolver_basic_spin(user, 1)
-			if(3)
-				revolver_throw_catch(user)
-			if(4)
-				revolver_basic_spin(user, 1)
-			if(5)
-				revolver_basic_spin(user, 1)
-			if(6)
-				var/arguments[] = istype(double) ? list(user, 1, double) : list(user, -1)
-				revolver_basic_spin(arglist(arguments))
-			if(7)
-				var/arguments[] = istype(double) ? list(user, -1, double) : list(user, 1)
-				revolver_basic_spin(arglist(arguments))
-			if(8)
-				if(istype(double))
-					spawn(0)
-						double.revolver_throw_catch(user)
-					revolver_throw_catch(user)
-				else
-					revolver_throw_catch(user)
-		return TRUE
-	else
-		user.visible_message(SPAN_INFO("<b>[user]</b> fumbles with [src] like a huge idiot!"), null, null, 3)
-		to_chat(user, SPAN_WARNING("You fumble with [src] like an idiot... Uncool."))
-		return FALSE
-
-
 //-------------------------------------------------------
 //M44 Revolver
 
@@ -368,6 +270,8 @@
 	current_mag = /obj/item/ammo_magazine/internal/revolver/m44
 	icon_state = "m44rc"
 	item_state = "m44rc"
+
+	trick_chance_bonus = 10
 
 //----------------------------------------------
 // Blade Runner Blasters.
@@ -541,7 +445,7 @@
 
 /obj/item/weapon/gun/revolver/small
 	name = "\improper S&W .38 model 37 revolver"
-	desc = "A lean .38 made by Smith & Wesson. A timeless classic, from antiquity to the future. This specific model is known to be wildly inaccurate, yet extremely lethal."
+	desc = "A lean .38 made by Smith & Wesson. A timeless classic, from antiquity to the future. This specific model is known to be slow to fire, yet extremely lethal."
 	icon = 'icons/obj/items/weapons/guns/guns_by_faction/colony/revolvers.dmi'
 	icon_state = "sw357"
 	item_state = "sw357"
@@ -549,6 +453,9 @@
 	current_mag = /obj/item/ammo_magazine/internal/revolver/small
 	force = 6
 	flags_gun_features = GUN_ANTIQUE|GUN_ONE_HAND_WIELDED|GUN_CAN_POINTBLANK
+
+	trick_chance_bonus = 20
+	ignore_skill_requirements = FALSE
 
 /obj/item/weapon/gun/revolver/small/set_gun_attachment_offsets()
 	attachable_offset = list("muzzle_x" = 30, "muzzle_y" = 19,"rail_x" = 12, "rail_y" = 21, "under_x" = 20, "under_y" = 15, "stock_x" = 20, "stock_y" = 15)
@@ -567,17 +474,9 @@
 	recoil = 0
 	recoil_unwielded = 0
 
-/obj/item/weapon/gun/revolver/small/unique_action(mob/user)
-	var/result = revolver_trick(user)
-	if(result)
-		to_chat(user, SPAN_NOTICE("Your badass trick inspires you. Your next few shots will be focused!"))
-		accuracy_mult = BASE_ACCURACY_MULT * 2
-		accuracy_mult_unwielded = BASE_ACCURACY_MULT * 2
-		addtimer(CALLBACK(src, PROC_REF(recalculate_attachment_bonuses)), 3 SECONDS)
-
 /obj/item/weapon/gun/revolver/small/black
 	name = "\improper S&W .38 model 37 Custom revolver"
-	desc = "A Custom, lean .38 made by Smith & Wesson. A timeless classic, from antiquity to the future. This specific model, with its sleek black body and custom ivory grips, is known to be wildly inaccurate, yet extremely lethal."
+	desc = "A Custom, lean .38 made by Smith & Wesson. A timeless classic, from antiquity to the future. This specific model, with its sleek black body and custom ivory grips, is known to be slow to fire, yet extremely lethal."
 	icon_state = "black_sw357"
 	item_state = "black_sw357"
 
@@ -621,6 +520,9 @@
 	unacidable = TRUE
 	explo_proof = TRUE
 	black_market_value = 100
+
+	trick_chance_bonus = 20
+
 	var/is_locked = TRUE
 	var/can_change_barrel = TRUE
 
@@ -839,17 +741,11 @@
 	item_state = "black_spearhead"
 	current_mag = /obj/item/ammo_magazine/internal/revolver/cmb
 
+	trick_chance_bonus = 20
+
 /obj/item/weapon/gun/revolver/cmb/custom/get_examine_text(mob/user)
 	. = ..()
 	. += SPAN_NOTICE("You feel like tricks with it can be done easily.")
-
-/obj/item/weapon/gun/revolver/cmb/custom/unique_action(mob/user)
-	var/result = revolver_trick(user)
-	if(result)
-		to_chat(user, SPAN_NOTICE("Your badass trick inspires you. Your next few shots will be focused!"))
-		accuracy_mult = BASE_ACCURACY_MULT * 2
-		accuracy_mult_unwielded = BASE_ACCURACY_MULT * 2
-		addtimer(CALLBACK(src, PROC_REF(recalculate_attachment_bonuses)), 3 SECONDS)
 
 /obj/item/weapon/gun/revolver/cmb/custom/tactical
 	starting_attachment_types = list(/obj/item/attachable/extended_barrel, /obj/item/attachable/lasersight, /obj/item/attachable/reflex)

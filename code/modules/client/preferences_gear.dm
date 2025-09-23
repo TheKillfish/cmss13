@@ -815,6 +815,11 @@ GLOBAL_LIST_EMPTY(roles_with_gear)
 	path = /obj/item/weapon/gun/revolver/m44/custom
 	allowed_origins = USCM_ORIGINS
 
+/datum/gear/weapon/guntricks_pamphlet
+	display_name = "Gun tricks pamphlet"
+	path = /obj/item/pamphlet/trait/guntricks
+	fluff_cost = 3
+
 /datum/gear/drink
 	category = "Canned drinks"
 	fluff_cost = 1

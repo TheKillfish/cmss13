@@ -251,6 +251,14 @@
 	/// Whether the weapon has expended it's "second wind" and lost its acid protection.
 	var/has_second_wind = TRUE
 
+	// Gun trick vars
+	var/can_perform_tricks = FALSE
+	var/trick_chance_bonus = 0
+	var/ignore_skill_requirements = FALSE
+	var/spin_sound = 'sound/effects/spin.ogg'
+	var/thud_sound = 'sound/effects/thud.ogg'
+	var/trick_delay = 3 SECONDS
+	var/recent_trick
 	/// the icon for spinning the gun
 	var/temp_icon = null
 
@@ -2215,3 +2223,114 @@ not all weapons use normal magazines etc. load_into_chamber() itself is designed
 			if(!explo_proof) // heavy explosions don't care if the weapon has it's protection left; else you'd get weird situations where OBs/yautja SD/etc leave damaged but working guns everywhere.
 				visible_message(SPAN_DANGER(SPAN_UNDERLINE("[src] [msg]")))
 				deconstruct(FALSE)
+
+/obj/item/weapon/gun/verb/perform_gun_trick()
+	set category = "Weapons"
+	set name = "Perform Gun Trick"
+	set desc = "Toggles which shotgun tube your gun loads from."
+	set src = usr.contents
+
+	var/obj/item/weapon/gun/our_gun = get_active_firearm(usr)
+	if(our_gun == src && our_gun.can_perform_tricks)
+		perform_trick(usr)
+
+/obj/item/weapon/gun/proc/perform_trick(mob/living/carbon/human/user)
+	if(world.time < (recent_trick + trick_delay))
+		return
+
+	if(!istype(user))
+		return
+
+	// If the weapon doesn't ignore requirements and the user isn't skilled enough with guns or have the trait, then they cannot do tricks
+	if(!ignore_skill_requirements && !skillcheck(user, SKILL_FIREARMS, SKILL_FIREARMS_SKILLED) && !HAS_TRAIT(user, TRAIT_GUN_TRICKS))
+		return
+
+	var/chance = 80
+	chance += (user.health < 0 ? -100 : user.health - user.maxHealth) + trick_chance_bonus
+
+	recent_trick = world.time //Turn on the delay for the next trick.
+	var/obj/item/weapon/gun/double = user.get_inactive_hand()
+	if(prob(chance))
+		switch(rand(1,8))
+			if(1)
+				basic_spin_trick(user, -1)
+			if(2)
+				basic_spin_trick(user, 1)
+			if(3)
+				throw_catch_trick(user)
+			if(4)
+				basic_spin_trick(user, 1)
+			if(5)
+				basic_spin_trick(user, 1)
+			if(6)
+				var/arguments[] = istype(double) ? list(user, 1, double) : list(user, -1)
+				basic_spin_trick(arglist(arguments))
+			if(7)
+				var/arguments[] = istype(double) ? list(user, -1, double) : list(user, 1)
+				basic_spin_trick(arglist(arguments))
+			if(8)
+				if(istype(double) && double.can_perform_tricks)
+					spawn(0)
+						double.throw_catch_trick(user)
+					throw_catch_trick(user)
+				else
+					throw_catch_trick(user)
+		return TRUE
+	else
+		user.visible_message(SPAN_INFO("<b>[user]</b> fumbles with [src] like a huge idiot!"), null, null, 3)
+		to_chat(user, SPAN_WARNING("You fumble with [src] like an idiot... Uncool."))
+		return FALSE
+
+/obj/item/weapon/gun/proc/basic_spin_trick(mob/living/carbon/human/user, direction = 1, obj/item/weapon/gun/revolver/double)
+	set waitfor = 0
+	playsound(user, spin_sound, 25, 1)
+	if(double && double.can_perform_tricks)
+		user.visible_message("[user] deftly flicks and spins [src] and [double]!", SPAN_NOTICE("You flick and spin [src] and [double]!"),  null, 3)
+		animation_wrist_flick(double, 1)
+	else
+		user.visible_message("[user] deftly flicks and spins [src]!",SPAN_NOTICE("You flick and spin [src]!"),  null, 3)
+
+	animation_wrist_flick(src, direction)
+	sleep(3)
+	if(loc && user)
+		playsound(user, thud_sound, 25, 1)
+
+/obj/item/weapon/gun/proc/throw_catch_trick(mob/living/carbon/human/user)
+	set waitfor = 0
+	no_store = TRUE
+	user.visible_message("[user] deftly flicks [src] and tosses it into the air!", SPAN_NOTICE("You flick and toss [src] into the air!"), null, 3)
+	var/img_layer = MOB_LAYER+0.1
+	var/image/trick = image(icon,user,icon_state,img_layer)
+	switch(pick(1,2))
+		if(1)
+			animation_toss_snatch(trick)
+		if(2)
+			animation_toss_flick(trick, pick(1,-1))
+
+	invisibility = 100
+	var/list/client/displayed_for = list()
+	for(var/mob/M as anything in viewers(user))
+		var/client/C = M.client
+		if(C)
+			C.images += trick
+			displayed_for += C
+
+	sleep(6) // BOO
+
+	for(var/client/C in displayed_for)
+		C.images -= trick
+	trick = null
+	invisibility = 0
+
+	if(loc && user)
+		playsound(user, thud_sound, 25, 1)
+		if(user.get_inactive_hand())
+			user.visible_message("[user] catches [src] with the same hand!", SPAN_NOTICE("You catch [src] as it spins in to your hand!"), null, 3)
+		else
+			user.visible_message("[user] catches [src] with \his other hand!", SPAN_NOTICE("You snatch [src] with your other hand! Awesome!"), null, 3)
+			user.temp_drop_inv_item(src)
+			user.put_in_inactive_hand(src)
+			user.swap_hand()
+			user.update_inv_l_hand(0)
+			user.update_inv_r_hand()
+	no_store = FALSE
