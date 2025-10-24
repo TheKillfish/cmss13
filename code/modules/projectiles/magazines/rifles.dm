@@ -571,6 +571,20 @@
 	default_ammo =  /datum/ammo/bullet/sniper/anti_materiel/vulture/holo_target
 	ammo_band_color = AMMO_BAND_COLOR_HOLOTARGETING
 
+/obj/item/ammo_magazine/rifle/boltaction/m42a3
+	name = "\improper M42A3 magazine (10x28mm Caseless)"
+	desc = "A magazine for the M42A3 sniper rifle. Holds up to 10 standard-issue 10x28mm Caseless rounds."
+	caliber = "10x28mm"
+	icon = 'icons/obj/items/weapons/guns/ammo_by_faction/USCM/marksman_rifles.dmi'
+	icon_state = "m42a3"
+	handful_state = "vulture_bullet"
+	default_ammo = /datum/ammo/bullet/sniper
+	max_rounds = 10
+	gun_type = /obj/item/weapon/gun/boltaction/M42A3_sniper
+	w_class = SIZE_MEDIUM
+	ammo_band_icon = "+m42a3_band"
+	ammo_band_icon_empty = "+m42a3_band_e"
+
 //=ROYAL MARINES=\\
 
 /obj/item/ammo_magazine/rifle/rmc_f90

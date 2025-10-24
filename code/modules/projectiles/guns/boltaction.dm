@@ -309,3 +309,48 @@
 
 /obj/item/weapon/gun/boltaction/vulture/holo_target/skillless
 	bypass_trait = TRUE
+
+/obj/item/weapon/gun/boltaction/M42A3_sniper // Non-specialist sniper rifle. No special gimmicks, just cool bolt-action action avaliable to the common unga from Req
+	name = "\improper M42A3 sniper rifle"
+	desc = "A sniper rifle manufactured by Armat Systems and derived from the M41A platform. While very powerful and accurate, it suffers from immense recoil and fires slower compared to other similar rifles thanks to the usage of a bolt-action system. \n Though officially considered the successor to the M42A scoped rifle, this variant has had IFF systems removed and lacks compatability to both advanced scope systems and specialist munitions. In exchange, it improved attachment modularity and compatability with standard 10x28mm ammunition."
+	desc_lore = {""}
+
+	icon = 'icons/obj/items/weapons/guns/guns_by_faction/USCM/marksman_rifles.dmi' // Has camos, so this gets overridden
+	icon_state = "m42a3"
+	item_state = "m42a3"
+	cocked_sound = 'sound/weapons/gun_cocked2.ogg'
+	fire_sound = 'sound/weapons/gun_vulture_fire.ogg'
+	open_bolt_sound ='sound/weapons/handling/gun_vulture_bolt_eject.ogg'
+	close_bolt_sound ='sound/weapons/handling/gun_vulture_bolt_close.ogg'
+	flags_gun_features = GUN_CAN_POINTBLANK|GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER
+	attachable_allowed = list(
+		// Assemble list of attachments here later
+	)
+	current_mag = /obj/item/ammo_magazine/rifle/boltaction/m42a3
+//	map_specific_decoration = TRUE
+	wield_delay = WIELD_DELAY_SLOW
+	civilian_usable_override = FALSE
+	bolt_delay = 0.5 SECONDS
+
+/obj/item/weapon/gun/boltaction/M42A3_sniper/Initialize(mapload, spawn_empty)
+	. = ..()
+	AddElement(/datum/element/corp_label/armat)
+	if(current_mag && current_mag.current_rounds > 0)
+		load_into_chamber()
+
+/obj/item/weapon/gun/boltaction/M42A3_sniper/set_gun_config_values()
+	..()
+	set_burst_amount(0)
+	set_fire_delay(FIRE_DELAY_TIER_1)
+	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_7
+	accuracy_mult_unwielded = BASE_ACCURACY_MULT - HIT_ACCURACY_MULT_TIER_10 - HIT_ACCURACY_MULT_TIER_3
+	scatter = SCATTER_AMOUNT_TIER_9
+	burst_scatter_mult = SCATTER_AMOUNT_TIER_9
+	scatter_unwielded = SCATTER_AMOUNT_TIER_10
+	movement_onehanded_acc_penalty_mult = MOVEMENT_ACCURACY_PENALTY_MULT_TIER_2
+	damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_8
+	recoil = RECOIL_AMOUNT_TIER_5
+	recoil_unwielded = RECOIL_AMOUNT_TIER_0
+
+/obj/item/weapon/gun/boltaction/M42A3_sniper/set_gun_attachment_offsets()
+	attachable_offset = list("muzzle_x" = 39, "muzzle_y" = 19, "rail_x" = 17, "rail_y" = 24, "under_x" = 31, "under_y" = 14, "stock_x" = 11, "stock_y" = 15)
