@@ -577,8 +577,9 @@
 	caliber = "10x28mm"
 	icon = 'icons/obj/items/weapons/guns/ammo_by_faction/USCM/marksman_rifles.dmi'
 	icon_state = "m42a3"
+	bonus_overlay = "m42a3_mag_overlay"
 	handful_state = "vulture_bullet"
-	default_ammo = /datum/ammo/bullet/sniper
+	default_ammo = /datum/ammo/bullet/rifle
 	max_rounds = 10
 	gun_type = /obj/item/weapon/gun/boltaction/M42A3_sniper
 	w_class = SIZE_MEDIUM

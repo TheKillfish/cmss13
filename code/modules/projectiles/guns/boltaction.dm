@@ -326,11 +326,12 @@
 	attachable_allowed = list(
 		// Assemble list of attachments here later
 	)
+	starting_attachment_types = list()
 	current_mag = /obj/item/ammo_magazine/rifle/boltaction/m42a3
 //	map_specific_decoration = TRUE
 	wield_delay = WIELD_DELAY_SLOW
 	civilian_usable_override = FALSE
-	bolt_delay = 0.5 SECONDS
+	bolt_delay = FIRE_DELAY_TIER_1
 
 /obj/item/weapon/gun/boltaction/M42A3_sniper/Initialize(mapload, spawn_empty)
 	. = ..()
@@ -348,9 +349,10 @@
 	burst_scatter_mult = SCATTER_AMOUNT_TIER_9
 	scatter_unwielded = SCATTER_AMOUNT_TIER_10
 	movement_onehanded_acc_penalty_mult = MOVEMENT_ACCURACY_PENALTY_MULT_TIER_2
-	damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_8
+	damage_mult = BASE_BULLET_DAMAGE_MULT + 1 // From 40 to 80
 	recoil = RECOIL_AMOUNT_TIER_5
 	recoil_unwielded = RECOIL_AMOUNT_TIER_0
+	damage_falloff_mult = 0
 
 /obj/item/weapon/gun/boltaction/M42A3_sniper/set_gun_attachment_offsets()
 	attachable_offset = list("muzzle_x" = 39, "muzzle_y" = 19, "rail_x" = 17, "rail_y" = 24, "under_x" = 31, "under_y" = 14, "stock_x" = 11, "stock_y" = 15)
