@@ -14,7 +14,7 @@
 	speed = XENO_SPEED_TIER_2
 	heal_standing = 0.66
 
-	available_strains = list(/datum/xeno_strain/charger)
+	available_strains = list(/datum/xeno_strain/charger, /datum/xeno_strain/bastion)
 	behavior_delegate_type = /datum/behavior_delegate/crusher_base
 
 	minimum_evolve_time = 15 MINUTES

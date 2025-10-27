@@ -33,3 +33,24 @@
 	set hidden = TRUE
 	var/action_name = "Stomp"
 	handle_xeno_macro(src, action_name)
+
+/datum/action/xeno_action/verb/verb_head_crush()
+	set category = "Alien"
+	set name = "Head-Crush"
+	set hidden = TRUE
+	var/action_name = "Head-Crush"
+	handle_xeno_macro(src, action_name)
+
+/datum/action/xeno_action/verb/verb_group_defence()
+	set category = "Alien"
+	set name = "Group Defence"
+	set hidden = TRUE
+	var/action_name = "Group Defence"
+	handle_xeno_macro(src, action_name)
+
+/datum/action/xeno_action/verb/verb_braced_recovery()
+	set category = "Alien"
+	set name = "Braced Recovery"
+	set hidden = TRUE
+	var/action_name = "Braced Recovery"
+	handle_xeno_macro(src, action_name)

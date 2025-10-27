@@ -282,3 +282,47 @@
 	if(!LinkBlocked(Xeno, get_turf(Xeno), target_turf))
 		Xeno.forceMove(target_turf)
 
+// BASTION ABILITIES
+/datum/action/xeno_action/activable/head_crush
+	name = "Head-Crush"
+	action_icon_state = "tumble"
+	macro_path = /datum/action/xeno_action/verb/verb_head_crush
+	action_type = XENO_ACTION_CLICK
+	ability_primacy = XENO_PRIMARY_ACTION_1
+
+	plasma_cost = 50
+	xeno_cooldown = 15 SECONDS
+
+	var/cade_damage_multiplier = 8
+
+/datum/action/xeno_action/onclick/group_defence
+	name = "Group Defence"
+	action_icon_state = "tumble"
+	macro_path = /datum/action/xeno_action/verb/verb_group_defence
+	action_type = XENO_ACTION_CLICK
+	ability_primacy = XENO_PRIMARY_ACTION_2
+
+	plasma_cost = 200
+	xeno_cooldown = 30 SECONDS
+
+	var/aoe_range = 5
+	var/armor_recieved_per_ally = 5
+	var/explosivearmor_recieved_per_ally = 10
+	var/max_armor_recieved = 20
+	var/max_explosivearmor_recieved = 60
+	var/buff_duration = 8 SECONDS
+
+/datum/action/xeno_action/onclick/braced_recovery
+	name = "Braced Recovery"
+	action_icon_state = "tumble"
+	macro_path = /datum/action/xeno_action/verb/verb_braced_recovery
+	action_type = XENO_ACTION_CLICK
+	ability_primacy = XENO_PRIMARY_ACTION_3
+
+	plasma_cost = 200
+	xeno_cooldown = 30 SECONDS
+
+	var/damage_accumulated = 0
+	var/max_damage_accumulated = 250
+	var/group_def_cooldown_reduction = 5 SECONDS
+	var/heal_duration = 20
