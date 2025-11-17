@@ -183,6 +183,9 @@
 
 /// Warrior specific behaviour for increasing pull power, limb rip.
 /mob/living/carbon/xenomorph/warrior/pull_power(mob/mob)
+	if(!istype(mob, /mob/living/carbon/human))
+		return FALSE
+
 	if(!ripping_limb && mob.stat != DEAD)
 		if(mob.status_flags & XENO_HOST)
 			to_chat(src, SPAN_XENOWARNING("This would harm the embryo!"))
@@ -195,9 +198,6 @@
 
 /// Warrior Rip Limb - called by pull_power()
 /mob/living/carbon/xenomorph/warrior/proc/rip_limb(mob/mob)
-	if(!istype(mob, /mob/living/carbon/human))
-		return FALSE
-
 	if(action_busy) //can't stack the attempts
 		return FALSE
 
@@ -212,9 +212,9 @@
 		to_chat(src, SPAN_XENOWARNING("We can't rip off that limb."))
 		return FALSE
 
-	var/limb_time = rand(40,60)
+	var/limb_time = 5 SECONDS
 	if(limb.body_part == BODY_FLAG_HEAD)
-		limb_time = rand(90,110)
+		limb_time = 9 SECONDS
 
 	visible_message(SPAN_XENOWARNING("[src] begins pulling on [mob]'s [limb.display_name] with incredible strength!"),
 	SPAN_XENOWARNING("We begin to pull on [mob]'s [limb.display_name] with incredible strength!"))
@@ -231,13 +231,13 @@
 		return FALSE
 
 	if(limb.status & (LIMB_ROBOT|LIMB_SYNTHSKIN))
-		limb.take_damage(rand(30,40), 0, 0) // just do more damage
+		limb.take_damage(rand(30, 40), 0, 0) // just do more damage
 		visible_message(SPAN_XENOWARNING("You hear [mob]'s [limb.display_name] being pulled beyond its load limits!"),
 		SPAN_XENOWARNING("[mob]'s [limb.display_name] begins to tear apart!"))
 	else
 		visible_message(SPAN_XENOWARNING("We hear the bones in [mob]'s [limb.display_name] snap with a sickening crunch!"),
 		SPAN_XENOWARNING("[mob]'s [limb.display_name] bones snap with a satisfying crunch!"))
-		limb.take_damage(rand(15,25), 0, 0)
+		limb.take_damage(rand(15, 25), 0, 0)
 		limb.fracture(100)
 	mob.last_damage_data = create_cause_data(initial(caste_type), src)
 	src.attack_log += text("\[[time_stamp()]\] <font color='red'>ripped the [limb.display_name] off of [mob.name] ([mob.ckey]) 1/2 progress</font>")
