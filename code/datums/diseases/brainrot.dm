@@ -7,7 +7,7 @@
 	cure_id = list("alkysine")
 	agent = "Cryptococcus Cosmosis"
 	affected_species = list("Human")
-	curable = 0
+	self_curing = 0
 	cure_chance = 15//higher chance to cure, since two reagents are required
 	desc = "This disease destroys the braincells, causing brain fever, brain necrosis and general intoxication."
 	severity = "Major"

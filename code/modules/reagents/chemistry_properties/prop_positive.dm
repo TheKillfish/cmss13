@@ -1194,8 +1194,6 @@
 /datum/chem_property/positive/anticarcinogenic/process_critical(mob/living/M, potency = 1)
 	M.take_limb_damage(POTENCY_MULTIPLIER_MEDIUM * potency)//Hyperactive apoptosis
 
-
-
 /datum/chem_property/positive/firepenetrating
 	name = PROPERTY_FIRE_PENETRATING
 	code = "PTR"
@@ -1212,3 +1210,23 @@
 /datum/chem_property/positive/firepenetrating/update_reagent()
 	holder.fire_penetrating = TRUE
 	..()
+
+/datum/chem_property/positive/antibiotic
+	name = PROPERTY_ANTIBIOTIC
+	code = "ABC"
+	description = "Used to combat bacterial infections."
+	rarity = PROPERTY_DISABLED
+	category = PROPERTY_TYPE_MEDICINE
+	value = 3
+	max_level = 3
+
+/datum/chem_property/positive/antibiotic/process(mob/living/mob, potency = 1)
+	for(var/datum/disease/bacterial_disease in mob.viruses)
+		if(bacterial_disease.antibiotic_cure == TRUE)
+			bacterial_disease.cure()
+
+/datum/chem_property/positive/antibiotic/process_overdose(mob/living/mob, potency = 1, delta_time)
+	mob.apply_damage(0.5 * potency * delta_time, BRUTE)
+
+/datum/chem_property/positive/antibiotic/process_critical(mob/living/mob, potency = 1)
+	mob.apply_damages(POTENCY_MULTIPLIER_HIGH * potency, POTENCY_MULTIPLIER_HIGH * potency, POTENCY_MULTIPLIER_HIGH * potency)

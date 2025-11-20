@@ -3,7 +3,7 @@
 	name = "Chemical Addiction"
 	max_stages = 4
 	cure = "Withdrawal"
-	curable = 0
+	self_curing = 0
 	agent = "Chemical Addiction"
 	affected_species = list("Human")
 	permeability_mod = 1

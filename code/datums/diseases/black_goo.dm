@@ -12,7 +12,7 @@
 	name = "Black Goo"
 	max_stages = 4
 	cure = "Anti-Zed"
-	cure_id = "antiZed"
+	cure_id = list("antiZed")
 	spread = "Bites"
 	spread_type = SPECIAL
 	affected_species = list("Human")

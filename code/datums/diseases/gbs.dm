@@ -8,7 +8,7 @@
 	cure_chance = 15//higher chance to cure, since two reagents are required
 	agent = "Gravitokinetic Bipotential SADS+"
 	affected_species = list("Human")
-	curable = 0
+	self_curing = 0
 	permeability_mod = 1
 
 /datum/disease/gbs/stage_act()

@@ -478,6 +478,7 @@
 #include "code\datums\diseases\mob_procs.dm"
 #include "code\datums\diseases\pierrot_throat.dm"
 #include "code\datums\diseases\plasmatoid.dm"
+#include "code\datums\diseases\reaper_disease.dm"
 #include "code\datums\diseases\rhumba_beat.dm"
 #include "code\datums\diseases\xeno_transformation.dm"
 #include "code\datums\diseases\advance\advance.dm"

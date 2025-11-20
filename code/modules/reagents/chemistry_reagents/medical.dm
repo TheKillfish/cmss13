@@ -425,3 +425,13 @@
 	chemclass = CHEM_CLASS_NONE
 	properties = list(PROPERTY_CRITICALSTABILIZE = 1, PROPERTY_CROSSMETABOLIZING = 2)
 	flags = REAGENT_TYPE_MEDICAL | REAGENT_NO_GENERATION
+
+/datum/reagent/medical/hadepenem
+	name = "Hadepenem"
+	id = "hadepenem"
+	description = "A specialist theta-lactam antibiotic only administerable intravenously. Used to combat Spaceacillin-resistant bacteria, however it has some severe side-effects that limits it to hospital-use only."
+	reagent_state = LIQUID
+	reagent_state = "#5b1c80"
+	chemclass = CHEM_CLASS_RARE
+	properties = list(PROPERTY_ANTIBIOTIC = 3)
+	flags = REAGENT_TYPE_MEDICAL | REAGENT_NO_GENERATION

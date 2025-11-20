@@ -248,6 +248,7 @@
 #define PROPERTY_ANTICARCINOGENIC "anti-carcinogenic"
 #define PROPERTY_UNKNOWN "unknown" //just has an OD effect
 #define PROPERTY_HEMOSITIC "hemositic"
+#define PROPERTY_ANTIBIOTIC "antibiotic"
 
 ///Legendary properties, no PROPERTY_TYPE_ANOMALOUS, only normal ones.
 #define PROPERTY_LEGENDARY_LIST list(PROPERTY_HYPERGENETIC, PROPERTY_BOOSTING, PROPERTY_REGULATING, PROPERTY_OPTIMIZED)

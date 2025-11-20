@@ -3,10 +3,10 @@
 	max_stages = 4
 	spread = "Airborne"
 	cure = "Iron"
-	cure_id = "iron"
+	cure_id = list("iron")
 	agent = "Fukkos Miracos"
 	affected_species = list("Human")
-	curable = 0
+	self_curing = 0
 	permeability_mod = 0.75
 	desc = "This disease disrupts the magnetic field of your body, making it act as if a powerful magnet. Injections of iron help stabilize the field."
 	severity = "Medium"
