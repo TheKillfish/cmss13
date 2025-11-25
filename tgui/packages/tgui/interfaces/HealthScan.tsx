@@ -365,6 +365,36 @@ const Patient = (props) => {
               Minimal UI
             </Button>
           </LabeledList.Item>
+          <LabeledList.Item label="Buffered Scans">
+            <Button
+              inline
+              style={{ marginLeft: '2%' }}
+              onClick={() => act('previous_scan')}
+            >
+              Previous
+            </Button>
+            <Button
+              inline
+              style={{ marginLeft: '2%' }}
+              onClick={() => act('print_scan')}
+            >
+              Print Scan
+            </Button>
+            <Button
+              inline
+              style={{ marginLeft: '2%' }}
+              onClick={() => act('next_scan')}
+            >
+              Next
+            </Button>
+            <Button
+              inline
+              style={{ marginLeft: '2%' }}
+              onClick={() => act('clear_scans')}
+            >
+              Clear Scans
+            </Button>
+          </LabeledList.Item>
         </LabeledList>
       )}
     </Section>
