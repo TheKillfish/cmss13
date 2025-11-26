@@ -536,7 +536,7 @@ K9 SCANNER
 	connected_to = null
 	connected_from = null
 
-	icon_state = "pve_health_scanner"
+	icon_state = "pve_health_analyzer"
 	overlays -= image(icon, src, "+pve_running")
 	overlays -= image(icon, src, "+pve_hooked")
 	overlays += image(icon, src, "+pve_unhooked")
