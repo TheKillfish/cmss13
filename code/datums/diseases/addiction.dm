@@ -1,20 +1,25 @@
 /datum/disease/addiction
-	form = "Condition"
 	name = "Chemical Addiction"
-	max_stages = 4
-	cure = "Withdrawal"
-	curable = 0
+	form = "Condition"
 	agent = "Chemical Addiction"
-	affected_species = list("Human")
-	permeability_mod = 1
-	can_carry = 0
-	spread_type = NON_CONTAGIOUS
 	desc = "Use of addictive stimulants results in physiological and psychological dependency."
 	severity = "Medium"
+
+	hidden = list(1, 1) // Hidden from med-huds and pandemic scanners
+
+	max_stages = 4
+	stage_minimum_age = 900001 // Advanced only by chemical
+
+	cure = "Withdrawal"
+
+	stage_curing = FALSE
+
+	spread_type = NON_CONTAGIOUS
+	contagious_period = 900001 // Additional safeguard to prevent spreading
+	affected_species = list("Human")
+	can_carry = FALSE
 	longevity = 1000
-	hidden = list(1, 1) //hidden from med-huds and pandemic scanners
-	contagious_period = 900001 //additional safeguard to prevent spreading
-	stage_minimum_age = 900001 // advanced only by chemical
+
 	var/addiction_progression = 1
 	var/progression_threshold = 300 //how many life() ticks it takes to advance stage. At 300, a 5 unit pill should increase progression from 0 to just below the threshold
 	var/withdrawal_progression = 0 //how long the individual has been in withdrawal

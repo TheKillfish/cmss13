@@ -1,14 +1,17 @@
 /datum/disease/fake_gbs
 	name = "GBS"
-	max_stages = 5
-	spread = "On contact"
-	spread_type = CONTACT_GENERAL
-	cure = "Sulfur"
-	cure_id = list("sulfur")
 	agent = "Gravitokinetic Bipotential SADS-"
-	affected_species = list("Human", "Monkey")
 	desc = "If left untreated death will occur."
 	severity = "Major"
+
+	max_stages = 5
+
+	cure = "Sulfur"
+	cure_id = list("sulfur")
+
+	spread = "On contact"
+	spread_type = CONTACT_GENERAL
+	affected_species = list("Human", "Monkey")
 
 /datum/disease/fake_gbs/stage_act()
 	..()

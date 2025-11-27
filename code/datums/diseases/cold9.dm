@@ -1,14 +1,21 @@
 /datum/disease/cold9
 	name = "The Cold"
-	max_stages = 3
-	spread = "On contact"
-	spread_type = CONTACT_GENERAL
-	cure = "Common Cold Anti-bodies & Spaceacillin"
-	cure_id = "spaceacillin"
 	agent = "ICE9-rhinovirus"
-	affected_species = list("Human")
 	desc = "If left untreated the subject will slow, as if partly frozen."
 	severity = "Moderate"
+
+	max_stages = 3
+
+	cure = "Spaceacillin, Self-resolving"
+	cure_id = list("spaceacillin")
+
+	self_curing = TRUE
+	self_cure_chance = 5
+	self_cure_stages = TRUE
+
+	spread = "On contact"
+	spread_type = CONTACT_GENERAL
+	affected_species = list("Human")
 
 /datum/disease/cold9/stage_act()
 	..()

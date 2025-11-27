@@ -1,14 +1,22 @@
 /datum/disease/cold
 	name = "The Cold"
-	max_stages = 3
-	spread = "Airborne"
-	cure = "Rest & Spaceacillin"
-	cure_id = "spaceacillin"
 	agent = "XY-rhinovirus"
-	affected_species = list("Human", "Monkey")
-	permeability_mod = 0.5
 	desc = "If left untreated the subject will contract the flu."
 	severity = "Minor"
+
+	max_stages = 3
+
+	cure = "Spaceacillin, Self-resolving"
+	cure_id = list("spaceacillin")
+
+	self_curing = TRUE
+	self_cure_chance = 5
+	self_cure_stages = TRUE
+
+	spread = "Airborne"
+	affected_species = list("Human", "Monkey")
+	permeability_mod = 0.5
+
 
 /datum/disease/cold/stage_act()
 	..()

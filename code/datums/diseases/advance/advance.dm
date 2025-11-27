@@ -28,10 +28,12 @@ GLOBAL_LIST_INIT(advance_cures, list(
 /datum/disease/advance
 
 	name = "Unknown" // We will always let our Virologist name our disease.
-	desc = "An engineered disease which can contain a multitude of symptoms."
 	form = "Advance Disease" // Will let med-scanners know that this disease was engineered.
 	agent = "advance microbes"
+	desc = "An engineered disease which can contain a multitude of symptoms."
+
 	max_stages = 5
+
 	spread = "Unknown"
 	affected_species = list("Human","Monkey")
 
@@ -206,7 +208,7 @@ GLOBAL_LIST_INIT(advance_cures, list(
 		// The more symptoms we have, the less transmittable it is but some symptoms can make up for it.
 		SetSpread(clamp(properties["transmittable"] - length(symptoms), BLOOD, AIRBORNE))
 		permeability_mod = max(ceil(0.4 * properties["transmittable"]), 1)
-		cure_chance = 15 - clamp(properties["resistance"], -5, 5) // can be between 10 and 20
+		stage_cure_chance = 15 - clamp(properties["resistance"], -5, 5) // can be between 10 and 20
 		stage_prob = max(properties["stage_rate"], 2)
 		SetSeverity(properties["severity"])
 		GenerateCure(properties)
