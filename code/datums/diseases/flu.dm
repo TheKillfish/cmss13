@@ -6,7 +6,7 @@
 
 	max_stages = 3
 
-	cure = "Spaceacillin & Self-resolving"
+	cure = "Spaceacillin, self-resolving"
 	cure_id = list("spaceacillin")
 
 	stage_cure_chance = 10

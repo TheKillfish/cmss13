@@ -13,7 +13,7 @@
 	agent = "Unknown Biological Organism X-65"
 	severity = "Medium"
 
-	hidden = list(1,0) //Hidden from med-huds, but not pandemic scanners.  BLOOD TESTS FOR THE WIN
+	hidden = list(1,0) // Hidden from med-huds, but not pandemic scanners.  BLOOD TESTS FOR THE WIN
 
 	max_stages = 4 // No randomness
 	stage_prob = 0

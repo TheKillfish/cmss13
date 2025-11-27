@@ -23,7 +23,8 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	var/max_stages = 0
 	var/stage_prob = 4 // Probability of advancing to next stage, default 4% per check
 	var/age = 0 // Age of the disease in the current mob
-	var/stage_minimum_age = 0 // How old the disease must be to advance per stage
+	var/stage_minimum_age = 0 // How old the disease must be to advance stage
+	var/stage_maximum_age = 240 // Ensures the disease goes up in stage once it reaches this point, to curb some of the randomness
 	var/aging_variance = STEADY_AGING // How will the disease age? Will it be steady (1 per process) or wild (more than 1 per process)?
 	var/duplicates_age_original = FALSE // If infected with a disease you are already infected by, will the existing disease have their age increased
 	var/duplicate_age_amount = 1 // Amount the disease ages if aged via duplicate instance of itself
@@ -115,7 +116,7 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	// - They don't have a/the cure in them
 	// - If applicable, a random chance for success
 	// - If applicable, the disease's age to be above a minimum
-	if(!cure_present && prob(stage_prob) && age > stage_minimum_age)
+	if(!cure_present && ((prob(stage_prob) && age > stage_minimum_age) || (age >= stage_maximum_age)))
 		stage = min(stage + 1, max_stages)
 		age = 0
 

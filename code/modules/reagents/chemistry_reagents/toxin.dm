@@ -381,4 +381,4 @@
 	color = "#c5bc81"
 	reagent_state = LIQUID
 	chemclass = CHEM_CLASS_NONE
-	properties = list(PROPERTY_TOXIC = 2, PROPERTY_CROSSMETABOLIZING = 3)
+	properties = list(PROPERTY_BIOCIDIC = 2, PROPERTY_TOXIC = 2, PROPERTY_CROSSMETABOLIZING = 3)

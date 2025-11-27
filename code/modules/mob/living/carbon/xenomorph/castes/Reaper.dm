@@ -184,6 +184,10 @@
 	var/mob/living/carbon/xenomorph/reaper/reaper = bound_xeno
 	reaper.modify_flesh_plasma(flesh_plasma_slash)
 
+	if(prob(15 * (reaper.flesh_plasma / 150)) && ishuman_strict(target_mob))
+		to_chat(reaper, SPAN_XENODANGER("We sense our claws imparted our disease to our target!"))
+		target_mob.AddDisease(new /datum/disease/reaper_disease)
+
 /datum/behavior_delegate/base_reaper/on_kill_mob()
 	var/mob/living/carbon/xenomorph/reaper/reaper = bound_xeno
 	reaper.modify_flesh_plasma(flesh_plasma_kill)

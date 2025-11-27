@@ -773,7 +773,6 @@
 
 	var/hivenumber = XENO_HIVE_NORMAL
 	var/immediate_toxin_damage = 0.5
-	var/toxin_reagent_amount = 1
 
 /obj/effect/particle_effect/smoke/reaper_mist/Initialize(mapload, amount, datum/cause_data/cause_data)
 	if(istype(cause_data))
@@ -822,8 +821,7 @@
 		affected_xeno.set_effect(2, SLOW)
 		affected_mob.apply_damage(2, OXY)
 		affected_mob.apply_damage(immediate_toxin_damage, TOX)
-		affected_mob.reagents.add_reagent("sepsicine", toxin_reagent_amount)
-		affected_mob.reagents.set_source_mob(src, /datum/reagent/toxin/sepsicine)
+		affected_mob.AddDisease(new /datum/disease/reaper_disease)
 
 		if(affected_mob.coughedtime < world.time && !affected_mob.stat)
 			affected_mob.coughedtime = world.time + 2 SECONDS
