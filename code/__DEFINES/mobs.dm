@@ -297,6 +297,13 @@
 #define SCANNER 1
 #define PANDEMIC 2
 
+// Disease aging variables
+#define STEADY_AGING 1
+#define LOW_VARIANCE 2
+#define MEDIUM_VARIANCE 3
+#define HIGH_VARIANCE 4
+#define WILD_VARIANCE 5
+
 //emote flags
 #define EMOTING_HIGH_FIVE  (1<<0)
 #define EMOTING_FIST_BUMP  (1<<1)

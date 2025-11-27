@@ -10,20 +10,26 @@
 
 /datum/disease/black_goo
 	name = "Black Goo"
-	max_stages = 4
+	agent = "Unknown Biological Organism X-65"
+	severity = "Medium"
+
+	hidden = list(1,0) //Hidden from med-huds, but not pandemic scanners.  BLOOD TESTS FOR THE WIN
+
+	max_stages = 4 // No randomness
+	stage_prob = 0
+
 	cure = "Anti-Zed"
 	cure_id = list("antiZed")
+	resistable = FALSE // Let's just say that getting cured gives immunity
+
+	stage_cure_chance = 100 // Meaning the cure will kill the virus asap
+
 	spread = "Bites"
 	spread_type = SPECIAL
 	affected_species = list("Human")
-	cure_chance = 100 //meaning the cure will kill the virus asap
-	severity = "Medium"
-	agent = "Unknown Biological Organism X-65"
-	hidden = list(1,0) //Hidden from med-huds, but not pandemic scanners.  BLOOD TESTS FOR THE WIN
 	permeability_mod = 2
-	survive_mob_death = TRUE //We want the dead to turn into zombie.
-	longevity = 500 //the virus tend to die before the dead is turn into zombie this should fix it.
-	stage_prob = 0//no randomness
+	survive_mob_death = TRUE // We want the dead to turn into zombie.
+	longevity = 500 // The virus tend to die before the dead is turn into zombie this should fix it.
 
 	/// boolean value to determine if the mob is currently transforming into a zombie.
 	var/zombie_is_transforming = FALSE
@@ -44,6 +50,7 @@
 
 /datum/disease/black_goo/stage_act()
 	..()
+
 	if(!ishuman_strict(affected_mob))
 		return
 	var/mob/living/carbon/human/infected_mob = affected_mob

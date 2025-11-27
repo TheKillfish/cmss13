@@ -1,14 +1,17 @@
 /datum/disease/gbs
 	name = "GBS"
+	agent = "Gravitokinetic Bipotential SADS+"
+
 	max_stages = 5
-	spread = "On contact"
-	spread_type = CONTACT_GENERAL
+
 	cure = "Sulfur"
 	cure_id = list("sulfur")
-	cure_chance = 15//higher chance to cure, since two reagents are required
-	agent = "Gravitokinetic Bipotential SADS+"
+
+	stage_cure_chance = 15 // Higher chance to cure, since two reagents are required
+
+	spread = "On contact"
+	spread_type = CONTACT_GENERAL
 	affected_species = list("Human")
-	self_curing = 0
 	permeability_mod = 1
 
 /datum/disease/gbs/stage_act()

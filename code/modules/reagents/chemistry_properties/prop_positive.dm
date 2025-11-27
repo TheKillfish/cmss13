@@ -1220,11 +1220,13 @@
 	value = 3
 	max_level = 3
 
+// Making changes to how diseases and this property interact, BDL
+/*
 /datum/chem_property/positive/antibiotic/process(mob/living/mob, potency = 1)
 	for(var/datum/disease/bacterial_disease in mob.viruses)
 		if(bacterial_disease.antibiotic_cure == TRUE)
 			bacterial_disease.cure()
-
+*/
 /datum/chem_property/positive/antibiotic/process_overdose(mob/living/mob, potency = 1, delta_time)
 	mob.apply_damage(0.5 * potency * delta_time, BRUTE)
 

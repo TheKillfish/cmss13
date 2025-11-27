@@ -464,7 +464,6 @@
 #include "code\datums\decorators\decorator.dm"
 #include "code\datums\decorators\gamemode_decorator.dm"
 #include "code\datums\diseases\addiction.dm"
-#include "code\datums\diseases\beesease.dm"
 #include "code\datums\diseases\black_goo.dm"
 #include "code\datums\diseases\brainrot.dm"
 #include "code\datums\diseases\cold.dm"

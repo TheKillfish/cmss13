@@ -2,15 +2,20 @@
 
 /datum/disease/xeno_transformation
 	name = "Unknown Mutagenic Disease"
+	agent = "Rip-LEY Mutagenic Microbes"
+
+	hidden = list(1, 0)
+
 	max_stages = 5
+	stage_minimum_age = 100
+
+	cure = "Unknown"
+
+	stage_cure_chance = 5
+
 	spread = "Syringe"
 	spread_type = SPECIAL
-	cure = "Unknown"
-	cure_chance = 5
-	agent = "Rip-LEY Mutagenic Microbes"
 	affected_species = list("Human")
-	hidden = list(1, 0)
-	stage_minimum_age = 100
 
 /datum/disease/xeno_transformation/stage_act()
 	..()

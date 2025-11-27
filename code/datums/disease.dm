@@ -1,9 +1,3 @@
-#define STEADY_AGING 1
-#define LOW_VARIANCE 2
-#define MEDIUM_VARIANCE 3
-#define HIGH_VARIANCE 4
-#define WILD_VARIANCE 5
-
 /*
 
 IMPORTANT NOTE: Please delete the diseases by using cure() proc or del() instruction.
@@ -20,6 +14,7 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	var/form = "Virus" // During medscans, what the disease is referred to as
 	var/agent = "some microbes"// Name of the disease agent
 	var/desc = null // Description. Leave it null and this disease won't show in med records.
+	var/severity = null // Severity description
 
 	// If hidden[1] is true, then virus is hidden from medical scanners. If hidden[2] is true, then virus is hidden from PANDEMIC machine.
 	var/list/hidden = list(0, 0)
@@ -31,18 +26,34 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	var/stage_minimum_age = 0 // How old the disease must be to advance per stage
 	var/aging_variance = STEADY_AGING // How will the disease age? Will it be steady (1 per process) or wild (more than 1 per process)?
 	var/duplicates_age_original = FALSE // If infected with a disease you are already infected by, will the existing disease have their age increased
-	var/duplicate_age_amount = 1 // If aged by a disease duplicate,
+	var/duplicate_age_amount = 1 // Amount the disease ages if aged via duplicate instance of itself
 
 	var/cure = null
-	var/cure_id = null // List of reagent.ids
-	var/cure_threshold = 1 // If equal or less than this value, the disease can cured by the cure
-	var/cure_chance = 8 // Chance for the cure to do its job
-	var/self_curing = FALSE // Can this disease cure itself?
-	var/self_cure_threshold = 1 // If equal or less than this value, the disease can cure itself at this stage
-	var/self_cure_chance = 1 // If self-curing, what is the chance it succeeds?
-	var/antibiotic_cure = FALSE // If TRUE, can be cured by reagents with PROPERTY_ANTIBIOTIC
-	var/antibiotic_level = 0 // If the potency of PROPERTY_ANTIBIOTIC is equal or higher than this, it can cure
+	var/cure_id = null // List of reagent.ids that can cure the disease
 	var/resistable = TRUE // Do cured mobs gain resistance to this disease?
+	var/antibiotic_cure = FALSE // If TRUE, we check chems for PROPERTY_ANTIBIOTIC
+	var/antibiotic_strength_needed = 0 // Chems with PROPERTY_ANTIBIOTIC are considered a valid cure if their property strength is equal or greather than this value
+
+	var/stage_curing = TRUE // If TRUE, disease is cured once it reaches a certain stage
+	var/stage_cure_stage_threshold = 1 // If the disease stage is equal or less than this value, the disease can be cured
+	var/stage_cure_chance = 8 // Chance for the cure to do its job
+	var/stage_cure_instadrop = TRUE // If TRUE, immediately drops the stage to 1 rather than go stage-by-stage like diseases of yore did
+
+	var/self_curing = FALSE // If TRUE, disease can cure itself independant of having the cure. This is seperate from stage_curing, but can be made to cure stages too
+	var/self_cure_threshold = 1 // If the disease stage is equal or less than this value, the disease can cure itself
+	var/self_cure_chance = 1 // Chance for disease to cure itself
+	var/self_cure_stages = FALSE // If TRUE, also cures stages
+
+	var/progressional_curing = FALSE // If TRUE, disease is cured over time seperately from stage curing
+	var/current_curing_progress = 0
+	var/curing_threshold = null // The amount current_curing_progress needs to reach for the disease to be cured
+	var/progression_increase = 0 // The amount of cure progression gained over time
+	var/prog_gain_rand_min = 0 // Minimum amount of variance in curing progress
+	var/prog_gain_rand_max = 0 // Maximum amount of variance in curing progress
+	var/lose_progression = FALSE // If TRUE, cure progress is lost when the cure is not present in the body
+	var/progression_decrease = 0 // The amount of cure progression lost over time. If you want it to be immediate, just make it more than curing goal
+	var/prog_loss_rand_min = 0 // Minimum amount of variance in curing loss
+	var/prog_loss_rand_max = 0 // Maximum amount of variance in curing loss
 
 	var/spread = null // Spread type description
 	var/initial_spread = null
@@ -51,14 +62,12 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	var/list/affected_species = list()
 	var/mob/living/carbon/affected_mob = null // The mob which is affected by disease.
 	var/holder = null // The atom containing the disease (mob or obj)
-	var/can_carry = TRUE // If the disease allows "carriers".
-	var/carrier = 0 // There will be a small chance that the person will be a carrier
-
+	var/can_carry = TRUE // If the disease allows "carriers"
+	var/carrier = 0 // Chance that the person will be a carrier
 	var/list/strain_data = list() // This is passed on to infectees
 	var/permeability_mod = 1// Permeability modifier coefficient.
-	var/severity = null // Severity descr
-	var/longevity = 150 // Time in "ticks" the virus stays in inanimate object (blood stains, corpses, etc). In syringes, bottles and beakers it stays infinitely.
 	var/survive_mob_death = FALSE // Whether the virus continues processing as normal when the affected mob is dead.
+	var/longevity = 150 // Time in "ticks" the virus stays in inanimate object (blood stains, corpses, etc). In syringes, bottles and beakers it stays infinitely.
 
 /datum/disease/New(process = TRUE) // Process = TRUE - Adding the object to global list. List is processed by master controller.
 	if(process)  // Diseases in list are considered active.
@@ -82,6 +91,7 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 /datum/disease/proc/stage_act()
 	var/cure_present = has_cure()
 
+	// First big-ish thing, increase the age of the disease
 	switch(aging_variance)
 		if(STEADY_AGING)
 			age += 1
@@ -94,34 +104,79 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 		if(WILD_VARIANCE)
 			age += rand(1, 10)
 
-	if(carrier && !cure_present) // If the patient is a carrier and doesn't have the cure in them, don't process further
+	// If the patient is a carrier and doesn't have the cure in them, don't process further
+	if(carrier && !cure_present)
 		return
 
-	spread = (cure_present ? "Remissive" : initial_spread) // If the cure is present, change spread
+	// Change spread name if the cure is present
+	spread = (cure_present ? "Remissive" : initial_spread)
 
-	if(!cure_present && prob(stage_prob) && age > stage_minimum_age) // Check to see if the disease can increase stage
+	// Next big-ish thing, check to see if the disease can increase stage. Requires the following:
+	// - They don't have a/the cure in them
+	// - If applicable, a random chance for success
+	// - If applicable, the disease's age to be above a minimum
+	if(!cure_present && prob(stage_prob) && age > stage_minimum_age)
 		stage = min(stage + 1, max_stages)
 		age = 0
+		affected_mob.visible_message(SPAN_BOLDANNOUNCE("AGE INCREASED"))
 
-	else if(cure_present && prob(cure_chance)) // Otherwise check to see if it can be decremented for curing
-		stage = max(stage - 1, 1)
+	// Final big-ish thing, curing methods
+	if(cure_present && stage_curing)
+		if(stage_cure_instadrop) // For replicating that legacy behavior
+			stage = 1
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("STAGE CURE INSTADROP"))
+		else
+			stage -= 1
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("STAGE CURE STAGE REDUCED"))
+		if(stage <= stage_cure_stage_threshold && prob(stage_cure_chance))
+			cure(resistable)
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("STAGE CURE COMPLETE"))
 
-	if(self_curing && stage <= self_cure_threshold && prob(self_cure_chance)) // Check for self-curing
-		cure()
-		return
+	// Progressional curing is a bit more complex than stage_curing, hence why it and stage_curing aren't under the same if statement
+	if(progressional_curing)
+		// Prevent there being an underflow
+		if(current_curing_progress < 0)
+			current_curing_progress = 0
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS UNDERFLOW PREVENTED"))
+		// Check for cure and increase progress
+		if(cure_present)
+			current_curing_progress += progression_increase + rand(prog_gain_rand_min, prog_gain_rand_max)
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS PROGRESSED"))
+		// If the cure isn't present, check if progression can be lost and then decrease
+		else if(lose_progression && current_curing_progress > 0)
+			current_curing_progress -= progression_decrease + rand(prog_loss_rand_min, prog_loss_rand_max)
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS REGRESSED"))
+		// If we are at or are over the threshold, cure
+		if(current_curing_progress >= curing_threshold)
+			cure(resistable)
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS COMPLETE"))
 
-	if(cure_present && stage <= cure_threshold && (cure_chance > 0 && prob(cure_chance))) // Check for proper curing
-		cure()
-		return
+	if(self_curing)
+		if(self_cure_stages)
+			stage -= 1
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("SELF CURE STAGE REDUCED"))
+		if(stage <= self_cure_threshold && prob(self_cure_chance))
+			cure(resistable)
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("SELF CURE COMPLETE"))
 
 /datum/disease/proc/has_cure()
-	if(!cure_id)
+	if(!cure_id && !antibiotic_cure)
 		return FALSE
 
 	var/result = FALSE
+	if(antibiotic_cure)
+		for(var/datum/reagent/potential_antibiotic in affected_mob.reagents.reagent_list)
+			if(potential_antibiotic.properties["antibiotic"])
+				var/strength = potential_antibiotic.properties["antibiotic"]
+				if(strength >= antibiotic_strength_needed)
+					result = TRUE
+					affected_mob.visible_message(SPAN_BOLDANNOUNCE("ANTIBIOTIC FOUND"))
+					break
+
 	for(var/C_id in cure_id)
 		if(affected_mob.reagents.has_reagent(C_id))
 			result = TRUE
+			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE ID FOUND"))
 			break
 
 	return result
@@ -187,7 +242,7 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 					qdel(disease) // If there are somehow two viruses of the same kind in the system, delete the other one
 
 	if(holder == affected_mob)
-		if((affected_mob.stat != DEAD) || survive_mob_death) // He's alive or disease transcends death.
+		if((affected_mob.stat != DEAD) || survive_mob_death) // He's alive or disease transcends death
 			stage_act()
 
 		else
@@ -215,9 +270,3 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	if(ishuman(affected_mob))
 		var/mob/living/carbon/human/H = affected_mob
 		H.med_hud_set_status()
-
-#undef STEADY_AGING
-#undef LOW_VARIANCE
-#undef MEDIUM_VARIANCE
-#undef HIGH_VARIANCE
-#undef WILD_VARIANCE

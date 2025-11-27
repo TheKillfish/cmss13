@@ -1,15 +1,20 @@
 /datum/disease/pierrot_throat
 	name = "Pierrot's Throat"
-	max_stages = 4
-	spread = "Airborne"
-	cure = "A whole banana."
-	cure_id = list("banana")
-	cure_chance = 75
 	agent = "H0NI<42 Virus"
-	affected_species = list("Human")
-	permeability_mod = 0.75
 	desc = "If left untreated the subject will probably drive others to insanity."
 	severity = "Medium"
+
+	max_stages = 4
+	stage_minimum_age = 100
+
+	cure = "A whole banana."
+	cure_id = list("banana")
+
+	stage_cure_chance = 75
+
+	spread = "Airborne"
+	affected_species = list("Human")
+	permeability_mod = 0.75
 	longevity = 400
 
 /datum/disease/pierrot_throat/stage_act()

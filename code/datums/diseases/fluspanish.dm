@@ -1,15 +1,21 @@
 /datum/disease/fluspanish
 	name = "Spanish inquisition Flu"
-	max_stages = 3
-	spread = "Airborne"
-	cure = "Spaceacillin & Anti-bodies to the common flu"
-	cure_id = list("spaceacillin")
-	cure_chance = 10
 	agent = "1nqu1s1t10n flu virion"
-	affected_species = list("Human")
-	permeability_mod = 0.75
 	desc = "If left untreated the subject will burn to death for being a heretic."
 	severity = "Serious"
+
+	max_stages = 3
+
+	cure = "Spaceacillin & Anti-bodies to the common flu"
+	cure_id = list("spaceacillin")
+
+	stage_cure_chance = 10
+
+	self_curing = TRUE
+
+	spread = "Airborne"
+	affected_species = list("Human")
+	permeability_mod = 0.75
 
 /datum/disease/inquisition/stage_act()
 	..()

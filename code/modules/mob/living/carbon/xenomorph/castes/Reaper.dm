@@ -258,6 +258,9 @@
 	for(var/datum/reagent/toxin/sepsicine/sepsis in carbon.reagents.reagent_list)
 		xeno.modify_flesh_plasma(flesh_plasma_from_plagued_target)
 
+	if(ishuman_strict(carbon))
+		carbon.AddDisease(new /datum/disease/reaper_disease)
+
 	shake_camera(target, 2, 1)
 	apply_cooldown()
 	return ..()
