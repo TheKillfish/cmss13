@@ -66,7 +66,7 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	var/can_carry = TRUE // If the disease allows "carriers"
 	var/carrier = 0 // Chance that the person will be a carrier
 	var/list/strain_data = list() // This is passed on to infectees
-	var/permeability_mod = 1// Permeability modifier coefficient.
+	var/permeability_mod = 1 // Permeability modifier coefficient.
 	var/survive_mob_death = FALSE // Whether the virus continues processing as normal when the affected mob is dead.
 	var/longevity = 150 // Time in "ticks" the virus stays in inanimate object (blood stains, corpses, etc). In syringes, bottles and beakers it stays infinitely.
 

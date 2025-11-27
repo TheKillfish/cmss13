@@ -1,13 +1,15 @@
 /datum/disease/rhumba_beat
 	name = "The Rhumba Beat"
+	agent = "Unknown"
+
 	max_stages = 5
-	spread = "On contact"
-	spread_type = CONTACT_GENERAL
+
 	cure = "Chick Chicky Boom!"
 	cure_id = list("phoron")
-	agent = "Unknown"
+
+	spread = "On contact"
+	spread_type = CONTACT_GENERAL
 	affected_species = list("Human")
-	permeability_mod = 1
 
 /datum/disease/rhumba_beat/stage_act()
 	..()
