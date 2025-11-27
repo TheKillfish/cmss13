@@ -118,46 +118,36 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	if(!cure_present && prob(stage_prob) && age > stage_minimum_age)
 		stage = min(stage + 1, max_stages)
 		age = 0
-		affected_mob.visible_message(SPAN_BOLDANNOUNCE("AGE INCREASED"))
 
 	// Final big-ish thing, curing methods
 	if(cure_present && stage_curing)
 		if(stage_cure_instadrop) // For replicating that legacy behavior
 			stage = 1
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("STAGE CURE INSTADROP"))
 		else
 			stage -= 1
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("STAGE CURE STAGE REDUCED"))
 		if(stage <= stage_cure_stage_threshold && prob(stage_cure_chance))
 			cure(resistable)
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("STAGE CURE COMPLETE"))
 
 	// Progressional curing is a bit more complex than stage_curing, hence why it and stage_curing aren't under the same if statement
 	if(progressional_curing)
 		// Prevent there being an underflow
 		if(current_curing_progress < 0)
 			current_curing_progress = 0
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS UNDERFLOW PREVENTED"))
 		// Check for cure and increase progress
 		if(cure_present)
 			current_curing_progress += progression_increase + rand(prog_gain_rand_min, prog_gain_rand_max)
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS PROGRESSED"))
 		// If the cure isn't present, check if progression can be lost and then decrease
 		else if(lose_progression && current_curing_progress > 0)
 			current_curing_progress -= progression_decrease + rand(prog_loss_rand_min, prog_loss_rand_max)
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS REGRESSED"))
 		// If we are at or are over the threshold, cure
 		if(current_curing_progress >= curing_threshold)
 			cure(resistable)
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE PROGRESS COMPLETE"))
 
 	if(self_curing)
 		if(self_cure_stages)
 			stage -= 1
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("SELF CURE STAGE REDUCED"))
 		if(stage <= self_cure_threshold && prob(self_cure_chance))
 			cure(resistable)
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("SELF CURE COMPLETE"))
 
 /datum/disease/proc/has_cure()
 	if(!cure_id && !antibiotic_cure)
@@ -166,17 +156,14 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 	var/result = FALSE
 	if(antibiotic_cure)
 		for(var/datum/reagent/potential_antibiotic in affected_mob.reagents.reagent_list)
-			if(potential_antibiotic.properties["antibiotic"])
-				var/strength = potential_antibiotic.properties["antibiotic"]
-				if(strength >= antibiotic_strength_needed)
+			for(var/datum/chem_property/positive/antibiotic/antibio in potential_antibiotic.properties)
+				if(antibio.level >= antibiotic_strength_needed)
 					result = TRUE
-					affected_mob.visible_message(SPAN_BOLDANNOUNCE("ANTIBIOTIC FOUND"))
 					break
 
 	for(var/C_id in cure_id)
 		if(affected_mob.reagents.has_reagent(C_id))
 			result = TRUE
-			affected_mob.visible_message(SPAN_BOLDANNOUNCE("CURE ID FOUND"))
 			break
 
 	return result
@@ -238,8 +225,7 @@ GLOBAL_LIST_INIT(diseases, typesof(/datum/disease) - /datum/disease)
 				if(IsSame(disease))
 					if(duplicates_age_original)
 						age += duplicate_age_amount
-					//error("Deleting [D.name] because it's the same as [src.name].")
-					qdel(disease) // If there are somehow two viruses of the same kind in the system, delete the other one
+					disease.cure(FALSE) // If there are somehow two viruses of the same kind in the system, delete the other one
 
 	if(holder == affected_mob)
 		if((affected_mob.stat != DEAD) || survive_mob_death) // He's alive or disease transcends death

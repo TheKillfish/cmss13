@@ -5,15 +5,14 @@
 	agent = "Clostridium xenothanati"
 	severity = "Medium"
 
-	// If hidden[1] is true, then virus is hidden from medical scanners. If hidden[2] is true, then virus is hidden from PANDEMIC machine.
 	hidden = list(1,0)
 
 	max_stages = 5
 	stage_prob = 20 // Not guaranteed to go up in stage immediately, but pretty likely
 	stage_minimum_age = 45
-	aging_variance = MEDIUM_VARIANCE // Means minimum age for stage progression will be reached between 9 to 45 seconds
+	aging_variance = MEDIUM_VARIANCE
 	duplicates_age_original = TRUE // Fighting Reaper means lots of infections, lots of infections means more rapid aging disease
-	duplicate_age_amount = 5 // Substantially more rapid aging
+	duplicate_age_amount = 10 // Substantially more rapid aging
 
 	resistable = FALSE // No immunity once you've been cured, especially since it cures itself at stage 5 (after dumping a shitload of toxins in you)
 	antibiotic_cure = TRUE // It is a bacterium, so antibiotics work
@@ -31,4 +30,4 @@
 
 	spread_type = BLOOD // Might not be the best idea to give blood transfusions if infected, unlikely as they are to ever happen
 	affected_species = list("Human") // Mayhaps I will be funny and let Xenos be afflicted later too, we'll see
-	longevity = 500 // 500 ticks, so death is no
+	longevity = 500 // 500 ticks, so death is no get-out-of-jail-free card unless CPR'd

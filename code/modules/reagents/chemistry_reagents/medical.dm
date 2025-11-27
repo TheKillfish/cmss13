@@ -356,7 +356,6 @@
 	description = "General use theta-lactam antibiotic. Prevents and cures mundane infections."
 	reagent_state = LIQUID
 	color = "#9749c4" // rgb: 200, 165, 220
-	custom_metabolism = AMOUNT_PER_TIME(1, 200 SECONDS)
 	overdose = REAGENTS_OVERDOSE
 	overdose_critical = REAGENTS_OVERDOSE_CRITICAL
 	properties = list(PROPERTY_ANTIBIOTIC = 1)
