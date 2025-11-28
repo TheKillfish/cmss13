@@ -356,9 +356,8 @@
 	description = "General use theta-lactam antibiotic. Inhibits and cures mundane bacterial infections, and even some viral infections."
 	reagent_state = LIQUID
 	color = "#9749c4" // rgb: 151, 73, 196
-	custom_metabolism = AMOUNT_PER_TIME(1, 200 SECONDS)
-	overdose = REAGENTS_OVERDOSE
-	overdose_critical = REAGENTS_OVERDOSE_CRITICAL
+	overdose = MED_REAGENTS_OVERDOSE
+	overdose_critical = MED_REAGENTS_OVERDOSE_CRITICAL
 	properties = list(PROPERTY_ANTIBIOTIC = 1)
 
 /datum/reagent/medical/ethylredoxrazine // FUCK YOU, ALCOHOL

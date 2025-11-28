@@ -1220,15 +1220,13 @@
 	value = 3
 	max_level = 3
 
-// Making changes to how diseases and this property interact, BDL
-/*
-/datum/chem_property/positive/antibiotic/process(mob/living/mob, potency = 1)
-	for(var/datum/disease/bacterial_disease in mob.viruses)
-		if(bacterial_disease.antibiotic_cure == TRUE)
-			bacterial_disease.cure()
-*/
-/datum/chem_property/positive/antibiotic/process_overdose(mob/living/mob, potency = 1, delta_time)
-	mob.apply_damage(0.5 * potency * delta_time, BRUTE)
+/datum/chem_property/positive/antibiotic/process(mob/living/user_mob, potency = 1, delta_time)
+	if(potency >= 1 && user_mob.stat != DEAD) // Stronger antibiotics have active drawbacks to dissuade immediately going into battle
+		user_mob.apply_damage(0.5 * potency * delta_time, TOX)
+		user_mob.confused = (max(user_mob.confused, 2.5 * potency))
 
-/datum/chem_property/positive/antibiotic/process_critical(mob/living/mob, potency = 1)
-	mob.apply_damages(POTENCY_MULTIPLIER_HIGH * potency, POTENCY_MULTIPLIER_HIGH * potency, POTENCY_MULTIPLIER_HIGH * potency)
+/datum/chem_property/positive/antibiotic/process_overdose(mob/living/user_mob, potency = 1, delta_time)
+	user_mob.apply_damage(0.5 * potency * delta_time, TOX)
+
+/datum/chem_property/positive/antibiotic/process_critical(mob/living/user_mob, potency = 1, delta_time)
+	user_mob.apply_damage(1 * potency * delta_time, TOX)
