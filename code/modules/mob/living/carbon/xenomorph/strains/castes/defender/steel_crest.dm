@@ -6,13 +6,13 @@
 
 	actions_to_remove = list(
 		/datum/action/xeno_action/activable/headbutt,
-		/datum/action/xeno_action/activable/fortify,
+		/datum/action/xeno_action/onclick/fortify,
 		/datum/action/xeno_action/onclick/tail_sweep,
 	)
 	actions_to_add = list(
 		/datum/action/xeno_action/activable/headbutt/steel_crest,
 		/datum/action/xeno_action/onclick/soak,
-		/datum/action/xeno_action/activable/fortify/steel_crest,
+		/datum/action/xeno_action/onclick/fortify/steel_crest,
 	)
 
 /datum/xeno_strain/steel_crest/apply_strain(mob/living/carbon/xenomorph/defender/defender)
@@ -24,7 +24,7 @@
 
 
 // Steel crest override
-/datum/action/xeno_action/activable/fortify/steel_crest/apply_modifiers(mob/living/carbon/xenomorph/xeno, fortify_state)
+/datum/action/xeno_action/onclick/fortify/steel_crest/apply_modifiers(mob/living/carbon/xenomorph/xeno, fortify_state)
 	if(fortify_state)
 		xeno.armor_deflection_buff += 10
 		xeno.armor_explosive_buff += 60
@@ -36,14 +36,14 @@
 		xeno.ability_speed_modifier -= 3
 		xeno.damage_modifier += XENO_DAMAGE_MOD_SMALL
 
-/datum/action/xeno_action/activable/fortify/proc/check_directional_armor(mob/living/carbon/xenomorph/defendy, list/damagedata)
+/datum/action/xeno_action/onclick/fortify/proc/check_directional_armor(mob/living/carbon/xenomorph/defendy, list/damagedata)
 	SIGNAL_HANDLER
 	var/projectile_direction = damagedata["direction"]
 	// If the defender is facing the projectile.
 	if(defendy.dir & REVERSE_DIR(projectile_direction))
 		damagedata["armor"] += frontal_armor
 
-/datum/action/xeno_action/activable/fortify/proc/unconscious_check()
+/datum/action/xeno_action/onclick/fortify/proc/unconscious_check()
 	SIGNAL_HANDLER
 
 	if(QDELETED(owner))

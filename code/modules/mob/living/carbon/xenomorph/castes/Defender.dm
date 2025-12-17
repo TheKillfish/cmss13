@@ -49,7 +49,7 @@
 		/datum/action/xeno_action/onclick/toggle_crest,
 		/datum/action/xeno_action/activable/headbutt,
 		/datum/action/xeno_action/onclick/tail_sweep,
-		/datum/action/xeno_action/activable/fortify,
+		/datum/action/xeno_action/onclick/fortify,
 	)
 
 	icon_xeno = 'icons/mob/xenos/castes/tier_1/defender.dmi'
@@ -96,7 +96,6 @@
 	if(bound_xeno.crest_defense && bound_xeno.health > 0)
 		bound_xeno.icon_state = "[bound_xeno.get_strain_icon()] Defender Crest"
 		return TRUE
-
 
 /datum/action/xeno_action/onclick/toggle_crest/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/xeno = owner
@@ -249,7 +248,7 @@
 	return ..()
 
 // Defender Fortify
-/datum/action/xeno_action/activable/fortify/use_ability(atom/target)
+/datum/action/xeno_action/onclick/fortify/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/xeno = owner
 	if (!istype(xeno))
 		return
@@ -270,32 +269,18 @@
 		RegisterSignal(owner, COMSIG_XENO_ENTER_CRIT, PROC_REF(unconscious_check))
 		RegisterSignal(owner, COMSIG_MOB_DEATH, PROC_REF(unconscious_check))
 		fortify_switch(xeno, TRUE)
-		if(xeno.selected_ability != src)
-			button.icon_state = "template_active"
+		button.icon_state = "template_active"
+		apply_cooldown(0.5)
 	else
 		UnregisterSignal(owner, COMSIG_XENO_ENTER_CRIT)
 		UnregisterSignal(owner, COMSIG_MOB_DEATH)
 		fortify_switch(xeno, FALSE)
-		if(xeno.selected_ability != src)
-			button.icon_state = "template_xeno"
+		button.icon_state = "template_xeno"
+		apply_cooldown()
 
-	apply_cooldown()
 	return ..()
 
-/datum/action/xeno_action/activable/fortify/action_activate()
-	. = ..()
-	..()
-	var/mob/living/carbon/xenomorph/xeno = owner
-	if(xeno.fortify && xeno.selected_ability != src)
-		button.icon_state = "template_active"
-
-/datum/action/xeno_action/activable/fortify/action_deselect()
-	..()
-	var/mob/living/carbon/xenomorph/xeno = owner
-	if(xeno.fortify)
-		button.icon_state = "template_active"
-
-/datum/action/xeno_action/activable/fortify/proc/fortify_switch(mob/living/carbon/xenomorph/xeno, fortify_state)
+/datum/action/xeno_action/onclick/fortify/proc/fortify_switch(mob/living/carbon/xenomorph/xeno, fortify_state)
 	if(xeno.fortify == fortify_state)
 		return
 
@@ -317,7 +302,7 @@
 	apply_modifiers(xeno, fortify_state)
 	xeno.update_icons()
 
-/datum/action/xeno_action/activable/fortify/proc/apply_modifiers(mob/living/carbon/xenomorph/xeno, fortify_state)
+/datum/action/xeno_action/onclick/fortify/proc/apply_modifiers(mob/living/carbon/xenomorph/xeno, fortify_state)
 	if(fortify_state)
 		xeno.armor_deflection_buff += 30
 		xeno.armor_explosive_buff += 60

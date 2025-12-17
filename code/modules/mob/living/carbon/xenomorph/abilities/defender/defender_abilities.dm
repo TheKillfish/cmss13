@@ -34,7 +34,7 @@
 	plasma_cost = 10
 	xeno_cooldown = 11 SECONDS
 
-/datum/action/xeno_action/activable/fortify
+/datum/action/xeno_action/onclick/fortify
 	name = "Fortify"
 	action_icon_state = "fortify"
 	macro_path = /datum/action/xeno_action/verb/verb_fortify
@@ -45,7 +45,7 @@
 	/// Extra armor when fortified and facing bullets.
 	var/frontal_armor = 5
 
-/datum/action/xeno_action/activable/fortify/steel_crest
+/datum/action/xeno_action/onclick/fortify/steel_crest
 	frontal_armor = 15
 
 /datum/action/xeno_action/activable/tail_stab/slam
