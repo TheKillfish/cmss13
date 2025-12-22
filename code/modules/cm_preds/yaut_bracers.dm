@@ -51,6 +51,10 @@
 	///sprite style
 	var/material
 
+/obj/item/clothing/gloves/yautja/Initialize(mapload)
+	. = ..()
+	AddComponent(/datum/component/fancy_invisibility)
+
 /obj/item/clothing/gloves/yautja/equipped(mob/user, slot)
 	. = ..()
 	if(slot == WEAR_HANDS)
@@ -264,7 +268,7 @@
 	charge = 3000
 	charge_max = 3000
 
-	cloak_alpha = 10
+	cloak_alpha = 40
 
 	var/exploding = 0
 	var/disc_timer = 0
@@ -734,7 +738,7 @@
 		return
 
 	var/mob/living/carbon/human/M = user
-	var/new_alpha = cloak_alpha
+	var/new_alpha
 
 	if(!istype(M) || M.is_mob_incapacitated())
 		return FALSE
@@ -782,9 +786,10 @@
 			playsound(M.loc, sound_to_use, 15, 1, 4)
 
 		if(!instant)
-			animate(M, alpha = new_alpha, time = 1.5 SECONDS, easing = SINE_EASING|EASE_OUT)
-		else
-			M.alpha = new_alpha
+			new_alpha = cloak_alpha
+
+		var/datum/component/fancy_invisibility/fancyinvisComp = GetComponent(/datum/component/fancy_invisibility)
+		fancyinvisComp.engage_invisibility(user, new_alpha)
 
 		var/datum/mob_hud/security/advanced/SA = GLOB.huds[MOB_HUD_SECURITY_ADVANCED]
 		SA.remove_from_hud(M)
@@ -837,6 +842,10 @@
 		sound_to_use = 'sound/effects/pred_cloakoff.ogg'
 	playsound(user.loc, sound_to_use, 15, 1, 4)
 	user.alpha = initial(user.alpha)
+
+	var/datum/component/fancy_invisibility/fancyinvisComp = GetComponent(/datum/component/fancy_invisibility)
+	fancyinvisComp.disengage_invisibility(user)
+
 	if(true_cloak)
 		user.invisibility = initial(user.invisibility)
 		user.see_invisible = initial(user.see_invisible)

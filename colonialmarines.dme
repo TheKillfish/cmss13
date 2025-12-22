@@ -437,6 +437,7 @@
 #include "code\datums\components\damage_over_time.dm"
 #include "code\datums\components\deevolve_cooldown.dm"
 #include "code\datums\components\disk_reader.dm"
+#include "code\datums\components\fancy_invisibility.dm"
 #include "code\datums\components\footstep.dm"
 #include "code\datums\components\healing_reduction.dm"
 #include "code\datums\components\id_lock.dm"
