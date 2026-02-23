@@ -34,8 +34,8 @@
 	tacklestrength_max = 5
 
 	aura_strength = 2
-	hugger_delay = 20
-	egg_cooldown = 250
+	hugger_throw_delay = 5 DECISECONDS
+	egg_cooldown = 25 SECONDS
 
 	minimum_evolve_time = 5 MINUTES
 
@@ -178,22 +178,22 @@
 		return
 
 	//target a hugger on the ground to store it directly
-	if(istype(T, /obj/item/clothing/mask/facehugger))
-		var/obj/item/clothing/mask/facehugger/F = T
-		if(isturf(F.loc) && Adjacent(F))
-			if(F.hivenumber != hivenumber)
+	if(istype(object, /obj/item/clothing/mask/facehugger))
+		var/obj/item/clothing/mask/facehugger/child = object
+		if(isturf(child.loc) && Adjacent(child))
+			if(child.hivenumber != hivenumber)
 				to_chat(src, SPAN_WARNING("That facehugger is tainted!"))
-				drop_inv_item_on_ground(F)
+				drop_inv_item_on_ground(child)
 				return
 			if(on_fire)
-				to_chat(src, SPAN_WARNING("Touching \the [F] while you're on fire would burn it!"))
+				to_chat(src, SPAN_WARNING("Touching \the [child] while you're on fire would burn it!"))
 				return
-			store_hugger(F)
+			store_hugger(child)
 			return
 
 	//target an egg morpher to top up on huggers
-	if(istype(T, /obj/effect/alien/resin/special/eggmorph))
-		var/obj/effect/alien/resin/special/eggmorph/morpher = T
+	if(istype(object, /obj/effect/alien/resin/special/eggmorph))
+		var/obj/effect/alien/resin/special/eggmorph/morpher = object
 		if(Adjacent(morpher))
 			if(morpher.linked_hive && (morpher.linked_hive.hivenumber != hivenumber))
 				to_chat(src, SPAN_WARNING("That egg morpher is tainted!"))
@@ -204,42 +204,41 @@
 			store_huggers_from_egg_morpher(morpher)
 			return
 
-	var/obj/item/clothing/mask/facehugger/F = get_active_hand()
-	if(!F) //empty active hand
+	var/obj/item/clothing/mask/facehugger/child = get_active_hand()
+	if(!child) //empty active hand
 		//if no hugger in active hand, we take one from our storage
 		if(huggers_cur <= 0)
 			to_chat(src, SPAN_WARNING("We don't have any facehuggers to use!"))
+			return
+
+		if(world.time < hugger_retrieve_timer)
+			to_chat(src, SPAN_WARNING("We must wait before retrieving another facehugger."))
 			return
 
 		if(on_fire)
 			to_chat(src, SPAN_WARNING("Retrieving a stored facehugger while we're on fire would burn it!"))
 			return
 
-		F = new(src, hivenumber)
+		child = new(src, hivenumber)
 		huggers_cur--
-		put_in_active_hand(F)
+		put_in_active_hand(child)
 		to_chat(src, SPAN_XENONOTICE("We grab one of the facehugger in our storage. Now sheltering: [huggers_cur] / [huggers_max]."))
 		update_icons()
+		hugger_retrieve_timer = world.time + 1 SECONDS
 		return
 
-	if(!istype(F)) //something else in our hand
+	if(!istype(child)) //something else in our hand
 		to_chat(src, SPAN_WARNING("We need a facehugger in our hand to throw one!"))
 		return
 
-	if(!threw_a_hugger)
-		threw_a_hugger = TRUE
-		for(var/X in actions)
-			var/datum/action/A = X
-			A.update_button_icon()
-		drop_inv_item_on_ground(F)
-		F.throw_atom(T, 4, caste.throwspeed)
-		visible_message(SPAN_XENOWARNING("\The [src] throws something towards \the [T]!"),
-			SPAN_XENOWARNING("We throw a facehugger towards \the [T]!"))
-		spawn(caste.hugger_delay)
-			threw_a_hugger = 0
-			for(var/X in actions)
-				var/datum/action/A = X
-				A.update_button_icon()
+	if(world.time >= hugger_throw_cooldown)
+		hugger_throw_cooldown = world.time + caste.hugger_throw_delay
+		update_action_buttons()
+		drop_inv_item_on_ground(child, force = TRUE)
+		child.throw_atom(object, CARRIER_HUGGER_THROW_RANGE, caste.throwspeed)
+		visible_message(SPAN_XENOWARNING("\The [src] throws something towards \the [object]!"),
+			SPAN_XENOWARNING("We throw a facehugger towards \the [object]!"))
+		addtimer(CALLBACK(src, PROC_REF(update_action_buttons)), caste.hugger_throw_delay) // no idea why hugger_throw_delay is a parent since its only really used by this file but whatever
 
 
 /datum/behavior_delegate/carrier_base
