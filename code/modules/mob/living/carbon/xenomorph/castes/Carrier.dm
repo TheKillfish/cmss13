@@ -94,7 +94,7 @@
 	var/mutable_appearance/eggsac_overlays_icon
 
 	//Carrier specific vars
-	var/threw_a_hugger = 0
+	var/hugger_retrieve_timer = 5 DECISECONDS
 
 /mob/living/carbon/xenomorph/carrier/proc/update_hugger_overlays()
 	if(!hugger_overlays_icon)
@@ -170,8 +170,8 @@
 	hugger_overlays_icon = mutable_appearance('icons/mob/xenos/overlay_effects64x64.dmi',"empty")
 	eggsac_overlays_icon = mutable_appearance('icons/mob/xenos/overlay_effects64x64.dmi',"empty")
 
-/mob/living/carbon/xenomorph/carrier/proc/throw_hugger(atom/T)
-	if(!T)
+/mob/living/carbon/xenomorph/carrier/proc/throw_hugger(atom/object)
+	if(!object)
 		return
 
 	if(!check_state())
