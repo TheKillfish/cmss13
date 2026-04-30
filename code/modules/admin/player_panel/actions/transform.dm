@@ -119,6 +119,11 @@ GLOBAL_LIST_INIT(pp_transformables, list(
 	color = "purple"
 	),
 	list(
+	name = XENO_CASTE_TERRAFORMER,
+	key = /mob/living/carbon/xenomorph/terraformer,
+	color = "purple"
+	),
+	list(
 	name = XENO_CASTE_BOILER,
 	key = /mob/living/carbon/xenomorph/boiler,
 	color = "purple"
