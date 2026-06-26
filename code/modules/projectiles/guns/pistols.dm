@@ -1209,3 +1209,110 @@ L54 service pistol
 	desc = "The standard-issue semi-automatic sidearm of the NSPA and various military forces within the Three World Empire, chambered in 9mm. Functionally comparable to the USCM’s M4A3 service pistol, this particular example has been heavily customized—featuring a dark special-alloy finish, extended barrel with an integrated compensator, and precision-tuned internals, as well as an auto-eject feature. These modifications push its performance well beyond standard service specifications."
 	icon_state = "l54_custom_alt"
 	item_state = "l54_custom_alt"
+
+//-------------------------------------------------------
+/*
+
+SO-X4 Smartpistol, the civilian IFF pistol that's inferior to the SU-6's IFF
+
+*/
+
+/obj/item/weapon/gun/pistol/sox4
+	name = "\improper SO-X4 Smartpistol"
+	desc = "A precise, electrically primed semi-auto smartpistol loaded in 9mm. Submitted to and rejected by the USCM, it has instead seen reasonable popularity on the public market for the same reason it was rejected; its integrated IFF system."
+	desc_lore = "Designed by an obscure Scandinavian company and manufactured by Armat Battlefield Systems in the 2170s, the SO-X4 wound up as a submission for the USCM's IFF Sidearm program competing against W-Y and Spearhead submissions as well as the USCM's own in-house development. \
+	While positively recieved for its use of standard 9mm ammo and magazines used by the M4 family of pistols, it was rejected from further trials due to its IFF system being of a comparatively inferior kind compared to its competitors. \
+	It survived being shuffled onto the public market were ironically its inferior IFF system proved to be a boon; cheaper to produce, easier to maintain and easier to integrate into commonly avaliable networks while remaining as reliable as more advanced systems, even if its mechanism of function is worse."
+	icon = 'icons/obj/items/weapons/guns/guns_by_faction/colony/pistols.dmi'
+	icon_state = "sox4"
+	item_state = "m4a3"
+	current_mag = /obj/item/ammo_magazine/pistol
+	flags_gun_features = GUN_AUTO_EJECTOR|GUN_CAN_POINTBLANK|GUN_ONE_HAND_WIELDED|GUN_AMMO_COUNTER
+
+	accepted_ammo = list(
+		/obj/item/ammo_magazine/pistol,
+		/obj/item/ammo_magazine/pistol/hp,
+		/obj/item/ammo_magazine/pistol/ap,
+		/obj/item/ammo_magazine/pistol/rubber,
+		/obj/item/ammo_magazine/pistol/incendiary,
+		/obj/item/ammo_magazine/pistol/penetrating,
+		/obj/item/ammo_magazine/pistol/toxin,
+	)
+
+	actions_types = list(
+		/datum/action/item_action/sox4/toggle_iff
+	)
+
+	attachable_allowed = list(
+		/obj/item/attachable/suppressor,
+		/obj/item/attachable/suppressor/sleek,
+		/obj/item/attachable/reddot,
+		/obj/item/attachable/reddot/small,
+		/obj/item/attachable/reflex,
+		/obj/item/attachable/flashlight,
+		/obj/item/attachable/compensator,
+		/obj/item/attachable/extended_barrel,
+		/obj/item/attachable/heavy_barrel,
+	)
+
+	// Whether IFF is toggled on or not, much like with Smartguns.
+	// In fact, I simply cannibalized the code from that for this.
+	var/iff_enabled = TRUE
+
+/obj/item/weapon/gun/pistol/sox4/Initialize()
+	. = ..()
+	AddElement(/datum/element/corp_label/armat)
+	AddComponent(/datum/component/iff_fire_prevention)
+
+/obj/item/weapon/gun/pistol/sox4/set_gun_attachment_offsets()
+	attachable_offset = list("muzzle_x" = 28, "muzzle_y" = 20,"rail_x" = 10, "rail_y" = 21, "under_x" = 21, "under_y" = 17, "stock_x" = 21, "stock_y" = 17)
+
+/obj/item/weapon/gun/pistol/sox4/set_gun_config_values()
+	..()
+	set_fire_delay(FIRE_DELAY_TIER_10)
+	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_6
+	accuracy_mult_unwielded = BASE_ACCURACY_MULT
+	scatter = SCATTER_AMOUNT_TIER_8
+	burst_scatter_mult = SCATTER_AMOUNT_TIER_8
+	scatter_unwielded = SCATTER_AMOUNT_TIER_8
+	damage_mult = BASE_BULLET_DAMAGE_MULT
+
+/datum/action/item_action/sox4/update_button_icon()
+	return
+
+/datum/action/item_action/sox4/toggle_iff/New(Target, obj/item/holder)
+	. = ..()
+	name = "Toggle IFF"
+	action_icon_state = "iff_toggle_on"
+	button.name = name
+	button.overlays.Cut()
+	button.overlays += image('icons/mob/hud/actions.dmi', button, action_icon_state)
+
+/datum/action/item_action/sox4/toggle_iff/action_activate()
+	. = ..()
+	var/obj/item/weapon/gun/pistol/sox4/smartpistol = holder_item
+	if(!ishuman(owner))
+		return
+	var/mob/living/carbon/human/user_mob = owner
+	if(user_mob.is_mob_incapacitated() || smartpistol.get_active_firearm(user_mob, FALSE) != holder_item)
+		return
+
+	smartpistol.toggle_iff(usr)
+	if(smartpistol.iff_enabled)
+		action_icon_state = "iff_toggle_on"
+	else
+		action_icon_state = "iff_toggle_off"
+	button.overlays.Cut()
+	button.overlays += image('icons/mob/hud/actions.dmi', button, action_icon_state)
+
+/obj/item/weapon/gun/pistol/sox4/proc/toggle_iff(mob/user)
+	to_chat(user, "[icon2html(src, usr)] You [iff_enabled? "<B>disable</b>" : "<B>enable</b>"] \the [src]'s IFF fire controller.")
+	balloon_alert(user, "[iff_enabled ? "disabled" : "enabled"] IFF")
+	playsound(loc,'sound/machines/click.ogg', 25, 1)
+	iff_enabled = !iff_enabled
+	if(iff_enabled)
+		add_bullet_trait(BULLET_TRAIT_ENTRY_ID("iff", /datum/element/bullet_trait_iff))
+		SEND_SIGNAL(src, COMSIG_GUN_ALT_IFF_TOGGLED, TRUE)
+	else
+		remove_bullet_trait("iff")
+		SEND_SIGNAL(src, COMSIG_GUN_ALT_IFF_TOGGLED, FALSE)
