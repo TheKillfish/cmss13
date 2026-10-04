@@ -149,8 +149,13 @@ GLOBAL_LIST_INIT(pp_transformables, list(
 	list(
 	name = XENO_CASTE_KING,
 	key = /mob/living/carbon/xenomorph/king,
-	color="purple"
+	color = "purple"
 	)
+	),
+	list(
+	name = XENO_CASTE_CHRONOPHAGE,
+	key = /mob/living/carbon/xenomorph/chronophage,
+	color = "purple"
 	),
 
 	"Miscellaneous" = list(

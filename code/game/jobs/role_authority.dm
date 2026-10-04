@@ -679,6 +679,8 @@ I hope it's easier to tell what the heck this proc is even doing, unlike previou
 			M = /mob/living/carbon/xenomorph/king
 		if(XENO_CASTE_DESPOILER)
 			M = /mob/living/carbon/xenomorph/despoiler
+		if(XENO_CASTE_CHRONOPHAGE)
+			M = /mob/living/carbon/xenomorph/chronophage
 	return M
 
 
